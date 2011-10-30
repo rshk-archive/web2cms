@@ -25,10 +25,8 @@ response.google_analytics_id = None
 import cms_settings
 
 response.menu = [
-    (T('Home'), False, URL('default','index'), [
-        (T('Status'), False, URL('debugging','status'), []),
-    ]),
-
+    (T('Home'), False, URL('default','index'), []),
+    
     ## Node stuff
     (T('Content'), False, URL('default','node_list'), [
         (T('List content'), False, URL('default','node_list'), []),
@@ -41,6 +39,12 @@ response.menu = [
     
     ## Administration panel
     (T('Admin'), False, URL('admin','index'), []),
+    
+    ## Development          
+    (T('Devel'), False, URL('devel','index'), [
+        (T('Status'), False, URL('devel','status'), []),
+        (T('Generate'), False, URL('devel','generate'), []),
+    ]),
     
     ]
 
