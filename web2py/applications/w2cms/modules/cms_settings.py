@@ -22,3 +22,9 @@ def list_text_formats():
     'markmin': {'label': T('Markmin')},
     'code': {'label': T('Code')},
     }
+
+cfg_parsers = {}
+
+def get_config(cfg_file, section, option, default=None):
+    """Get a configuration parameter from a configuration file"""
+    pass
