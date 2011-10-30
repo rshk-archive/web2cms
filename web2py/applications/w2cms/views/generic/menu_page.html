@@ -1,0 +1,5 @@
+{{left_sidebar_enabled=right_sidebar_enabled=False}}
+{{extend 'layout.html'}}
+
+{{if 'title' in globals():}}<h1>{{=title}}</h1>{{pass}}
+{{=MENU(menu_items)}}

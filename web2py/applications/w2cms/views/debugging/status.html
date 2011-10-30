@@ -1,0 +1,37 @@
+{{left_sidebar_enabled=right_sidebar_enabled=False}}
+{{extend 'layout.html'}}
+
+<h1>{{=T("CMS Status")}}</h1>
+
+<!-- [NOTE] --------------------------------------------------------------------
+
+This view was created for testing purposes ONLY.
+It contains a lot of bad practices, such as queries run directly
+from the view, but that's only because:
+
+1- This was the quickest way
+2- We already know this view wouldn't make into production releases!
+3- I am pretty sure HTML output is enough for debugging purposes..
+
+---------------------------------------------------------------------------- -->
+
+<h2>Nodes</h2>
+
+<ul>
+  <li>{{=T('Total nodes:')}} {{=nodes_count}}</li>
+  {{for key,val in nodes_per_type.items():}}
+  <li>{{=T('Nodes of type "%s":', key)}} {{=val}}</li>
+  {{pass}}
+</ul>
+
+<h2>Users</h2>
+
+<ul>
+    <li>{{=T('Total users:')}} {{=db(db.auth_user).count()}}</li>
+</ul>
+
+<h2>{{=T('response._vars')}}</h2>
+{{=BEAUTIFY(response._vars)}}
+
+{{block left_sidebar}}New Left Sidebar Content{{end}}
+{{block right_sidebar}}New Right Sidebar Content{{end}}

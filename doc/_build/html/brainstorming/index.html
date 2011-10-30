@@ -1,0 +1,242 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Brainstorming &mdash; web2py_cms 0.1-brainstorming documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1-brainstorming',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="web2py_cms 0.1-brainstorming documentation" href="../index.html" />
+    <link rel="prev" title="Brainstorming" href="" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="#" title="Brainstorming"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">web2py_cms 0.1-brainstorming documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="brainstorming">
+<h1>Brainstorming<a class="headerlink" href="#brainstorming" title="Permalink to this headline">¶</a></h1>
+<p>Some brainstorming about stuff to be implemented in the web2py CMS.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This page lists features that may be included in the real project,
+but at the moment this is only brainstorming stuff.</p>
+</div>
+<p>A lot of stuff is compared to Drupal or using Drupal terms, due to the author&#8217;s
+(~redShadow~) experience with that CMS.</p>
+<div class="admonition-todo admonition " id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">Make a list of stuff I&#8217;m commonly using in Drupal that would be cool to have
+implemented here.</p>
+</div>
+<div class="admonition-todo admonition " id="index-1">
+<p class="first admonition-title">Todo</p>
+<p class="last">Make a list of stuff that in Drupal is missing or not working as it should,
+but it would be useful to have.</p>
+</div>
+<div class="section" id="features">
+<h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt><strong>Different types of content</strong></dt>
+<dd>At least, <em>page</em> and <em>article</em>, but the best would be to allow plugins
+to define their own (as Drupal does).</dd>
+<dt><strong>Input formats</strong></dt>
+<dd><p class="first">As in Drupal, different formats that gets converted into HTML.</p>
+<p class="last">Example: HTML, reStructuredText, restricted HTML, bbcode (is this already
+used??), markmin (web2py-specific reST-like markup), wiki markup, ...</p>
+</dd>
+<dt><strong>Taxonomy</strong></dt>
+<dd>To manage categories, tags, etc. etc.</dd>
+<dt><strong>Users + profiles</strong></dt>
+<dd>We need users, user profiles, user roles + permissions sets, etc.</dd>
+<dt><strong>Configuration registry</strong></dt>
+<dd>Something like Drupal variables, but more advanced.
+We might also use ini files to store some configuration... ?</dd>
+<dt><strong>Plugins</strong></dt>
+<dd>We need to support plugins in order to allow extending the functionality.
+All the stuff that is not the core, must go in a plugin.</dd>
+<dt><strong>Ajax loading</strong> (Future plan)</dt>
+<dd><p class="first">Something like Facebook BigPipe, allow fetching of page components without
+actually reloading the page. This could be seen also as something like
+client-side views rendering.</p>
+<div class="last admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">We could also experiment with XML + XSL transformations in order
+to do this.</p>
+</div>
+</dd>
+<dt><strong>Web services</strong></dt>
+<dd><p class="first">We should allow the application to expose web services.</p>
+<ul class="last">
+<li><p class="first">REST is almost a must-have.</p>
+<div class="admonition-todo admonition " id="index-2">
+<p class="first admonition-title">Todo</p>
+<p class="last">Decide whether to allow also WebDAV methods (copy, move, ...)
+for some stuff or not.</p>
+</div>
+</li>
+<li><p class="first">XML-RPC can be used to expose API for particular calls that cannot be
+represented using  REST</p>
+</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="nice-stuff">
+<h2>Nice stuff<a class="headerlink" href="#nice-stuff" title="Permalink to this headline">¶</a></h2>
+<p>These are not &#8220;real&#8221; features, but nice additions that makes the
+user-experience better.</p>
+<dl class="docutils">
+<dt><strong>wysiwyg editor</strong></dt>
+<dd>Something like CKEditor; we also need some better file selector
+and custom plugins to integrate with the CMS</dd>
+<dt><strong>File browser</strong></dt>
+<dd>A proper file browser is needed in order to allow users upload and
+manipulate files.
+The only problem is setting ACLs on directories/files -&gt; how to do in a
+clean way?</dd>
+<dt><strong>Fancy javascript stuff</strong></dt>
+<dd><ul class="first last simple">
+<li>Custom widgets (extjs?)</li>
+<li>Lightbox to open images/files/links/..?</li>
+<li>Overlay for administration stuff, etc.</li>
+</ul>
+</dd>
+<dt><strong>mobile version</strong></dt>
+<dd>This may be accomplished by allowing views selection to consider also stuff
+like the user-agent, the browser window size, etc.
+Or maybe, selection could also be done by subdomain (<tt class="docutils literal"><span class="pre">example.com</span></tt> is the
+standard version, <tt class="docutils literal"><span class="pre">m.example.com</span></tt> is the mobile version,
+<tt class="docutils literal"><span class="pre">text.example.com</span></tt> is the plain-text light version, <tt class="docutils literal"><span class="pre">api.example.com</span></tt>
+is used to make REST API calls, ...)</dd>
+</dl>
+</div>
+<div class="section" id="stuff-similar-to-drupal">
+<h2>Stuff similar to Drupal<a class="headerlink" href="#stuff-similar-to-drupal" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt><strong>views</strong></dt>
+<dd><p class="first">A mechanism to create custom visualizations for content / stuff.
+This includes everything: standard pages, rss feeds, xml sitemaps, ...</p>
+<div class="last admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Views should be defined in <em>files</em>, not in the database!
+We want to keep well separated what is the structure from what is data!</p>
+</div>
+</dd>
+<dt><strong>fields</strong></dt>
+<dd><p class="first">Generate a schema for each <em>node</em>, allow definition of additional fields,
+etc...</p>
+<div class="last admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">As for views, content types and fields should be defined in configuration
+files instead that in the database</p>
+</div>
+</dd>
+<dt><strong>image manipulation</strong></dt>
+<dd>Like Drupal imagecache module, allow some image trasformation (preset-based?)
+Also find a good way to serve pre-generated static content.</dd>
+</dl>
+</div>
+<div class="section" id="useful-plugins">
+<h2>Useful plugins<a class="headerlink" href="#useful-plugins" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>OpenID</li>
+<li>Social network integration (Facebook, twitter, status.net, ...)</li>
+<li>QR Codes generation for each page</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Brainstorming</a><ul>
+<li><a class="reference internal" href="#features">Features</a></li>
+<li><a class="reference internal" href="#nice-stuff">Nice stuff</a></li>
+<li><a class="reference internal" href="#stuff-similar-to-drupal">Stuff similar to Drupal</a></li>
+<li><a class="reference internal" href="#useful-plugins">Useful plugins</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href=""
+                        title="previous chapter">Brainstorming</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/brainstorming/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="#" title="Brainstorming"
+             >previous</a> |</li>
+        <li><a href="../index.html">web2py_cms 0.1-brainstorming documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Samuele Santi &lt;redshadow@hackzine.org&gt;.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.
+    </div>
+  </body>
+</html>

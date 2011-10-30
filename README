@@ -1,0 +1,13 @@
+web2cms - web2py-based CMS
+==========================
+
+:Author: Samuele Santi <samuele@santi.co.it>
+
+This projects goal is to build web2py-based CMS.
+
+Many of the logic and terms come from the Drupal_ CMS, since I like that
+CMS/framework a lot, but I don't like PHP anymore.. 
+
+
+
+_Drupal: http://www.drupal.org

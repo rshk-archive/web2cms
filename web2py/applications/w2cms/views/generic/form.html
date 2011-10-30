@@ -1,0 +1,6 @@
+{{left_sidebar_enabled=right_sidebar_enabled=False}}
+{{extend 'layout.html'}}
+
+{{include 'generic/tabs.html'}}
+{{if 'title' in globals() and title:}}<h1>{{=title}}</h1>{{pass}}
+{{=form if 'form' in globals() else T('Undefined form')}}
