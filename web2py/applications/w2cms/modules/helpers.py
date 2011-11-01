@@ -3,7 +3,7 @@ Created on Oct 30, 2011
 @author: samu
 '''
 
-from gluon import current
+from gluon import current, URL
 
 def use_custom_view(viewname):
     """Decorator to be used to customize the view to be used

@@ -1,5 +1,44 @@
 {{left_sidebar_enabled=right_sidebar_enabled=False}}
 {{extend 'layout.html'}}
-
+{{
+if not 'layout' in globals():
+    layout='list'
+    pass
+}}
 {{if 'title' in globals():}}<h1>{{=title}}</h1>{{pass}}
-{{=MENU(menu_items)}}
+
+{{if layout=='list':}}
+    {{=MENU(menu_items)}}
+
+{{elif layout=='grid':}}
+
+    {{
+    import math
+    columns = 6
+    rows = []
+    }}
+    
+    <table style="width:100%;border-collapse:separate;border-spacing: 5px;" class="grid-menu">
+    {{for _r in range(int(math.ceil(1.0*len(menu_items)/columns))):}}
+        <tr>
+        {{for _c in range(columns):}}
+            {{try:}}
+                {{menu_item = menu_items[_r*columns+_c]}}
+            {{except IndexError:}}
+                <td></td>
+            {{else:}}
+                <td class="grid-menu-cell" style="width:{{="%.2f" % (100.0/columns)}}%;">
+                
+                <a href="{{=menu_item[2]}}" style="font-weight:bold;" title="{{=menu_item[4].get('description', '')}}">
+                <img src="{{=menu_item[4].get('icon', '')}}" alt="{{=menu_item[0]}}" /><br/>
+                {{=menu_item[0]}}
+                </a>
+                
+                </td>
+            {{pass}}
+        {{pass}}
+        </tr>
+    {{pass}}
+    </table>
+
+{{pass}}

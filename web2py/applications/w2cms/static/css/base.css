@@ -772,3 +772,22 @@ ul.tabs-menu li.web2py-menu-active a {
 	border-bottom: solid 1px #fff;
 	background: #fff;
 }
+
+/** Grid-layout menu **/
+.grid-menu-cell {
+	height:100px;
+	margin:0;
+	padding:0;
+}
+.grid-menu-cell a {
+	display: block;
+	border:solid 1px #ddd;
+	text-align:center;
+	padding:5px;
+	color: #000;
+}
+.grid-menu-cell a:hover {
+	background: #ffd;
+	text-decoration: none;
+	border-color: #555;
+}

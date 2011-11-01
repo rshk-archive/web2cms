@@ -4,3 +4,13 @@
 {{include 'generic/tabs.html'}}
 {{if 'title' in globals() and title:}}<h1>{{=title}}</h1>{{pass}}
 {{=form if 'form' in globals() else T('Undefined form')}}
+
+
+<!-- Debugging stuff. To be removed in production -->
+<hr/>
+<h2>Submitted variables</h2>
+{{=BEAUTIFY(request.vars)}}
+<h2>Accepted variables</h2>
+{{=BEAUTIFY(form.vars)}}
+<h2>Errors in form</h2>
+{{=BEAUTIFY(form.errors)}}

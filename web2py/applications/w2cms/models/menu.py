@@ -6,11 +6,11 @@
 #########################################################################
 
 response.title = "web2cms"
-response.subtitle = T('A web2py-base Content Management System')
+response.subtitle = T('A web2py-based Content Management System')
 
 ## read more at http://dev.w3.org/html5/markup/meta.name.html
 response.meta.author = 'Samuele Santi <redshadow@hackzine.org>'
-response.meta.description = 'a cool new app'
+response.meta.description = 'A web2py-based Content Management System'
 response.meta.keywords = 'web2py, python, framework'
 response.meta.generator = 'Web2py Web Framework'
 response.meta.copyright = 'Copyright (C) 2011 - Under GPLv3'
@@ -44,6 +44,7 @@ response.menu = [
     (T('Devel'), False, URL('devel','index'), [
         (T('Status'), False, URL('devel','status'), []),
         (T('Generate'), False, URL('devel','generate'), []),
+        (T('Appadmin'), False, URL('appadmin','index'), []),
     ]),
     
     ]

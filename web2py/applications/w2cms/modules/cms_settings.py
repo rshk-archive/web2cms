@@ -4,8 +4,12 @@ Created on Oct 30, 2011
 @author: samu
 '''
 
+import os
+from ConfigParser import RawConfigParser
+
 from gluon import *
 T = current.T
+from cms_exceptions import w2cSettingsException
 
 def list_node_types():
     return {
@@ -24,7 +28,24 @@ def list_text_formats():
     }
 
 cfg_parsers = {}
+cfg_dir = [
+    os.path.join(current.request.folder,'private','settings'),
+    ]
 
 def get_config(cfg_file, section, option, default=None):
     """Get a configuration parameter from a configuration file"""
-    pass
+    
+    ## Find the configuration file in the path
+    _cfg_file = None
+    for d in cfg_dir:
+        if os.path.isfile(os.path.join(d, cfg_file)):
+            _cfg_file = os.path.join(d, cfg_file)
+            break
+    if _cfg_file is None:
+        raise w2cSettingsException("Configuration file %r not found in path." % cfg_file)
+    cfp = RawConfigParser()
+    cfp.read(_cfg_file)
+    try:
+        return cfp.get(section, option)
+    except (NoSectionError, NoOptionError), e:
+        return default
