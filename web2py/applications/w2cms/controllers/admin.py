@@ -35,7 +35,14 @@ def index():
         layout='grid')
 
 def content():
-    return dict(nodes=db(db.node).select())
+    #[row.type for row in db().select(db.node.type, distinct=True, orderby=db.node.type)]
+    form = SQLFORM.factory(
+        Field('node_type', label="Node type", requires=IS_IN_SET([row.type for row in db().select(db.node.type, distinct=True, orderby=db.node.type)]))
+        )
+    return dict(
+        nodes=db(db.node).select(),
+        filter_form=form
+        )
 
 def users():
     pass

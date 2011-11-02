@@ -5,7 +5,7 @@ Created on Oct 30, 2011
 '''
 
 import os
-from ConfigParser import RawConfigParser
+from ConfigParser import RawConfigParser, NoSectionError, NoOptionError
 
 from gluon import *
 T = current.T
@@ -32,20 +32,122 @@ cfg_dir = [
     os.path.join(current.request.folder,'private','settings'),
     ]
 
-def get_config(cfg_file, section, option, default=None):
-    """Get a configuration parameter from a configuration file"""
+class CustomConfigParser(RawConfigParser):
+    def getd(self,section,option,default=None):
+        try:
+            return self.get(section,option)
+        except (NoSectionError,NoOptionError),e:
+            return default
+    
+    def getbooleand(self,section,option,default=None):
+        try:
+            return self.getboolean(section,option)
+        except (NoSectionError,NoOptionError),e:
+            return default
+        
+    def getintd(self,section,option,default=None):
+        try:
+            return self.getint(section,option)
+        except (NoSectionError,NoOptionError),e:
+            return default
+    
+    def getfloatd(self,section,option,default=None):
+        try:
+            return self.getfloat(section,option)
+        except (NoSectionError,NoOptionError),e:
+            return default
+
+class CfgManager(object):
+    filename=None
+    parser=None
+    def __init__(self, filename=None):
+        self.__dict__['filename']=filename
+        self.__dict__['parser']=RawConfigParser()
+        self.__dict__['parser'].read(filename)
+    def __getattr__(self, key):
+        if key in self.__dict__.keys():
+            return self.__dict__[key]
+        return CfgSectionManager(self.filename, self.parser, key)
+    def __setattr__(self,key,value):
+        if key in self.__dict__.keys():
+            self.__dict__[key] = value
+    def __delattr__(self,name,value):
+        pass
+
+class CfgSectionManager(object):
+    parser=None
+    section=None
+    def __init__(self,filename,parser,section):
+        self.__dict__['parser']=parser
+        self.__dict__['section']=section
+    def __getattr__(self, key):
+        if key in self.__dict__.keys():
+            return self.__dict__[key]
+        #print "=> GET %s -> %s" % (self.section,key)
+        return CfgOptionManager(self.parser,self.section,key)
+    def __setattr__(self, key, value):
+        if key in self.__dict__.keys():
+            self.__dict__[key] = value
+        #print "=> SET %s -> %s = %r" % (self.section,key,value)
+        #return CfgOptionManager(self.parser,section,key)
+        if not self.parser.has_section(self.section):
+            self.parser.add_section(self.section)
+        self.parser.set(self.section,key,value)
+        self.parser.write(open(self.filename,'w'))
+    def __delattr__(self, key):
+        #print "=> DEL %s -> %s" % (self.section,key)
+        pass
+
+class CfgOptionManager(object):
+    parser=None
+    section=None
+    option=None
+    def __init__(self,parser,section,option):
+        self.parser=parser
+        self.section=section
+        self.option=option
+    def value(self):
+        try:
+            return self.parser.get(self.section,self.option)
+        except:
+            return None
+    def __bool__(self):
+        try:
+            return self.parser.getboolean(self.section,self.option)
+        except:
+            return None
+    def __int__(self):
+        try:
+            return self.parser.getint(self.section,self.option)
+        except:
+            return None
+    def __float__(self):
+        try:
+            return self.parser.getfloat(self.section,self.option)
+        except:
+            return None
+    def __str__(self):
+        try:
+            return self.parser.get(self.section,self.option)
+        except:
+            return None
+
+def cfg_parser(cfg_file, force_reload=False):
+    if not force_reload and cfg_parsers.has_key(cfg_file):
+        return cfg_parsers[cfg_file]
     
     ## Find the configuration file in the path
     _cfg_file = None
     for d in cfg_dir:
-        if os.path.isfile(os.path.join(d, cfg_file)):
-            _cfg_file = os.path.join(d, cfg_file)
+        if os.path.isfile(os.path.join(d, "%s.ini" % cfg_file)):
+            _cfg_file = os.path.join(d, "%s.ini" % cfg_file)
             break
     if _cfg_file is None:
         raise w2cSettingsException("Configuration file %r not found in path." % cfg_file)
-    cfp = RawConfigParser()
+    
+    cfp = CustomConfigParser()
     cfp.read(_cfg_file)
-    try:
-        return cfp.get(section, option)
-    except (NoSectionError, NoOptionError), e:
-        return default
+    
+    cfg_parsers[cfg_file] = cfp
+    
+    return cfp

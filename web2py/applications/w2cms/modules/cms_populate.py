@@ -2,7 +2,21 @@
 Population functions for the CMS.
 '''
 
-def populate(table, n, default=True):
+import re, cPickle, random, datetime
+from gluon.contrib.populate import Learner, IUP, da_du_ma
+
+def populate(table, n, default=True, values=None):
+    """
+    Custom population function, for web2cms
+    
+    :param table: Table to populate
+    :param n: Amount of records to generate
+    :param default: Whether to use default value if one specified, or not
+    :param values: A list to be used to populate fields. It can be:
+        - a fixed value, used directly
+        - callable: will be called with (table, fieldname) and the
+          return value used as field value
+    """
     ell=Learner()
     #ell.learn(open('20417.txt','r').read())
     #ell.save('frequencies.pickle')
@@ -17,6 +31,15 @@ def populate(table, n, default=True):
                 continue
             elif field.type == 'id':
                 continue
+            
+            ## --- [SAMU 2011-11-01] BEGIN
+            elif values is not None and values.has_key(fieldname):
+                if callable(values[fieldname]):
+                    record[fieldname] = values[fieldname](table, fieldname)
+                else:
+                    record[fieldname]=values[fieldname]
+            ## --- END
+            
             elif default and field.default:
                 record[fieldname]=field.default
             elif field.type == 'text':

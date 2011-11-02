@@ -3,8 +3,14 @@
 
 <h1>{{=T('Administer content')}}</h1>
 
+<fieldset style="border:dashed 1px #aaa;margin-bottom:10px;" class="collapsible">
+<legend style="background:#fff;border:solid 1px #ddd;padding:0 5px;">{{=T('Filter form')}}</legend>
+{{=filter_form}}
+</fieldset>
+
 {{from gluon.sqlhtml import represent}}
 
+<div>
 {{=TABLE(
 
 THEAD(TR(
@@ -41,3 +47,4 @@ TBODY(*[TR(
 _style = 'width:100%;'
 
 )}}
+</div>
