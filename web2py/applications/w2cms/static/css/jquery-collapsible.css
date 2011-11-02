@@ -1,0 +1,52 @@
+body {
+    font-size: 12px;
+}
+fieldset, fieldset.collapsible {
+    padding: 10px;
+    margin-bottom: 1em;
+    border-color: #888;
+}
+fieldset.collapsed {
+    border-bottom-width: 0;
+    border-left-width: 0;
+    border-right-width: 0;
+    margin-bottom: 0;
+    border-color: #888;
+}
+
+legend.collapsible {
+    margin-left: 5px;
+    padding: 0 5px;
+    cursor: pointer;
+}
+legend.collapsed {
+    color: #448;
+    margin-left: 6px;
+}
+
+legend.collapsible .collapse-indicator {
+	/* position:      absolute;
+    display:        block;
+    right:          .75em;
+    top:            1.05em; IE6 only
+    width:          10px;
+    height:         10px;
+    text-indent:    -999em;
+    overflow:       hidden; */
+    position: relative;
+    top: .4em;
+    right: .2em;
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+	background: url('../images/arrows-000000.png') no-repeat 0px -100px;
+}
+legend.collapsed .collapse-indicator {
+	background-position: 0px 0px;
+}
+legend.collapsible:hover .collapse-indicator {
+	background-position: -10px -100px;
+}
+legend.collapsed:hover .collapse-indicator {
+	background-position: -10px 0px;
+}

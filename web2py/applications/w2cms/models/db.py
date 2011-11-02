@@ -7,18 +7,24 @@ from gluon.custom_import import track_changes; track_changes(True)
 ## File is released under public domain and you can use without limitations
 #########################################################################
 
-if not request.env.web2py_runtime_gae:     
-    ## if NOT running on Google App Engine use SQLite or other DB
-    db = DAL('sqlite://storage.sqlite') 
-else:
-    ## connect to Google BigTable (optional 'google:datastore://namespace')
-    db = DAL('google:datastore') 
-    ## store sessions and tickets there
-    session.connect(request, response, db = db) 
-    ## or store session in Memcache, Redis, etc.
-    ## from gluon.contrib.memdb import MEMDB
-    ## from google.appengine.api.memcache import Client
-    ## session.connect(request, response, db = MEMDB(Client()))
+from cms_settings import cfg_parser
+main_cfg = cfg_parser('cms-settings', force_reload=True)
+
+db_connection_url = main_cfg.getd('database','connection_url')
+db = DAL(db_connection_url)
+
+#if not request.env.web2py_runtime_gae:     
+#    ## if NOT running on Google App Engine use SQLite or other DB
+#    db = DAL('sqlite://storage.sqlite')
+#else:
+#    ## connect to Google BigTable (optional 'google:datastore://namespace')
+#    db = DAL('google:datastore') 
+#    ## store sessions and tickets there
+#    session.connect(request, response, db = db) 
+#    ## or store session in Memcache, Redis, etc.
+#    ## from gluon.contrib.memdb import MEMDB
+#    ## from google.appengine.api.memcache import Client
+#    ## session.connect(request, response, db = MEMDB(Client()))
 
 ## by default give a view/generic.extension to all actions from localhost
 ## none otherwise. a pattern can be 'controller/function.extension'
@@ -50,9 +56,12 @@ auth.define_tables()
 
 ## configure email
 mail=auth.settings.mailer
-mail.settings.server = 'logging' or 'smtp.gmail.com:587'
-mail.settings.sender = 'you@gmail.com'
-mail.settings.login = 'username:password'
+#mail.settings.server = 'logging' or 'smtp.gmail.com:587'
+#mail.settings.sender = 'you@gmail.com'
+#mail.settings.login = 'username:password'
+mail.settings.server = main_cfg.getd('mail','server')
+mail.settings.sender = main_cfg.getd('mail','sender')
+mail.settings.login = main_cfg.getd('mail','login')
 
 ## configure auth policy
 auth.settings.registration_requires_verification = False

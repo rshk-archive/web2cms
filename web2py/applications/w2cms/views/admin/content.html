@@ -3,12 +3,21 @@
 
 <h1>{{=T('Administer content')}}</h1>
 
-<fieldset style="border:dashed 1px #aaa;margin-bottom:10px;" class="collapsible">
-<legend style="background:#fff;border:solid 1px #ddd;padding:0 5px;">{{=T('Filter form')}}</legend>
-{{=filter_form}}
+<fieldset class="collapsible">
+<legend>{{=T('Filter form')}}</legend>
+<div>{{=filter_form}}</div>
 </fieldset>
 
 {{from gluon.sqlhtml import represent}}
+
+{{if 'description' in globals() and len(description):}}
+<fieldset class="collapsible">
+<legend>{{=T('Search query')}}</legend>
+<div>{{=TABLE(*[TR(TH(text[0]), TD(text[1])) for text in description])}}</div>
+</fieldset>
+{{pass}}
+
+<div>{{=T('Found %d nodes matching query', len(nodes))}}</div>
 
 <div>
 {{=TABLE(
@@ -48,3 +57,16 @@ _style = 'width:100%;'
 
 )}}
 </div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+	// -- Collapse collapsible fieldsets
+    $("fieldset.collapsible").collapse({'speed':'fast'});
+    
+    // -- Add blank button right of datetime fields
+    $('input.datetime').each(function(){
+    	oc = "$('#"+this.id+"').val('');return false;"
+    	$(this).after('<button class="blank-btn" onclick="'+oc+'">BLANK</button>');
+    });
+});
+</script>

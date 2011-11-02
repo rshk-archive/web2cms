@@ -1,4 +1,4 @@
-#Wed Nov 02 01:02:04 CET 2011
+#Wed Nov 02 03:34:56 CET 2011
 eclipse.preferences.version=1
 encoding//web2py/applications/admin/models/db.py=utf-8
 encoding//web2py/applications/w2cms/controllers/appadmin.py=utf-8
@@ -6,6 +6,7 @@ encoding//web2py/applications/w2cms/controllers/default.py=utf-8
 encoding//web2py/applications/w2cms/models/db.py=utf-8
 encoding//web2py/applications/w2cms/models/menu.py=utf-8
 encoding//web2py/gluon/__init__.py=utf-8
+encoding//web2py/gluon/dal.py=utf-8
 encoding//web2py/gluon/html.py=utf-8
 encoding//web2py/gluon/sqlhtml.py=utf-8
 encoding//web2py/gluon/storage.py=utf-8

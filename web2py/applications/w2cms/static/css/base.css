@@ -791,3 +791,19 @@ ul.tabs-menu li.web2py-menu-active a {
 	text-decoration: none;
 	border-color: #555;
 }
+
+button.blank-btn {
+	background: transparent url(../images/icons/blank-field.png) 0 0;
+	border:none;
+	outline:none;
+	width: 16px;
+	height: 16px;
+	overflow: hidden;
+	text-indent: -999px;
+	font-size: 0;
+	vertical-align: middle;
+	margin-left: -34px;
+}
+button.blank-btn:hover {
+	background-position: -16px 0;
+}
