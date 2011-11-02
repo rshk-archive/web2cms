@@ -32,6 +32,8 @@ cfg_dir = [
     os.path.join(current.request.folder,'private','settings'),
     ]
 
+
+########## WORK IN PROGRESS BEGIN ##############################################
 class CustomConfigParser(RawConfigParser):
     def getd(self,section,option,default=None):
         try:
@@ -57,6 +59,7 @@ class CustomConfigParser(RawConfigParser):
         except (NoSectionError,NoOptionError),e:
             return default
 
+##### WORK IN PROGRESS
 class CfgManager(object):
     filename=None
     parser=None
@@ -74,6 +77,7 @@ class CfgManager(object):
     def __delattr__(self,name,value):
         pass
 
+##### WORK IN PROGRESS
 class CfgSectionManager(object):
     parser=None
     section=None
@@ -98,6 +102,7 @@ class CfgSectionManager(object):
         #print "=> DEL %s -> %s" % (self.section,key)
         pass
 
+##### WORK IN PROGRESS
 class CfgOptionManager(object):
     parser=None
     section=None
@@ -131,6 +136,8 @@ class CfgOptionManager(object):
             return self.parser.get(self.section,self.option)
         except:
             return None
+########## WORK IN PROGRESS END ################################################
+
 
 def cfg_parser(cfg_file, force_reload=False):
     if not force_reload and cfg_parsers.has_key(cfg_file):
