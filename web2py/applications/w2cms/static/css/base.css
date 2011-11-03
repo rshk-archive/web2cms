@@ -172,7 +172,7 @@ html { overflow-y: scroll; }
 /* Accessible focus treatment: people.opera.com/patrickl/experiments/keyboard/test */
 a:hover, a:active { outline: none; }
 
-a { color: #275b90 }
+a { color: #275b90; }
 
 ul, ol { margin-left: 1.8em; }
 ol { list-style-type: decimal; }
@@ -382,7 +382,8 @@ h6 {font-size: 0.8em;}
 #header h1 {  padding: 1.33em 0.66em 0.66em 0.66em; }
 #container, #header, #page, #content, #statusbar,
 #footer, #wrapper { display:block; line-height: 170%}
-#wrapper {width: 900px;}
+#wrapper, body.fixed-width #wrapper { width: 960px; }
+body.fluid-width #wrapper {width:95%;}
 #container {
     margin: 0 auto;
     padding: 0;
@@ -806,4 +807,82 @@ button.blank-btn {
 }
 button.blank-btn:hover {
 	background-position: -16px 0;
+}
+
+/* .block .block-admin-links{
+	display: none;
+	margin-right: 0;
+	margin-left: 0;
+	float: right;
+	background: #fff;
+	opacity:.8;
+	padding:3px;
+	border: solid 1px #888;
+}
+.block:hover .block-admin-links{
+    display: block;
+}
+.block .block-admin-links ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+.block .block-admin-links ul li {
+	display: inline;
+} */
+
+/*** NODE THEMING ***/
+
+.node.node-teaser {
+	border: solid 1px #ddd;
+	margin-bottom: 10px;
+	padding: 5px;
+}
+
+/*** NODE CALENDAR ***/
+
+.node-calendar {
+	float:right;
+	display: block;
+	width: 60px;
+	border: solid 1px #888;
+	text-align: center;
+	background: #fff;
+}
+.node-calendar .node-calendar-month {
+	font-size: .6em;
+}
+.node-calendar .node-calendar-day {
+    font-size: 2em;
+}
+.node-calendar .node-calendar-year {
+    font-size: .8em;
+}
+
+.node-title a {
+	color: #444;
+}
+.node-title a:hover {
+	text-decoration: none;
+	color: #777;
+}
+
+/** PAGER **/
+.pager-container {
+	text-align: center;
+}
+ul.pager {
+	list-style: none;
+	padding: 0;
+}
+ul.pager li {
+	display: inline;
+}
+ul.pager li a {
+	padding:3px;
+}
+ul.pager li a.current {
+	/* background: #275b90;
+	color: #fff; */
+	font-weight: bold;
 }

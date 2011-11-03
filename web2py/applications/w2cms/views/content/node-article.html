@@ -1,0 +1,14 @@
+<div class="node {{='node-teaser' if teaser else 'node-full'}} node-type-{{=node.type}}">
+<div class="node-calendar">
+    <div class="node-calendar-month">{{=node.created.strftime("%B")}}</div>
+    <div class="node-calendar-day">{{=node.created.strftime("%-d")}}</div>
+    <div class="node-calendar-year">{{=node.created.strftime("%Y")}}</div>
+</div>
+
+{{if teaser:}}
+<h2 class="node-title">{{=A(node.title, _href=URL('default', 'view', args=['node', node.id]))}}</h2>
+{{else:}}
+<h2 class="node-title">{{=node.title}}</h2>
+{{pass}}
+<div>{{=node.body}}</div>
+</div>

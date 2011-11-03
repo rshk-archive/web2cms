@@ -1,0 +1,11 @@
+{{left_sidebar_enabled=right_sidebar_enabled=False}}
+{{body_classes='fluid-width'}}
+{{extend 'layout.html'}}
+
+<h1>{{=(request.args(0) or 'Database administration')}}</h1>
+{{if request.args(0):}}
+    {{=SQLFORM.smartgrid(db[request.args(0)])}}
+{{else:}}
+    Tables:<br/>
+    {{=UL(*[LI(A(x, _href=URL(request.controller,request.function,args=[x]))) for x in db.tables])}}
+{{pass}}

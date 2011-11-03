@@ -115,8 +115,20 @@ db.node.body_format.requires = IS_IN_SET(
 db.node.created.requires = IS_DATETIME(T('%Y-%m-%d %H:%M:%S'))    
 db.node.updated.requires = IS_DATETIME(T('%Y-%m-%d %H:%M:%S'))
 db.node.author.requires = IS_IN_DB(db, db.auth_user.id, '%(first_name)s %(last_name)s [#%(id)d]')
-db.node.author.represent = lambda x: '%(first_name)s %(last_name)s' % x
+db.node.author.represent = lambda x,y=None: '%(first_name)s %(last_name)s' % x
 db.node.weight.requires = IS_INT_IN_RANGE(-50, 50)
+
+## Table: block ================================================================
+db.define_table(
+    'block',
+    Field('type', 'string', length=128, required=True, default='custom'),
+    Field('title', 'string', length=256, required=True, requires=IS_NOT_EMPTY()),
+    Field('body', 'text'),
+    Field('body_format', 'string', length=256),
+    Field('weight', 'integer', default=0),
+    Field('region', 'string', length=128),
+    )
+
 
 ## Table: variable =============================================================
 ## Used to store configuration variables, as pickled values

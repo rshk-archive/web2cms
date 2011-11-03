@@ -203,3 +203,95 @@ def node_list():
 def node_search():
     """Content search page"""
     pass
+
+def view():
+    """Expose visualizations of content, in a way similar to what
+    Drupal views does.
+    
+    .. NOTE::
+        At the moment, all the code needed to generate views is temporarily
+        here. Then, in the future, we'll find a way to move it to
+        configuration files. Problem is how to define possibly complex
+        database queries in a flexible way inside configuration files.
+        
+        @todo: find a way to represent and parse ldap-like search filters
+    """
+    
+    view_name = request.args(0)
+    view_args = request.args[1:]
+    view_vars = request.vars
+    
+    if view_name == 'blog':
+        ## Return paginated list of articles
+        articles_per_page = 5
+        page_id = int(view_vars.get('page', 0))
+        
+        blog_nodes = db(db.node.type=='article')
+        
+        _first_node = articles_per_page * page_id
+        _last_node = _first_node + articles_per_page
+        
+        nodes = blog_nodes.select(
+            db.node.ALL,
+            orderby=~db.node.created|db.node.title,
+            limitby=(_first_node, _last_node))
+        nodes_count = blog_nodes.count()
+        
+        return response.render(
+            'content/page-blog.%s' % request.extension,
+            dict(nodes=nodes,
+                 nodes_count=nodes_count,
+                 page_id=page_id,
+                 articles_per_page=articles_per_page,
+                 ))
+
+#def get_page_content():
+#    import cgi
+#    req_path = request.vars.get('path')
+#    items = req_path.split('?', 1)
+#    path = filter(None, items[0].split('/'))
+#    vars = {}
+#    if len(items) > 1:
+#        for k,v in cgi.parse_qsl(items[1]):
+#            vars[k] = v
+#    
+#    if len(path) < 3:
+#        pass ## Cannot serve page
+#    
+#    content = "page not found: %r" % path
+#    
+#    if path[0] == request.application \
+#        and path[1] == 'default' \
+#        and path[2] == 'view' \
+#        and path[3] == 'blog':
+#        
+#        view_vars = vars
+#        
+#        ## Return paginated list of articles
+#        articles_per_page = 5
+#        page_id = int(view_vars.get('page', 0))
+#        
+#        blog_nodes = db(db.node.type=='article')
+#        
+#        _first_node = articles_per_page * page_id
+#        _last_node = _first_node + articles_per_page
+#        
+#        nodes = blog_nodes.select(
+#            db.node.ALL,
+#            orderby=~db.node.created|db.node.title,
+#            limitby=(_first_node, _last_node))
+#        nodes_count = blog_nodes.count()
+#        
+#        content = "AASDFASDASDASDASDASDASD"
+#        
+#        content = response.render(
+#            'content/page-blog_content.html',
+#            dict(nodes=nodes,
+#                 nodes_count=nodes_count,
+#                 page_id=page_id,
+#                 articles_per_page=articles_per_page,
+#                 render_full_page=False,
+#                 ))
+#    
+#    return dict(content=content)
+

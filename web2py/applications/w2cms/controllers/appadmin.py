@@ -37,11 +37,17 @@ if (request.application=='admin' and not session.authorized) or \
 
 ignore_rw = True
 response.view = 'appadmin.html'
-response.menu = [[T('design'), False, URL('admin', 'default', 'design',
-                 args=[request.application])], [T('db'), False,
-                 URL('index')], [T('state'), False,
-                 URL('state')], [T('cache'), False,
-                 URL('ccache')]]
+response.menu.append((T('Appadmin'), False, None, [
+                [T('design'), False, URL('admin', 'default', 'design', args=[request.application])],
+                [T('db'), False, URL('index')],
+                [T('state'), False, URL('state')],
+                [T('cache'), False, URL('ccache')],
+                ]))
+#response.menu = [[T('design'), False, URL('admin', 'default', 'design',
+#                 args=[request.application])], [T('db'), False,
+#                 URL('index')], [T('state'), False,
+#                 URL('state')], [T('cache'), False,
+#                 URL('ccache')]]
 
 # ##########################################################
 # ## auxiliary functions

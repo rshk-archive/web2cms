@@ -17,16 +17,19 @@ admin_menu = [
     (T('Files'), False, URL('admin','files'), [],
         {'icon': URL('static', 'images/icons/folder.png'),
          'description': 'Use the web file manager to administer uploaded files.'}),
+    (T('Database'), False, URL('admin', 'dbadmin'), [],
+        {'icon':URL('static','images/icons/server-database.png'),
+         'description':T('Administer database')})
 ]
 
 @use_custom_view('generic/menu_page')
 def index():
     links = admin_menu[:]
     
-    for i in xrange(8):
-        links.append((T('Fake %d', i), False, URL('admin','fake_page'), [],
-            {'icon': URL('static', 'images/icons/folder.png'),
-             'description' : 'Just a fake menu item, #%d' % i,}))
+#    for i in xrange(8):
+#        links.append((T('Fake %d', i), False, URL('admin','fake_page'), [],
+#            {'icon': URL('static', 'images/icons/folder.png'),
+#             'description' : 'Just a fake menu item, #%d' % i,}))
     
     
     return dict(
@@ -116,3 +119,6 @@ def users():
 
 def files():
     pass
+
+def dbadmin():
+    return dict()
