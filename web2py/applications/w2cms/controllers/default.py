@@ -76,6 +76,7 @@ def data():
 #helpers.response = response
 
 import helpers
+from helpers import use_custom_view
 
 def _node_load(node_id):
     """Load a node from database.
@@ -143,13 +144,13 @@ def node_create():
             (T('Create "%s" node', type_def['label']), False, URL('default','node_create',args=[node_type]), [])
             for node_type, type_def in cms_settings.list_node_types().items()
         ]
-        response.view = 'generic/menu_page.'+request.extension
+        response.view = 'generic/menu_page.%s' % request.extension
         return dict(
             title=T('Create content'),
             menu_items=menu_items,
             )
     
-@helpers.use_custom_view('generic/form')
+@use_custom_view('generic/form')
 def node_update():
     """Node update form"""
     try:
@@ -178,7 +179,7 @@ def node_read():
             tabs=_node_menu(node.id),
             )
 
-@helpers.use_custom_view('generic/form')
+@use_custom_view('generic/form')
 def node_delete():
     """Node deletion confirm form.
     
@@ -204,6 +205,8 @@ def node_search():
     """Content search page"""
     pass
 
+from cms_views import render_view
+
 def view():
     """Expose visualizations of content, in a way similar to what
     Drupal views does.
@@ -221,77 +224,26 @@ def view():
     view_args = request.args[1:]
     view_vars = request.vars
     
-    if view_name == 'blog':
-        ## Return paginated list of articles
-        articles_per_page = 5
-        page_id = int(view_vars.get('page', 0))
-        
-        blog_nodes = db(db.node.type=='article')
-        
-        _first_node = articles_per_page * page_id
-        _last_node = _first_node + articles_per_page
-        
-        nodes = blog_nodes.select(
-            db.node.ALL,
-            orderby=~db.node.created|db.node.title,
-            limitby=(_first_node, _last_node))
-        nodes_count = blog_nodes.count()
-        
-        return response.render(
-            'content/page-blog.%s' % request.extension,
-            dict(nodes=nodes,
-                 nodes_count=nodes_count,
-                 page_id=page_id,
-                 articles_per_page=articles_per_page,
-                 ))
+    data = render_view(view_name, view_args, view_vars, db)
+    if data.has_key('_view'):
+        response.view = data['_view']
+    return data
 
-#def get_page_content():
-#    import cgi
-#    req_path = request.vars.get('path')
-#    items = req_path.split('?', 1)
-#    path = filter(None, items[0].split('/'))
-#    vars = {}
-#    if len(items) > 1:
-#        for k,v in cgi.parse_qsl(items[1]):
-#            vars[k] = v
-#    
-#    if len(path) < 3:
-#        pass ## Cannot serve page
-#    
-#    content = "page not found: %r" % path
-#    
-#    if path[0] == request.application \
-#        and path[1] == 'default' \
-#        and path[2] == 'view' \
-#        and path[3] == 'blog':
-#        
-#        view_vars = vars
-#        
-#        ## Return paginated list of articles
-#        articles_per_page = 5
-#        page_id = int(view_vars.get('page', 0))
-#        
-#        blog_nodes = db(db.node.type=='article')
-#        
-#        _first_node = articles_per_page * page_id
-#        _last_node = _first_node + articles_per_page
-#        
-#        nodes = blog_nodes.select(
-#            db.node.ALL,
-#            orderby=~db.node.created|db.node.title,
-#            limitby=(_first_node, _last_node))
-#        nodes_count = blog_nodes.count()
-#        
-#        content = "AASDFASDASDASDASDASDASD"
-#        
-#        content = response.render(
-#            'content/page-blog_content.html',
-#            dict(nodes=nodes,
-#                 nodes_count=nodes_count,
-#                 page_id=page_id,
-#                 articles_per_page=articles_per_page,
-#                 render_full_page=False,
-#                 ))
-#    
-#    return dict(content=content)
+@use_custom_view('generic/form')
+def comment_create():
+    """Comment creation form"""
+    
+    if len(request.args) >= 2:
+        ## We need object_type,object_delta to create comment
+        ##@todo: check that the object we are commenting exists and is commentable!!
+        db.comment.object_type.default=request.args[0]
+        db.comment.object_delta.default=request.args[1]
+        return dict(
+            title=T('Add comment'),
+            form=crud.create(db.comment),
+            )
+    else:
+        raise HTTP(404)
+        
+
 

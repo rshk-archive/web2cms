@@ -1,0 +1,59 @@
+{{teaser=globals().get('teaser',False)}}
+{{comments_enabled = True}}
+{{from gluon.sqlhtml import represent}}
+<article class="node {{='node-teaser' if teaser else 'node-full'}} node-type-{{=node.type}}">
+    <header>
+		{{#@todo: Read the list of nodes for which to show calendar from configuration}}
+		{{if node.type in ['article']:}}
+		<div class="node-calendar">
+		    <div class="node-calendar-month">{{=node.created.strftime("%B")}}</div>
+		    <div class="node-calendar-day">{{=node.created.strftime("%-d")}}</div>
+		    <div class="node-calendar-year">{{=node.created.strftime("%Y")}}</div>
+		</div>
+		{{pass}}
+	
+		{{if teaser:}}
+		<h2 class="node-title">{{=A(node.title, _href=URL('default', 'view', args=['node', node.id]))}}</h2>
+		{{else:}}
+		<h1 class="node-title">{{=node.title}}</h1>
+		{{pass}}
+		
+		<time pubdate datetime="{{=node.created.strftime('%FT%T')}}"></time>
+		
+		<div class="submitted">
+		{{=XML(T('Submitted by %(author)s on %(date)s', dict(
+		    author = A(represent(db.node.author, node.author, node), _href=URL('default', 'user_profile', args=[node.author])),
+		    date = represent(db.node.created, node.created, node),
+		)))}}
+		</div>
+		
+		{{if node.created != node.updated:}}
+		<div class="updated">
+        ({{=T('Last update on %(date)s', dict(date=represent(db.node.updated, node.updated, node)))}})
+        </div>
+        {{pass}}
+		
+    </header>
+
+    <div class="node-body">
+        {{=node.body}}
+    </div>
+
+    <footer>
+	    <nav>
+	       <ul>
+	           <li>{{=A(T('Edit'), _href=URL('default','node_update',args=[node.id]))}}</li>
+	           <li>{{=A(T('Add comment'), _href=URL('default','comment_create',args=['node', node.id]))}}</li>
+	       </ul>
+	    </nav>
+    </footer>
+
+	{{if (not teaser) and comments_enabled:}}
+	{{from helpers import get_comments}}
+	{{comments=get_comments(db, 'node', str(node.id))}}
+	{{include 'content/comment-list.html'}}
+	{{pass}}
+	
+	
+
+</article>

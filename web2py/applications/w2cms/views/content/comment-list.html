@@ -1,0 +1,8 @@
+{{if comments:}}
+<section>
+    <h2>{{=T('Comments')}}</h2>
+    {{for comment in comments:}}
+    {{include 'content/comment.html'}}
+    {{pass}}
+</section>
+{{pass}}

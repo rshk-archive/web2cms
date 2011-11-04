@@ -2,12 +2,15 @@
 
 <!-- LIST OF NODES -->
 {{for node in nodes:}}
-{{=XML(response.render('content/node-article.html', dict(node=node, teaser=True)))}}
+{{#=XML(response.render('content/node.html', dict(node=node, teaser=True)))}}
+{{teaser=True}}
+{{include 'content/node.html'}}
 {{pass}}
 
 <!-- PAGER -->
 {{
 def url_to_page(page_id):
+    """Generate link to the ``page_id``th page of the current URL"""
     _vars = request.vars.copy()
     _vars['page'] = page_id
     return URL(
@@ -24,7 +27,7 @@ def url_to_page(page_id):
 import math
 pages_count = int(math.ceil(1.0 * nodes_count / articles_per_page))
 }}
-<div class="pager-container">
+<nav class="pager-container">
 <ul class="pager">
     {{if page_id > 0:}}
     <li>{{=A(T('first'), _href=url_to_page(0))}}</li>
@@ -38,59 +41,7 @@ pages_count = int(math.ceil(1.0 * nodes_count / articles_per_page))
     <li>{{=A(T('last'), _href=url_to_page(pages_count-1))}}</li>
     {{pass}}
 </ul>
-</div>
+</nav>
 {{pass}}
 
 
-<!-- DEBUG -->
-<!-- nodes_count={{=nodes_count}}<br/>
-page_id={{=page_id}}<br/>
-articles_per_page={{=articles_per_page}}<br/> -->
-
-{{if False:}}
-<!-- TEST - AJAX LOADING OF PAGES -->
-<!-- <script>
-function dynamic_load(load_path) {
-    alert('Will load dynamically! ' + load_path);
-    new_content = $.get(
-        "{{=URL('default', 'get_page_content.json')}}",
-        {"path" : load_path},
-        function (data, textStatus, jqXHR) {
-            alert("Received data:\n\n" + data.content);
-            $('#content-region-content').html(data.content);
-            w2cms_update_links();
-        }, 'json')
-}
-
-function w2cms_update_links() {
-	// Mark as "ajax-ready"!
-    $('.pager > li > a').css('color', '#f00');
-    
-    // Convert to fragment links
-    $('.pager > li > a').each(function(){
-    	if (this._rel_load_url) return;
-        _url = $(this).url();
-        _rel_load_url = _url.attr('path') + '?' + _url.attr('query');
-        this.href='#!' + _rel_load_url;
-        this._rel_load_url = _rel_load_url;
-        $(this).click(function(){
-            dynamic_load(this._rel_load_url);
-        });
-    });
-}
-
-$(document).load(function(){alert('load');});
-$(document).ready(function(){
-    w2cms_update_links();
-    
-    // Load page if needed
-    _url = $(this).url();
-    fragment = _url.attr('fragment')
-    if (fragment.match(/^!/)) {
-        load_path = fragment.replace(/^!/, '')
-        dynamic_load(load_path);
-    }
-});
-</script>
- -->
-{{pass}}

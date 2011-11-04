@@ -1,11 +1,18 @@
 # -*- coding: utf-8 -*-
 
-from gluon.custom_import import track_changes; track_changes(True)
+## Avoid warnings from eclipse -------------------------------------------------
+if False:
+    from __fake__ import response, request, T
+    from gluon import *
 
-#########################################################################
+## Automatically track changes and reload modules ------------------------------
+from gluon.custom_import import track_changes
+track_changes(True)
+
+################################################################################
 ## This scaffolding model makes your app work on Google App Engine too
 ## File is released under public domain and you can use without limitations
-#########################################################################
+################################################################################
 
 from cms_settings import cfg_parser
 main_cfg = cfg_parser('cms-settings', force_reload=True)
@@ -30,7 +37,7 @@ db = DAL(db_connection_url)
 ## none otherwise. a pattern can be 'controller/function.extension'
 response.generic_patterns = ['*'] if request.is_local else []
 
-#########################################################################
+################################################################################
 ## Here is sample code if you need for
 ## - email capabilities
 ## - authentication (registration, login, logout, ... )
@@ -38,7 +45,7 @@ response.generic_patterns = ['*'] if request.is_local else []
 ## - services (xml, csv, json, xmlrpc, jsonrpc, amf, rss)
 ## - old style crud actions
 ## (more options discussed in gluon/tools.py)
-#########################################################################
+################################################################################
 
 from gluon.tools import Auth, Crud, Service, PluginManager, prettydate
 auth = Auth(db, hmac_key=Auth.get_or_create_key()) 
@@ -73,7 +80,7 @@ auth.settings.reset_password_requires_verification = True
 #from gluon.contrib.login_methods.rpx_account import use_janrain
 #use_janrain(auth,filename='private/janrain.key')
 
-#########################################################################
+################################################################################
 ## Define your tables below (or better in another model file) for example
 ##
 ## >>> db.define_table('mytable',Field('myfield','string'))
@@ -88,7 +95,7 @@ auth.settings.reset_password_requires_verification = True
 ## >>> db.mytable.insert(myfield='value')
 ## >>> rows=db(db.mytable.myfield=='value').select(db.mytable.ALL)
 ## >>> for row in rows: print row.id, row.myfield
-#########################################################################
+################################################################################
 
 #db.auth_user.format = lambda x: '%(first_name)s %(last_name)s' % x
 
@@ -102,7 +109,7 @@ db.define_table(
     Field('type', 'string', length=128, required=True, requires=IS_NOT_EMPTY()),
     Field('title', 'string', length=256, required=True, requires=IS_NOT_EMPTY()),
     Field('body', 'text'),
-    Field('body_format', 'string', length=256),
+    Field('body_format', 'string', length=128),
     Field('created', 'datetime', default=request.now, required=True),
     Field('updated', 'datetime', update=request.now, required=True),
     Field('author', db.auth_user, default=auth.user_id, required=True),
@@ -118,17 +125,45 @@ db.node.author.requires = IS_IN_DB(db, db.auth_user.id, '%(first_name)s %(last_n
 db.node.author.represent = lambda x,y=None: '%(first_name)s %(last_name)s' % x
 db.node.weight.requires = IS_INT_IN_RANGE(-50, 50)
 
+## Table: comment ==============================================================
+db.define_table(
+    'comment',
+    
+    ## What is commented. Usually something like ('node', 20)
+    Field('object_type', 'string', length=128, required=True, requires=IS_NOT_EMPTY()),
+    Field('object_delta', 'string', length=128, required=True, requires=IS_NOT_EMPTY()),
+    
+    ## Attributes of the comment
+    Field('title', 'string', length=256),
+    Field('body', 'text'),
+    Field('body_format', 'string', length=128),
+    
+    ## Meta of the comment
+    Field('created', 'datetime', default=request.now, required=True),
+    Field('updated', 'datetime', update=request.now, required=True),
+    Field('author', db.auth_user, default=auth.user_id, required=True),
+    Field('published', 'boolean', default=True),
+    )
+
+db.comment.body_format.requires = IS_IN_SET(
+    dict([(k,v['label']) for k,v in cms_settings.list_text_formats().items()]))
+db.comment.author.requires = IS_EMPTY_OR(IS_IN_DB(db, db.auth_user.id, '%(first_name)s %(last_name)s [#%(id)d]'))
+db.comment.author.represent = lambda x,y=None: '%(first_name)s %(last_name)s' % x
+
+
 ## Table: block ================================================================
 db.define_table(
     'block',
     Field('type', 'string', length=128, required=True, default='custom'),
     Field('title', 'string', length=256, required=True, requires=IS_NOT_EMPTY()),
     Field('body', 'text'),
-    Field('body_format', 'string', length=256),
+    Field('body_format', 'string', length=128),
     Field('weight', 'integer', default=0),
     Field('region', 'string', length=128),
     )
 
+db.block.body_format.requires = IS_IN_SET(
+    dict([(k,v['label']) for k,v in cms_settings.list_text_formats().items()]))
 
 ## Table: variable =============================================================
 ## Used to store configuration variables, as pickled values

@@ -76,3 +76,11 @@ def get_region(region_name, custom_db=None, request_context=None):
             return DIV(region_content, _id=region_name)
     return ""
 
+
+def get_comments(db, obj_type, obj_delta):
+    """Get list of comments to a given object"""
+    return db(
+        (db.comment.object_type == obj_type),
+        #db.comment.object_delta == obj_delta
+        ).select(orderby=~db.comment.created)
+

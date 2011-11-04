@@ -1,0 +1,17 @@
+<article>
+	<header>
+	   <h3>{{=comment.title}}</h3>
+	   <time pubdate datetime="{{=comment.created.strftime('%FT%T')}}"></time>
+	   <div class="submitted">
+       {{=XML(T('Submitted by %(author)s on %(date)s', dict(
+           author = A(represent(db.comment.author, comment.author, comment), _href=URL('default', 'user_profile', args=[comment.author])) \
+            if comment.author else T('Not identified'),
+           date = represent(db.comment.created, comment.created, comment),
+       )))}}
+       </div>
+       {{if comment.created != comment.updated:}}
+       <div class="updated">({{=T('Last update on %(date)s', dict(date=represent(db.comment.updated, comment.updated, comment)))}})</div>
+       {{pass}}
+	</header>
+	<p>{{=comment.body}}</p>
+</article>
