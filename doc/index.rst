@@ -14,21 +14,6 @@ Contents:
    brainstorming/index
 
 
-Brainstorming
-=============
-
-Some documentation pages created while still thinking about the project
-features / goals / etc.
-
-None of this is guaranteed to find a way in the final version
-
-.. toctree::
-   :maxdepth: 2
-
-   brainstorming/index
-
-
-
 Indices and tables
 ==================
 

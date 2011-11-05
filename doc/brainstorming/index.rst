@@ -19,11 +19,20 @@ A lot of stuff is compared to Drupal or using Drupal terms, due to the author's
    but it would be useful to have.
 
 
+Contents
+========
+
+.. toctree::
+   :maxdepth: 2
+
+   component-structure
+
+
 
 Features
 ========
 
-**Different types of content**
+**Different types of content** [DONE]
   At least, *page* and *article*, but the best would be to allow plugins
   to define their own (as Drupal does).
 
@@ -35,6 +44,12 @@ Features
 
 **Taxonomy**
   To manage categories, tags, etc. etc.
+
+**Blocks**
+  Both user-defined and component-defined.
+
+**Comments**
+  Everything could potentially be commented, not only nodes.
 
 **Users + profiles**
   We need users, user profiles, user roles + permissions sets, etc.
@@ -67,6 +82,7 @@ Features
 
   - XML-RPC can be used to expose API for particular calls that cannot be
     represented using  REST
+
 
 
 Nice stuff
