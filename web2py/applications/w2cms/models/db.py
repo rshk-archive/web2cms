@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## Avoid warnings from eclipse -------------------------------------------------
-if False:
-    from __fake__ import response, request, T
-    from gluon import *
+if False: from web2py_globals import *
 
 ## Automatically track changes and reload modules ------------------------------
 from gluon.custom_import import track_changes
@@ -51,7 +49,7 @@ from gluon.tools import Auth, Crud, Service, PluginManager, prettydate
 auth = Auth(db, hmac_key=Auth.get_or_create_key()) 
 crud, service, plugins = Crud(db), Service(), PluginManager()
 
-## @see: http://www.web2py.com/book/default/chapter/08#Authorization-and-CRUD
+## @see: http://www.web2py.com/book/default/chapter/08#Authorization-and-CRUDm
 ## "Another way to implement access control is to always use CRUD
 ## (as opposed to SQLFORM) to access the database and to ask CRUD to enforce
 ## access control on database tables and records."

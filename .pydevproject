@@ -6,5 +6,6 @@
 <pydev_property name="org.python.pydev.PYTHON_PROJECT_VERSION">python 2.7</pydev_property>
 <pydev_pathproperty name="org.python.pydev.PROJECT_SOURCE_PATH">
 <path>/web2py_cms/web2py</path>
+<path>/web2py_cms/completion_sources</path>
 </pydev_pathproperty>
 </pydev_project>
