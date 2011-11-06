@@ -101,7 +101,7 @@ S'03cebfd3-e04d-4b40-94ed-f3d29a4a30b9'
 p36
 sS'_formkey[comment/None]'
 p37
-S'08d42b3b-9d07-4da1-8927-812ce92123ee'
+S'821887b5-6452-4837-bdb5-e332e9f88f7c'
 p38
 sS'_formkey[login]'
 p39
@@ -121,7 +121,7 @@ S'/w2cms/default/index'
 p46
 sS'_formkey[web2py_grid]'
 p47
-S'8b750bc6-637a-4abe-b7ef-b3a9cdc24e39'
+S'2c66a6f4-449f-4c54-841d-f7756611f792'
 p48
 sS'_formkey[node/2]'
 p49
@@ -149,6 +149,6 @@ S'cb6cba14-588f-4f99-b6c2-43f2c9a61d3a'
 p60
 sS'_web2py_grid_referrer_web2py_grid'
 p61
-S'/w2cms/admin/dbadmin/auth_permission?_signature=bdcb6eb63722a9343f0c8aa0fe2e1282402e6acf'
+S'/w2cms/admin/dbadmin/auth_user?_signature=293b88529b73a47e8132a3bd8b4c66e34e2b8f25'
 p62
 s.

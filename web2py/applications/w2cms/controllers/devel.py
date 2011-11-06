@@ -3,6 +3,7 @@ Created on Oct 30, 2011
 @author: samu
 '''
 
+@auth.requires_permission('access development tools')
 def status():
     """
     This controller just displays the current status of the CMS:
@@ -24,6 +25,7 @@ def status():
 from gluon.contrib.populate import populate
 from helpers import use_custom_view
 
+@auth.requires_permission('access development tools')
 @use_custom_view('generic/form')
 def generate():
     """Content generation function"""
