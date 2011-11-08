@@ -19158,3 +19158,7 @@
 127.0.0.1, 2011-11-07 10:58:59, GET, /admin/static/images/small_special_button.png, HTTP/1.1, 200, 0.001170
 127.0.0.1, 2011-11-07 10:58:59, GET, /admin/static/images/folder_sm.png, HTTP/1.1, 200, 0.000480
 127.0.0.1, 2011-11-07 10:58:59, GET, /admin/static/images/small_button.png, HTTP/1.1, 200, 0.000313
+127.0.0.1, 2011-11-07 11:32:03, GET, /w2cms/default/user/, HTTP/1.1, 303, 0.068154
+127.0.0.1, 2011-11-07 11:32:03, GET, /w2cms/default/user/login, HTTP/1.1, 200, 0.091731
+127.0.0.1, 2011-11-07 11:32:06, POST, /w2cms/default/user/login, HTTP/1.1, 303, 0.068353
+127.0.0.1, 2011-11-07 11:32:06, GET, /w2cms/default/index, HTTP/1.1, 200, 0.054906

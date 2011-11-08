@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Components structure &mdash; web2py_cms 0.1-brainstorming documentation</title>
+    <title>Components structure &mdash; web2py_cms 0.1-alpha documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1-brainstorming',
+        VERSION:     '0.1-alpha',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,8 +25,9 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="web2py_cms 0.1-brainstorming documentation" href="../index.html" />
+    <link rel="top" title="web2py_cms 0.1-alpha documentation" href="../index.html" />
     <link rel="up" title="Brainstorming" href="index.html" />
+    <link rel="next" title="Default content types" href="content-types.html" />
     <link rel="prev" title="Brainstorming" href="index.html" /> 
   </head>
   <body>
@@ -37,9 +38,12 @@
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
+          <a href="content-types.html" title="Default content types"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
           <a href="index.html" title="Brainstorming"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">web2py_cms 0.1-brainstorming documentation</a> &raquo;</li>
+        <li><a href="../index.html">web2py_cms 0.1-alpha documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Brainstorming</a> &raquo;</li> 
       </ul>
     </div>  
@@ -51,6 +55,11 @@
             
   <div class="section" id="components-structure">
 <h1>Components structure<a class="headerlink" href="#components-structure" title="Permalink to this headline">¶</a></h1>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The &#8220;component&#8221; term is already used for <a href="#id1"><span class="problematic" id="id2">``</span></a>LOAD()``able web2py components
+and so should be changed into something like &#8220;add-on&#8221; or &#8220;extension&#8221;.</p>
+</div>
 <p>This page describes how components should be structured and work.</p>
 <div class="section" id="what-components-should-be-able-to-do">
 <h2>What components should be able to do<a class="headerlink" href="#what-components-should-be-able-to-do" title="Permalink to this headline">¶</a></h2>
@@ -64,6 +73,32 @@
 <li>Extend the menu to attach new items</li>
 </ul>
 </div>
+<div class="section" id="how-to-read-components">
+<h2>How to read components<a class="headerlink" href="#how-to-read-components" title="Permalink to this headline">¶</a></h2>
+<p>One way might be:</p>
+<ul class="simple">
+<li>Import the component package</li>
+<li>List package members, and depending on their type, use for different
+actions.</li>
+</ul>
+<p>Example add-on module:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">## The import is needed since we don&#39;t want to eval() this..</span>
+<span class="kn">from</span> <span class="nn">cms_addons</span> <span class="kn">import</span> <span class="n">NodeDefinitionAddon</span><span class="p">,</span> <span class="n">CustomControllerAddon</span>
+
+<span class="k">class</span> <span class="nc">MyNewNode</span><span class="p">(</span><span class="n">NodeDefinitionAddon</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">define_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db</span><span class="p">):</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">define_table</span><span class="p">(</span><span class="s">&#39;mynode&#39;</span><span class="p">,</span> <span class="o">...</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">insert</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">db</span><span class="p">):</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">mynode</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">db</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">MyCustomController</span><span class="p">(</span><span class="n">CustomControllerAddon</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">my_function</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;Hello from my controller!&quot;</span>
+</pre></div>
+</div>
+</div>
 </div>
 
 
@@ -76,6 +111,7 @@
   <ul>
 <li><a class="reference internal" href="#">Components structure</a><ul>
 <li><a class="reference internal" href="#what-components-should-be-able-to-do">What components should be able to do</a></li>
+<li><a class="reference internal" href="#how-to-read-components">How to read components</a></li>
 </ul>
 </li>
 </ul>
@@ -83,6 +119,9 @@
   <h4>Previous topic</h4>
   <p class="topless"><a href="index.html"
                         title="previous chapter">Brainstorming</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="content-types.html"
+                        title="next chapter">Default content types</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../_sources/brainstorming/component-structure.txt"
@@ -112,9 +151,12 @@
           <a href="../genindex.html" title="General Index"
              >index</a></li>
         <li class="right" >
+          <a href="content-types.html" title="Default content types"
+             >next</a> |</li>
+        <li class="right" >
           <a href="index.html" title="Brainstorming"
              >previous</a> |</li>
-        <li><a href="../index.html">web2py_cms 0.1-brainstorming documentation</a> &raquo;</li>
+        <li><a href="../index.html">web2py_cms 0.1-alpha documentation</a> &raquo;</li>
           <li><a href="index.html" >Brainstorming</a> &raquo;</li> 
       </ul>
     </div>

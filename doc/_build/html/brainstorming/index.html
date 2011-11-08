@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Brainstorming &mdash; web2py_cms 0.1-brainstorming documentation</title>
+    <title>Brainstorming &mdash; web2py_cms 0.1-alpha documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.1-brainstorming',
+        VERSION:     '0.1-alpha',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="web2py_cms 0.1-brainstorming documentation" href="../index.html" />
+    <link rel="top" title="web2py_cms 0.1-alpha documentation" href="../index.html" />
     <link rel="next" title="Components structure" href="component-structure.html" />
     <link rel="prev" title="Welcome to web2py_cms’s documentation!" href="../index.html" /> 
   </head>
@@ -42,7 +42,7 @@
         <li class="right" >
           <a href="../index.html" title="Welcome to web2py_cms’s documentation!"
              accesskey="P">previous</a> |</li>
-        <li><a href="../index.html">web2py_cms 0.1-brainstorming documentation</a> &raquo;</li> 
+        <li><a href="../index.html">web2py_cms 0.1-alpha documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -59,8 +59,23 @@
 <p class="last">This page lists features that may be included in the real project,
 but at the moment this is only brainstorming stuff.</p>
 </div>
-<p>A lot of stuff is compared to Drupal or using Drupal terms, due to the author&#8217;s
-(~redShadow~) experience with that CMS.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>We need a name to define the CMS components/modules:</p>
+<ul class="last simple">
+<li><em>module</em> is already in use for Python modules</li>
+<li><em>component</em> is a dynamically loadable component, used along with LOAD()
+and <tt class="docutils literal"><span class="pre">.load</span></tt> views.</li>
+<li><em>plugin</em> is a web2py extension component, but not structured in a way
+suitable for CMS extension.</li>
+<li><em>add-on</em> or <em>extension</em> are unallocated names that might be used.</li>
+</ul>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">A lot of stuff is compared to <a class="reference external" href="http://drupal.org/">Drupal</a> or using Drupal terms, due to the author&#8217;s
+experience with that CMS.</p>
+</div>
 <div class="admonition-todo admonition " id="index-0">
 <p class="first admonition-title">Todo</p>
 <p class="last">Make a list of stuff I&#8217;m commonly using in Drupal that would be cool to have
@@ -71,12 +86,19 @@ implemented here.</p>
 <p class="last">Make a list of stuff that in Drupal is missing or not working as it should,
 but it would be useful to have.</p>
 </div>
-<div class="section" id="contents">
-<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="table-of-contents">
+<h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="component-structure.html">Components structure</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="component-structure.html#what-components-should-be-able-to-do">What components should be able to do</a></li>
+<li class="toctree-l2"><a class="reference internal" href="component-structure.html#how-to-read-components">How to read components</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="content-types.html">Default content types</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="content-types.html#page">Page</a></li>
+<li class="toctree-l2"><a class="reference internal" href="content-types.html#article">Article</a></li>
+<li class="toctree-l2"><a class="reference internal" href="content-types.html#photo">Photo</a></li>
 </ul>
 </li>
 </ul>
@@ -84,113 +106,304 @@ but it would be useful to have.</p>
 </div>
 <div class="section" id="features">
 <h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
-<dl class="docutils">
-<dt><strong>Different types of content</strong> [DONE]</dt>
-<dd>At least, <em>page</em> and <em>article</em>, but the best would be to allow plugins
-to define their own (as Drupal does).</dd>
-<dt><strong>Input formats</strong></dt>
-<dd><p class="first">As in Drupal, different formats that gets converted into HTML.</p>
-<p class="last">Example: HTML, reStructuredText, restricted HTML, bbcode (is this already
+<div class="section" id="multiple-content-types">
+<h3>Multiple content types<a class="headerlink" href="#multiple-content-types" title="Permalink to this headline">¶</a></h3>
+<p>At least, <em>page</em> and <em>article</em>, but the best would be to allow plugins
+to define their own (as Drupal does).</p>
+<p>See also: <a class="reference internal" href="content-types.html"><em>Default content types</em></a></p>
+</div>
+<div class="section" id="content-versioning">
+<span id="feature-content-versioning"></span><h3>Content versioning<a class="headerlink" href="#content-versioning" title="Permalink to this headline">¶</a></h3>
+<p>Keep trace of old versions, etc.</p>
+</div>
+<div class="section" id="custom-fields">
+<span id="feature-custom-fields"></span><h3>Custom fields<a class="headerlink" href="#custom-fields" title="Permalink to this headline">¶</a></h3>
+<p>Generate a schema for each <em>node</em>, allow definition of additional fields, etc.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Additional node types and fields may be user-defined.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>As for views, content types and fields should be defined in configuration
+files instead that in the database</p>
+<p class="last">Many times definition of extension tables would be enough.
+We could make that if a table named <tt class="docutils literal"><span class="pre">node_&lt;type&gt;_fields</span></tt> exists,
+extra fields will be loaded and merged with the node.</p>
+</div>
+</div>
+<div class="section" id="image-manipulation">
+<span id="feature-image-manipulation"></span><h3>Image manipulation<a class="headerlink" href="#image-manipulation" title="Permalink to this headline">¶</a></h3>
+<p>We need something that handles at least basic, preset-based image
+manipulation; for example to create previews / thumbnails.</p>
+<p>We should find a good way to generate on-the-fly the images and then
+have a static cache from which files are served directly from the web server.</p>
+<p>Of course, the cache must be also flushed upon changes in preset / image, etc.</p>
+</div>
+<div class="section" id="input-formats">
+<span id="feature-input-formats"></span><h3>Input formats<a class="headerlink" href="#input-formats" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><p>As in Drupal, different formats that gets converted into HTML.</p>
+<p>Example: HTML, reStructuredText, restricted HTML, bbcode (is this already
 used??), markmin (web2py-specific reST-like markup), wiki markup, ...</p>
-</dd>
-<dt><strong>Taxonomy</strong></dt>
-<dd>To manage categories, tags, etc. etc.</dd>
-<dt><strong>Blocks</strong></dt>
-<dd>Both user-defined and component-defined.</dd>
-<dt><strong>Comments</strong></dt>
-<dd>Everything could potentially be commented, not only nodes.</dd>
-<dt><strong>Users + profiles</strong></dt>
-<dd>We need users, user profiles, user roles + permissions sets, etc.</dd>
-<dt><strong>Configuration registry</strong></dt>
-<dd>Something like Drupal variables, but more advanced.
-We might also use ini files to store some configuration... ?</dd>
-<dt><strong>Plugins</strong></dt>
-<dd>We need to support plugins in order to allow extending the functionality.
-All the stuff that is not the core, must go in a plugin.</dd>
-<dt><strong>Ajax loading</strong> (Future plan)</dt>
-<dd><p class="first">Something like Facebook BigPipe, allow fetching of page components without
+</div></blockquote>
+</div>
+<div class="section" id="taxonomy">
+<span id="feature-taxonomy"></span><h3>Taxonomy<a class="headerlink" href="#taxonomy" title="Permalink to this headline">¶</a></h3>
+<p>To manage tree-structured tags / categories / ...</p>
+<div class="admonition-todo admonition " id="index-2">
+<p class="first admonition-title">Todo</p>
+<p class="last">Make this a <a href="#id1"><span class="problematic" id="id2">``</span></a>LOAD()``able component, since everything may be
+tagged/categorized.</p>
+</div>
+</div>
+<div class="section" id="flagging">
+<span id="feature-flagging"></span><h3>Flagging<a class="headerlink" href="#flagging" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><p>Flagging is the adding of extra attributes to things.
+Attributes usually are key/value pairs.</p>
+<div class="admonition-todo admonition " id="index-3">
+<p class="first admonition-title">Todo</p>
+<p class="last">Make this a <a href="#id3"><span class="problematic" id="id4">``</span></a>LOAD()``able component.</p>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="blocks-and-regions">
+<span id="feature-blocks-regions"></span><h3>Blocks and regions<a class="headerlink" href="#blocks-and-regions" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><p>Both user-defined and component-defined.</p>
+<div class="admonition-todo admonition " id="index-4">
+<p class="first admonition-title">Todo</p>
+<p class="last">Make this a <a href="#id5"><span class="problematic" id="id6">``</span></a>LOAD()``able component. This way we could also easily
+support something big-pipe-like with dynamic ajax loading of stuff.</p>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="comments">
+<span id="feature-comments"></span><h3>Comments<a class="headerlink" href="#comments" title="Permalink to this headline">¶</a></h3>
+<p>Everything could potentially be commented, not only nodes.</p>
+<div class="admonition-todo admonition " id="index-5">
+<p class="first admonition-title">Todo</p>
+<p class="last">Make this a <a href="#id7"><span class="problematic" id="id8">``</span></a>LOAD()``able component.</p>
+</div>
+</div>
+<div class="section" id="users-profiles">
+<span id="feature-users-profiles"></span><h3>Users + profiles<a class="headerlink" href="#users-profiles" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div>We need users, user profiles, user roles + permissions sets, etc.
+See also: <a class="reference internal" href="#feature-access-control"><em>Access control</em></a></div></blockquote>
+</div>
+<div class="section" id="access-control">
+<span id="feature-access-control"></span><h3>Access control<a class="headerlink" href="#access-control" title="Permalink to this headline">¶</a></h3>
+<p>While most of this is already handled by web2py, we should also support
+more complex <strong>&#8220;permissions hierarchy&#8221;</strong>, at different granularity/depth
+levels: many permissions could be defined and checked in order
+to allow an action to be performed.</p>
+<p>For example, for the editing of an &#8220;article&#8221; node, checked permissions
+may be:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="64%" />
+<col width="16%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Action</th>
+<th class="head">Object</th>
+<th class="head">Id</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>god-like</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>any</td>
+<td>any node</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>any</td>
+<td>own nodes (if own node)</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>any</td>
+<td>any &#8220;article&#8221; node</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>any</td>
+<td>own &#8220;article&#8221; nodes (if own node)</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>edit</td>
+<td>any node</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>edit</td>
+<td>own nodes (if own node)</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>edit</td>
+<td>any &#8220;article&#8221; node</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>edit</td>
+<td>own &#8220;article&#8221; nodes (if own node)</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>edit</td>
+<td>specific node</td>
+<td>node.id</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><strong>God-like</strong> permission is the one usually granted to user #1</p>
+</div>
+<p>Plus, there might be other custom-defined checks; for example a module
+managing workflows might check whether the content editing should
+be allowed for content on this state or not.</p>
+</div>
+<div class="section" id="configuration-registry">
+<span id="feature-configuration"></span><h3>Configuration registry<a class="headerlink" href="#configuration-registry" title="Permalink to this headline">¶</a></h3>
+<p>Something like Drupal variables, but more advanced.</p>
+<div class="admonition-todo admonition " id="index-6">
+<p class="first admonition-title">Todo</p>
+<p class="last">Decide whether and how to mix ini files and database configuration.</p>
+</div>
+</div>
+<div class="section" id="plugin-expandible-structure">
+<span id="feature-expandible-structure"></span><h3>Plugin-expandible structure<a class="headerlink" href="#plugin-expandible-structure" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div>We need to support plugins in order to allow extending the functionality.
+All the stuff that is not the core, must go in a plugin.</div></blockquote>
+</div>
+<div class="section" id="ajax-loading-future-plan">
+<span id="feature-ajax-loading"></span><h3>Ajax loading (Future plan)<a class="headerlink" href="#ajax-loading-future-plan" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><p>Something like Facebook BigPipe, allow fetching of page components without
 actually reloading the page. This could be seen also as something like
 client-side views rendering.</p>
-<div class="last admonition note">
+<div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">We could also experiment with XML + XSL transformations in order
 to do this.</p>
 </div>
-</dd>
-<dt><strong>Web services</strong></dt>
-<dd><p class="first">We should allow the application to expose web services.</p>
-<ul class="last">
-<li><p class="first">REST is almost a must-have.</p>
-<div class="admonition-todo admonition " id="index-2">
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">We could also make benefit of the <tt class="docutils literal"><span class="pre">LOAD()</span></tt> mechanism to accomplish
+this, at least for regions containing blocks.</p>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="web-services">
+<span id="feature-webservices"></span><h3>Web services<a class="headerlink" href="#web-services" title="Permalink to this headline">¶</a></h3>
+<p>We should allow the application to expose web services.</p>
+<ul class="simple">
+<li><strong>REST</strong> is a must-have for any (r|d)ecent web application.</li>
+</ul>
+<div class="admonition-todo admonition " id="index-7">
 <p class="first admonition-title">Todo</p>
 <p class="last">Decide whether to allow also WebDAV methods (copy, move, ...)
 for some stuff or not.</p>
 </div>
-</li>
-<li><p class="first">XML-RPC can be used to expose API for particular calls that cannot be
-represented using  REST</p>
-</li>
+<ul class="simple">
+<li><strong>XML-RPC</strong> can be used to expose API for particular calls that cannot be
+represented using  REST</li>
 </ul>
-</dd>
-</dl>
+</div>
 </div>
 <div class="section" id="nice-stuff">
-<h2>Nice stuff<a class="headerlink" href="#nice-stuff" title="Permalink to this headline">¶</a></h2>
+<span id="id9"></span><h2>Nice stuff<a class="headerlink" href="#nice-stuff" title="Permalink to this headline">¶</a></h2>
 <p>These are not &#8220;real&#8221; features, but nice additions that makes the
 user-experience better.</p>
-<dl class="docutils">
-<dt><strong>wysiwyg editor</strong></dt>
-<dd>Something like CKEditor; we also need some better file selector
-and custom plugins to integrate with the CMS</dd>
-<dt><strong>File browser</strong></dt>
-<dd>A proper file browser is needed in order to allow users upload and
+<div class="section" id="wysiwyg-editor">
+<h3>WYSIWYG editor<a class="headerlink" href="#wysiwyg-editor" title="Permalink to this headline">¶</a></h3>
+<p>Something like CKEditor; we also need some better file selector
+and custom plugins to integrate with the CMS.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">We might support per-input-format editors/editor configurations;
+the editor should be <tt class="docutils literal"><span class="pre">LOAD()``ed</span> <span class="pre">using</span> <span class="pre">a</span> <span class="pre">component</span> <span class="pre">(also</span> <span class="pre">make</span> <span class="pre">sure</span>
+<span class="pre">all</span> <span class="pre">the</span> <span class="pre">loading</span> <span class="pre">is</span> <span class="pre">done</span> <span class="pre">only</span> <span class="pre">on</span> <span class="pre">the</span> <span class="pre">JS-side,</span> <span class="pre">in</span> <span class="pre">order</span> <span class="pre">to</span> <span class="pre">gracefully</span>
+<span class="pre">regress</span> <span class="pre">to</span> <span class="pre">a</span> <span class="pre">simple</span> <span class="pre">``textarea</span></tt> if no JS is enabled.)</p>
+</div>
+</div>
+<div class="section" id="file-browser">
+<h3>File browser<a class="headerlink" href="#file-browser" title="Permalink to this headline">¶</a></h3>
+<p>A proper file browser is needed in order to allow users upload and
 manipulate files.
 The only problem is setting ACLs on directories/files -&gt; how to do in a
-clean way?</dd>
-<dt><strong>Fancy javascript stuff</strong></dt>
-<dd><ul class="first last simple">
-<li>Custom widgets (extjs?)</li>
+clean way?</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">There is also an application called <tt class="docutils literal"><span class="pre">file_manager</span></tt> that might be
+converted into a plugin/component.</p>
+</div>
+</div>
+<div class="section" id="fancy-javascript-fx-and-stuff">
+<h3>Fancy JavaScript FX and stuff<a class="headerlink" href="#fancy-javascript-fx-and-stuff" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Custom widgets (extjs? or jQuery UI, jQuery-based is better, check
+projects features / statuses)</li>
 <li>Lightbox to open images/files/links/..?</li>
 <li>Overlay for administration stuff, etc.</li>
 </ul>
-</dd>
-<dt><strong>mobile version</strong></dt>
-<dd>This may be accomplished by allowing views selection to consider also stuff
+</div>
+</div>
+<div class="section" id="theming-support">
+<h2>Theming support<a class="headerlink" href="#theming-support" title="Permalink to this headline">¶</a></h2>
+<p>We should support easily re-theming minimizing the needs of views altering
++ handling reasonable defaults for unhandled cases.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Many times a whole theme is unnecessary, as a color change / small layout
+adjustment would be enough. So, we should handle these cases:</p>
+<ul class="last simple">
+<li>Custom themes that e.g. use different CSS framework, HTML version
+or provide different <strong>structural</strong> features.</li>
+<li>Themes that provide CSS customization to another structured theme,
+but without need of altering the views.</li>
+</ul>
+</div>
+<div class="section" id="mobile-version">
+<h3>Mobile version<a class="headerlink" href="#mobile-version" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><p>This may be accomplished by allowing views selection to consider also stuff
 like the user-agent, the browser window size, etc.
 Or maybe, selection could also be done by subdomain (<tt class="docutils literal"><span class="pre">example.com</span></tt> is the
 standard version, <tt class="docutils literal"><span class="pre">m.example.com</span></tt> is the mobile version,
 <tt class="docutils literal"><span class="pre">text.example.com</span></tt> is the plain-text light version, <tt class="docutils literal"><span class="pre">api.example.com</span></tt>
-is used to make REST API calls, ...)</dd>
-</dl>
+is used to make REST API calls, ...)</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Probably best thing would be to have custom CSS rules that gets applied
+for the mobile version.</p>
+<p class="last">In some other cases, a complete structure change may be wanted.
+How to handle this? -&gt; Custom views, defaulting to the html ones?
+(Something like <tt class="docutils literal"><span class="pre">*.mobile</span></tt> ?)</p>
 </div>
-<div class="section" id="stuff-similar-to-drupal">
-<h2>Stuff similar to Drupal<a class="headerlink" href="#stuff-similar-to-drupal" title="Permalink to this headline">¶</a></h2>
-<dl class="docutils">
-<dt><strong>views</strong></dt>
-<dd><p class="first">A mechanism to create custom visualizations for content / stuff.
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="customizable-views-support">
+<h2>Customizable views support<a class="headerlink" href="#customizable-views-support" title="Permalink to this headline">¶</a></h2>
+<p>We need a mechanism to define custom content visualizations, in a way similar
+to what the <a class="reference external" href="http://drupal.org/project/views">Views Drupal module</a> does.</p>
+<blockquote>
+<div><p>A mechanism to create custom visualizations for content / stuff.
 This includes everything: standard pages, rss feeds, xml sitemaps, ...</p>
-<div class="last admonition note">
+<div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">Views should be defined in <em>files</em>, not in the database!
 We want to keep well separated what is the structure from what is data!</p>
 </div>
-</dd>
-<dt><strong>fields</strong></dt>
-<dd><p class="first">Generate a schema for each <em>node</em>, allow definition of additional fields,
-etc...</p>
-<div class="last admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">As for views, content types and fields should be defined in configuration
-files instead that in the database</p>
-</div>
-</dd>
-<dt><strong>image manipulation</strong></dt>
-<dd>Like Drupal imagecache module, allow some image trasformation (preset-based?)
-Also find a good way to serve pre-generated static content.</dd>
-</dl>
+</div></blockquote>
 </div>
 <div class="section" id="useful-plugins">
 <h2>Useful plugins<a class="headerlink" href="#useful-plugins" title="Permalink to this headline">¶</a></h2>
+<p>This is a quick list of features that may be nice to see included in
+the CMS.</p>
 <ul class="simple">
 <li>OpenID</li>
 <li>Social network integration (Facebook, twitter, status.net, ...)</li>
@@ -208,12 +421,38 @@ Also find a good way to serve pre-generated static content.</dd>
   <h3><a href="../index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Brainstorming</a><ul>
-<li><a class="reference internal" href="#contents">Contents</a><ul>
+<li><a class="reference internal" href="#table-of-contents">Table of Contents</a><ul>
 </ul>
 </li>
-<li><a class="reference internal" href="#features">Features</a></li>
-<li><a class="reference internal" href="#nice-stuff">Nice stuff</a></li>
-<li><a class="reference internal" href="#stuff-similar-to-drupal">Stuff similar to Drupal</a></li>
+<li><a class="reference internal" href="#features">Features</a><ul>
+<li><a class="reference internal" href="#multiple-content-types">Multiple content types</a></li>
+<li><a class="reference internal" href="#content-versioning">Content versioning</a></li>
+<li><a class="reference internal" href="#custom-fields">Custom fields</a></li>
+<li><a class="reference internal" href="#image-manipulation">Image manipulation</a></li>
+<li><a class="reference internal" href="#input-formats">Input formats</a></li>
+<li><a class="reference internal" href="#taxonomy">Taxonomy</a></li>
+<li><a class="reference internal" href="#flagging">Flagging</a></li>
+<li><a class="reference internal" href="#blocks-and-regions">Blocks and regions</a></li>
+<li><a class="reference internal" href="#comments">Comments</a></li>
+<li><a class="reference internal" href="#users-profiles">Users + profiles</a></li>
+<li><a class="reference internal" href="#access-control">Access control</a></li>
+<li><a class="reference internal" href="#configuration-registry">Configuration registry</a></li>
+<li><a class="reference internal" href="#plugin-expandible-structure">Plugin-expandible structure</a></li>
+<li><a class="reference internal" href="#ajax-loading-future-plan">Ajax loading (Future plan)</a></li>
+<li><a class="reference internal" href="#web-services">Web services</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#nice-stuff">Nice stuff</a><ul>
+<li><a class="reference internal" href="#wysiwyg-editor">WYSIWYG editor</a></li>
+<li><a class="reference internal" href="#file-browser">File browser</a></li>
+<li><a class="reference internal" href="#fancy-javascript-fx-and-stuff">Fancy JavaScript FX and stuff</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#theming-support">Theming support</a><ul>
+<li><a class="reference internal" href="#mobile-version">Mobile version</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#customizable-views-support">Customizable views support</a></li>
 <li><a class="reference internal" href="#useful-plugins">Useful plugins</a></li>
 </ul>
 </li>
@@ -259,7 +498,7 @@ Also find a good way to serve pre-generated static content.</dd>
         <li class="right" >
           <a href="../index.html" title="Welcome to web2py_cms’s documentation!"
              >previous</a> |</li>
-        <li><a href="../index.html">web2py_cms 0.1-brainstorming documentation</a> &raquo;</li> 
+        <li><a href="../index.html">web2py_cms 0.1-alpha documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
