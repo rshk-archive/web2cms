@@ -1,0 +1,84 @@
+[: 44: /usr/local/bin/nosetests: unexpected operator
+....nose.plugins.multiprocess: ERROR: Worker 0 error running test or returning results
+Traceback (most recent call last):
+  File "/usr/local/lib/python2.6/dist-packages/nose-1.1.2-py2.6.egg/nose/plugins/multiprocess.py", line 688, in __runner
+    test(result)
+  File "/usr/local/lib/python2.6/dist-packages/nose-1.1.2-py2.6.egg/nose/suite.py", line 176, in __call__
+    return self.run(*arg, **kw)
+  File "/usr/local/lib/python2.6/dist-packages/nose-1.1.2-py2.6.egg/nose/plugins/multiprocess.py", line 784, in run
+    test(orig)
+  File "/usr/local/lib/python2.6/dist-packages/nose-1.1.2-py2.6.egg/nose/suite.py", line 176, in __call__
+    return self.run(*arg, **kw)
+  File "/usr/local/lib/python2.6/dist-packages/nose-1.1.2-py2.6.egg/nose/plugins/multiprocess.py", line 761, in run
+    if isinstance(test.test,nose.failure.Failure):
+AttributeError: 'NoSharedFixtureContextSuite' object has no attribute 'test'
+.E..............F.....F.....................
+======================================================================
+ERROR: Failure: AttributeError ('NoSharedFixtureContextSuite' object has no attribute 'test')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/local/lib/python2.6/dist-packages/nose-1.1.2-py2.6.egg/nose/plugins/multiprocess.py", line 688, in __runner
+    test(result)
+  File "/usr/local/lib/python2.6/dist-packages/nose-1.1.2-py2.6.egg/nose/suite.py", line 176, in __call__
+    return self.run(*arg, **kw)
+  File "/usr/local/lib/python2.6/dist-packages/nose-1.1.2-py2.6.egg/nose/plugins/multiprocess.py", line 784, in run
+    test(orig)
+  File "/usr/local/lib/python2.6/dist-packages/nose-1.1.2-py2.6.egg/nose/suite.py", line 176, in __call__
+    return self.run(*arg, **kw)
+  File "/usr/local/lib/python2.6/dist-packages/nose-1.1.2-py2.6.egg/nose/plugins/multiprocess.py", line 761, in run
+    if isinstance(test.test,nose.failure.Failure):
+AttributeError: 'NoSharedFixtureContextSuite' object has no attribute 'test'
+
+======================================================================
+FAIL: Test the default-application function
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/samu/projects/web2py_cms/web2py/gluon/tests/test_router.py", line 153, in test_router_defapp
+    self.assertEqual(filter_url('http://domain.com/favicon.ico'), '%s/applications/welcome/static/favicon.ico' % root)
+AssertionError: '/tmp/tmpdMuLaw/applications/welcome/static/favicon.ico' != '/tmp/tmpsuaYk4/applications/welcome/static/favicon.ico'
+-------------------- >> begin captured logging << --------------------
+web2py.rewrite: DEBUG: URL rewrite is on. configuration in /tmp/tmpdMuLaw/applications/examples/routes.py
+web2py.rewrite: DEBUG: URL rewrite is on. configuration in rdict
+web2py.rewrite: DEBUG: select application=welcome
+web2py.rewrite: DEBUG: select application=welcome
+web2py.rewrite: DEBUG: select application=welcome
+web2py.rewrite: DEBUG: route: controller=default
+web2py.rewrite: DEBUG: route: function.ext=index.html
+web2py.rewrite: DEBUG: select application=welcome
+web2py.rewrite: DEBUG: route: controller=default
+web2py.rewrite: DEBUG: route: function.ext=index.html
+web2py.rewrite: DEBUG: select application=welcome
+web2py.rewrite: DEBUG: route: controller=appadmin
+web2py.rewrite: DEBUG: route: function.ext=index.html
+web2py.rewrite: DEBUG: select application=welcome
+web2py.rewrite: DEBUG: route: controller=default
+web2py.rewrite: DEBUG: route: function.ext=abc.html
+web2py.rewrite: DEBUG: select application=welcome
+web2py.rewrite: DEBUG: route: controller=default
+web2py.rewrite: DEBUG: route: function.ext=index.html
+web2py.rewrite: DEBUG: select application=welcome
+web2py.rewrite: DEBUG: route: controller=default
+web2py.rewrite: DEBUG: route: function.ext=abc.html
+web2py.rewrite: DEBUG: select application=welcome
+web2py.rewrite: DEBUG: route: root static=/tmp/tmpdMuLaw/applications/welcome/static/favicon.ico
+--------------------- >> end captured logging << ---------------------
+
+======================================================================
+FAIL: Test hyphen conversion
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/samu/projects/web2py_cms/web2py/gluon/tests/test_router.py", line 609, in test_router_hyphen
+    "%s/applications/init/static/filename-with_underscore" % root)
+AssertionError: '/tmp/tmpdMuLaw/applications/init/static/filename-with_underscore' != '/tmp/tmpsuaYk4/applications/init/static/filename-with_underscore'
+-------------------- >> begin captured logging << --------------------
+web2py.rewrite: DEBUG: URL rewrite is on. configuration in /tmp/tmpdMuLaw/applications/examples/routes.py
+web2py.rewrite: DEBUG: URL rewrite is on. configuration in rdict
+web2py.rewrite: DEBUG: select application=init
+web2py.rewrite: DEBUG: route: controller=static
+web2py.rewrite: DEBUG: route: static=/tmp/tmpdMuLaw/applications/init/static/filename-with_underscore
+--------------------- >> end captured logging << ---------------------
+
+----------------------------------------------------------------------
+Ran 48 tests in 0.315s
+
+FAILED (errors=1, failures=2)
