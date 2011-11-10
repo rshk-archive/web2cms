@@ -214,43 +214,39 @@ may be:</p>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>god-like</td>
-<td>&nbsp;</td>
-<td>&nbsp;</td>
-</tr>
-<tr class="row-odd"><td>any</td>
+<tr class="row-even"><td>any</td>
 <td>any node</td>
 <td>&nbsp;</td>
 </tr>
-<tr class="row-even"><td>any</td>
+<tr class="row-odd"><td>any</td>
 <td>own nodes (if own node)</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>any</td>
+<td>any &#8220;article&#8221; node</td>
 <td>&nbsp;</td>
 </tr>
 <tr class="row-odd"><td>any</td>
-<td>any &#8220;article&#8221; node</td>
-<td>&nbsp;</td>
-</tr>
-<tr class="row-even"><td>any</td>
 <td>own &#8220;article&#8221; nodes (if own node)</td>
 <td>&nbsp;</td>
 </tr>
-<tr class="row-odd"><td>edit</td>
+<tr class="row-even"><td>edit</td>
 <td>any node</td>
 <td>&nbsp;</td>
 </tr>
-<tr class="row-even"><td>edit</td>
+<tr class="row-odd"><td>edit</td>
 <td>own nodes (if own node)</td>
 <td>&nbsp;</td>
 </tr>
-<tr class="row-odd"><td>edit</td>
+<tr class="row-even"><td>edit</td>
 <td>any &#8220;article&#8221; node</td>
 <td>&nbsp;</td>
 </tr>
-<tr class="row-even"><td>edit</td>
+<tr class="row-odd"><td>edit</td>
 <td>own &#8220;article&#8221; nodes (if own node)</td>
 <td>&nbsp;</td>
 </tr>
-<tr class="row-odd"><td>edit</td>
+<tr class="row-even"><td>edit</td>
 <td>specific node</td>
 <td>node.id</td>
 </tr>
@@ -258,7 +254,14 @@ may be:</p>
 </table>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last"><strong>God-like</strong> permission is the one usually granted to user #1</p>
+<p>We need a way to create superusers that automatically have full
+permissions. We can do that in several ways:</p>
+<ul class="last simple">
+<li>User #1 is automatically super-user</li>
+<li>Define a <tt class="docutils literal"><span class="pre">superuser</span></tt> role, assign user #1 by default</li>
+<li>Define a <tt class="docutils literal"><span class="pre">superuser</span></tt> permission, by default assigned to <tt class="docutils literal"><span class="pre">superuser</span></tt>
+role, by default assigned to user #1.</li>
+</ul>
 </div>
 <p>Plus, there might be other custom-defined checks; for example a module
 managing workflows might check whether the content editing should

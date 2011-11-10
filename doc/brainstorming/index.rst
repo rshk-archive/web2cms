@@ -169,7 +169,6 @@ may be:
 ===========  ====================================  =========
 Action       Object                                Id
 ===========  ====================================  =========
-god-like
 any          any node
 any          own nodes (if own node)
 any          any "article" node
@@ -182,7 +181,13 @@ edit         specific node                         node.id
 ===========  ====================================  =========
     
 .. NOTE::
-   **God-like** permission is the one usually granted to user #1
+   We need a way to create superusers that automatically have full
+   permissions. We can do that in several ways:
+   
+   * User #1 is automatically super-user
+   * Define a ``superuser`` role, assign user #1 by default
+   * Define a ``superuser`` permission, by default assigned to ``superuser``
+     role, by default assigned to user #1 
 
 Plus, there might be other custom-defined checks; for example a module
 managing workflows might check whether the content editing should
