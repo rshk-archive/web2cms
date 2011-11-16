@@ -287,10 +287,12 @@ button {  width: auto; overflow: visible; }
 .ez-wr:after,.ez-box:after{content:".";display:block;height:0;clear:both;visibility:hidden}.ez-wr,.ez-box,.ez-last{display:inline-block;min-height:0}/* \*/ * html .ez-wr,* html .ez-box,* html .ez-last{height:1%}.ez-wr,.ez-box,.ez-last{display:block}/* */.ez-oh{overflow:hidden}* html .ez-oh{overflow:visible}.ez-oa{overflow:auto}.ez-dt{display:table}.ez-it{display:inline-table}.ez-tc{display:table-cell}.ez-ib{display:inline-block}.ez-fl{float:left}* html .ez-fl{margin-right:-3px}.ez-fr{float:right}* html .ez-fr{margin-left:-3px}.ez-25{width:25%}.ez-33{width:33.33%}.ez-50{width:50%}.ez-66{width:66.66%}.ez-75{width:75%}.ez-negmr{margin-right:-1px}* html .ez-negmr{margin-right:-4px}.ez-negmx{margin-right:-1px}.ez-negml{margin-left:-1px}* html .ez-negml{margin-left:-4px}
 
 
-/*********** add bottom line to table rows ***********/
+/** add bottom line to table rows
+*******************************************************************************/
 th, td { padding: 0.1em 0.5em 0.1em 0.5em;}
 
-/*********** labels bold and occasionally centered ***********/
+/** labels bold and occasionally centered
+*******************************************************************************/
 label {
     white-space: nowrap;
 }
@@ -306,19 +308,22 @@ thead th {
     text-align:right;
 }
 
-/*********** forms and table padding ***********/
+/** forms and table padding
+*******************************************************************************/
 form, table {
     padding: 5px 10px 5px 10px;
 }
 
-/*********** code blocks ***********/
+/** code blocks
+*******************************************************************************/
 code {
     padding: 3px 5px;
     font-family: Andale Mono, monospace;
     font-size: 0.9em;
 }
 
-/*********** left and right padding to quoted text ***********/
+/** left and right padding to quoted text
+*******************************************************************************/
 blockquote {
     background: #cccccc;
     border-left: 30px transparent;
@@ -377,7 +382,8 @@ h4 {font-size: 1.2em;}
 h5 {font-size: 1.0em;}
 h6 {font-size: 0.8em;}
 
-/*********** page layout alignment, width and padding ***********/
+/** page layout alignment, width and padding
+*******************************************************************************/
 /*body {background-color: #000;}*/
 #header h1 {  padding: 1.33em 0.66em 0.66em 0.66em; }
 #container, #header, #page, #content, #statusbar,
@@ -423,7 +429,8 @@ body.fluid-width #wrapper {width:95%;}
     line-height: 1.4em;
 }
 
-/*********** web2py specific ***********/
+/** web2py specific
+*******************************************************************************/
 div.flash {
     font-weight: bold;
     display: none;
@@ -576,10 +583,9 @@ a.buttontext span.icon{ margin:auto;}
 }
 
 
-/*
-    * print styles
-    * inlined to avoid required HTTP connection www.phpied.com/delay-loading-your-print-css/
-    */
+/** print styles
+ ** inlined to avoid required HTTP connection www.phpied.com/delay-loading-your-print-css/
+*******************************************************************************/
 @media print {
     * { background: transparent !important; color: #444 !important; text-shadow: none !important; }
     a, a:visited { color: #444 !important; text-decoration: underline; }
@@ -594,13 +600,11 @@ a.buttontext span.icon{ margin:auto;}
     h2, h3{ page-break-after: avoid; }
 }
 
-/* 
-*Grid 
-*
-* The default style for SQLFORM.grid even using jquery-ui or another ui framework
-* will look better with the declarations below
-* if needed to remove base.css consider keeping these following lines in some css file.
-*/
+/** Grid 
+ ** The default style for SQLFORM.grid even using jquery-ui or another ui framework
+ ** will look better with the declarations below
+ ** if needed to remove base.css consider keeping these following lines in some css file.
+*******************************************************************************/
 .web2py_grid a { text-decoration:none;}
 .web2py_grid table { width: 100% }
 .web2py_grid td { white-space:nowrap; }
@@ -738,7 +742,8 @@ a.button:hover {
 }
 
 
-/*** CUSTOMIZATIONS ***/
+/** Misc customizations, for w2cms
+*******************************************************************************/
 body { background:#888; }
 .app-subtitle { padding: 0 10px; color: #ddd; }
 #header h1 {margin-top:10px;padding:10px 10px;}
@@ -831,7 +836,9 @@ button.blank-btn:hover {
 	display: inline;
 } */
 
-/*** NODE THEMING ***/
+
+/** w2cms node theming
+*******************************************************************************/
 
 .node.node-teaser {
 	border: solid 1px #ddd;
@@ -839,7 +846,8 @@ button.blank-btn:hover {
 	padding: 5px;
 }
 
-/*** NODE CALENDAR ***/
+/** w2cms node teaser date "calendar" display
+*******************************************************************************/
 
 .node-calendar {
 	float:right;
@@ -885,4 +893,59 @@ ul.pager li a.current {
 	/* background: #275b90;
 	color: #fff; */
 	font-weight: bold;
+}
+
+
+/** Tables with alternating row colors ("zebra")
+ ** These are CSS3 rules to apply alternating colors to even|odd table rows
+*******************************************************************************/
+table.zebra {
+	border: solid 1px #bbb;
+}
+table.zebra > tbody > tr {
+	border-bottom: solid 1px #bbb;
+}
+table.zebra > thead > tr > th {
+	background-color: #ddd;
+}
+table.zebra > tbody > tr:nth-child(odd) {
+    background-color: #fff;   
+}
+table.zebra > tbody > tr:nth-child(even) {
+    background-color: #eee;
+}
+
+/** Messages
+*******************************************************************************/
+.messages-box {
+	margin: 5px 0 10px;
+}
+ul.messages {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+ul.messages > li.message {
+	margin: 0 0 3px;
+	padding: 5px;
+}
+ul.messages > li.message.message-error {
+    background: #fee;
+    border: solid 1px #A00;
+    color: #600;
+}
+ul.messages > li.message.message-warning {
+    background: #ffe;
+    border: solid 1px #AA0;
+    color: #330;
+}
+ul.messages > li.message.message-info {
+    background: #efe;
+    border: solid 1px #0A0;
+    color: #030;
+}
+ul.messages > li.message.message-help {
+    background: #eef;
+    border: solid 1px #00A;
+    color: #006;
 }

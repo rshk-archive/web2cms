@@ -40,6 +40,7 @@ Table of Contents
 
    component-structure
    content-types
+   elements
 
 
 
@@ -79,6 +80,44 @@ Generate a schema for each *node*, allow definition of additional fields, etc.
    Many times definition of extension tables would be enough.
    We could make that if a table named ``node_<type>_fields`` exists,
    extra fields will be loaded and merged with the node.
+
+
+.. _feature-content-translation:
+
+Content translation
+-------------------
+
+Content must be translatable. This means we will have:
+
+* Language categorization of the content _(through taxonomy?)_
+* Translation of field contents
+
+
+.. _feature-revisions:
+
+Revisions
+---------
+
+We need to manage content versioning / revisions. Even in custom node types.
+To accomplish this plus translations etc. we should handle:
+
+* Table listing the nodes
+* Table listing revisions / languages, etc.
+* Tables containing versions of the fields.
+
+List of revisions should be something like:
+
+* ``id`` -> The unique ID to be used to refer to this revision/language
+* ``node_id`` -> id of the node
+* ``revision_id`` -> gobally incremented when adding a revision
+* ``language_code`` -> standard xx_XX language code
+
+Then, we might have translations of subsequential revisions; but *not*
+revisions only to one language translation!
+That means, if we have REV.1 in EN+IT and REV.2 only in EN, we show REV.2
+in EN plus, optionally, a link to REV.1-IT explaining that that is an outdated
+version of the document.
+
 
 
 .. _feature-image-manipulation:

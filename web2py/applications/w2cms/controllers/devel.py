@@ -3,6 +3,19 @@ Created on Oct 30, 2011
 @author: samu
 '''
 
+from helpers import use_custom_view
+from cms_auth import requires_cms_permission
+from gluon.contrib.populate import populate
+
+@auth.requires_permission('access development tools')
+@use_custom_view('generic/menu_page')
+def index():
+    links = menu_development[3][:]
+    return dict(
+        title=T('Development'),
+        menu_items=links,
+        layout='grid')
+
 @auth.requires_permission('access development tools')
 def status():
     """
@@ -21,9 +34,6 @@ def status():
         node_types = node_types,
         nodes_per_type = nodes_per_type,
         )
-
-from gluon.contrib.populate import populate
-from helpers import use_custom_view
 
 @auth.requires_permission('access development tools')
 @use_custom_view('generic/form')
@@ -72,3 +82,8 @@ def generate():
         title=T('Generate'),
         form=form,
         )
+
+@auth.requires_permission('access development tools')
+def css_devel():
+    """Controller for CSS development"""
+    return dict()

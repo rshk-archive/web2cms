@@ -37,6 +37,9 @@
           <a href="../genindex.html" title="General Index"
              accesskey="I">index</a></li>
         <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
           <a href="component-structure.html" title="Components structure"
              accesskey="N">next</a> |</li>
         <li class="right" >
@@ -101,6 +104,18 @@ but it would be useful to have.</p>
 <li class="toctree-l2"><a class="reference internal" href="content-types.html#photo">Photo</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="elements.html">CMS Elements</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="elements.html#user">User</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elements.html#group">Group</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elements.html#node">Node</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elements.html#taxonomy-tags">Taxonomy/tags</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elements.html#comment">Comment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elements.html#flag">Flag</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elements.html#relationship">Relationship</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elements.html#content-display">Content display</a></li>
+<li class="toctree-l2"><a class="reference internal" href="elements.html#configuration">Configuration</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -131,6 +146,36 @@ files instead that in the database</p>
 We could make that if a table named <tt class="docutils literal"><span class="pre">node_&lt;type&gt;_fields</span></tt> exists,
 extra fields will be loaded and merged with the node.</p>
 </div>
+</div>
+<div class="section" id="content-translation">
+<span id="feature-content-translation"></span><h3>Content translation<a class="headerlink" href="#content-translation" title="Permalink to this headline">¶</a></h3>
+<p>Content must be translatable. This means we will have:</p>
+<ul class="simple">
+<li>Language categorization of the content _(through taxonomy?)_</li>
+<li>Translation of field contents</li>
+</ul>
+</div>
+<div class="section" id="revisions">
+<span id="feature-revisions"></span><h3>Revisions<a class="headerlink" href="#revisions" title="Permalink to this headline">¶</a></h3>
+<p>We need to manage content versioning / revisions. Even in custom node types.
+To accomplish this plus translations etc. we should handle:</p>
+<ul class="simple">
+<li>Table listing the nodes</li>
+<li>Table listing revisions / languages, etc.</li>
+<li>Tables containing versions of the fields.</li>
+</ul>
+<p>List of revisions should be something like:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">id</span></tt> -&gt; The unique ID to be used to refer to this revision/language</li>
+<li><tt class="docutils literal"><span class="pre">node_id</span></tt> -&gt; id of the node</li>
+<li><tt class="docutils literal"><span class="pre">revision_id</span></tt> -&gt; gobally incremented when adding a revision</li>
+<li><tt class="docutils literal"><span class="pre">language_code</span></tt> -&gt; standard xx_XX language code</li>
+</ul>
+<p>Then, we might have translations of subsequential revisions; but <em>not</em>
+revisions only to one language translation!
+That means, if we have REV.1 in EN+IT and REV.2 only in EN, we show REV.2
+in EN plus, optionally, a link to REV.1-IT explaining that that is an outdated
+version of the document.</p>
 </div>
 <div class="section" id="image-manipulation">
 <span id="feature-image-manipulation"></span><h3>Image manipulation<a class="headerlink" href="#image-manipulation" title="Permalink to this headline">¶</a></h3>
@@ -260,7 +305,7 @@ permissions. We can do that in several ways:</p>
 <li>User #1 is automatically super-user</li>
 <li>Define a <tt class="docutils literal"><span class="pre">superuser</span></tt> role, assign user #1 by default</li>
 <li>Define a <tt class="docutils literal"><span class="pre">superuser</span></tt> permission, by default assigned to <tt class="docutils literal"><span class="pre">superuser</span></tt>
-role, by default assigned to user #1.</li>
+role, by default assigned to user #1</li>
 </ul>
 </div>
 <p>Plus, there might be other custom-defined checks; for example a module
@@ -431,6 +476,8 @@ the CMS.</p>
 <li><a class="reference internal" href="#multiple-content-types">Multiple content types</a></li>
 <li><a class="reference internal" href="#content-versioning">Content versioning</a></li>
 <li><a class="reference internal" href="#custom-fields">Custom fields</a></li>
+<li><a class="reference internal" href="#content-translation">Content translation</a></li>
+<li><a class="reference internal" href="#revisions">Revisions</a></li>
 <li><a class="reference internal" href="#image-manipulation">Image manipulation</a></li>
 <li><a class="reference internal" href="#input-formats">Input formats</a></li>
 <li><a class="reference internal" href="#taxonomy">Taxonomy</a></li>
@@ -495,6 +542,9 @@ the CMS.</p>
         <li class="right" style="margin-right: 10px">
           <a href="../genindex.html" title="General Index"
              >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
         <li class="right" >
           <a href="component-structure.html" title="Components structure"
              >next</a> |</li>

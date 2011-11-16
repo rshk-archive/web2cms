@@ -13,6 +13,18 @@ Contents:
 
    brainstorming/index
 
+Modules:
+
+.. toctree::
+   :maxdepth: 2
+   
+   modules/cms_auth
+   modules/cms_exceptions
+   modules/cms_plugin_def
+   modules/cms_populate
+   modules/cms_tools
+   modules/cms_views
+
 
 Indices and tables
 ==================

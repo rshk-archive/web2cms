@@ -47,14 +47,27 @@ response.menu = [
     ## Administration panel
     (T('Admin'), False, URL('admin','index'), []),
     
-    ## Development          
-    (T('Devel'), False, URL('devel','index'), [
-        (T('Status'), False, URL('devel','status'), []),
-        (T('Generate'), False, URL('devel','generate'), []),
-        (T('Appadmin'), False, URL('appadmin','index'), []),
-    ]),
+#    ## Development          
+#    (T('Devel'), False, URL('devel','index'), [
+#        (T('Status'), False, URL('devel','status'), []),
+#        (T('Generate'), False, URL('devel','generate'), []),
+#        (T('Appadmin'), False, URL('appadmin','index'), []),
+#    ]),
     
     ]
+
+menu_development = (T('Devel'), False, URL('devel','index'), [
+    (T('Status'), False, URL('devel','status'), [],
+        {'icon':URL('static','images/icons/system-monitor.png')}),
+    (T('Generate'), False, URL('devel','generate'), [],
+        {'icon':URL('static','images/icons/devel.png')}),
+    (T('Appadmin'), False, URL('appadmin','index'), [],
+        {'icon':URL('static','images/icons/devel.png')}),
+    (T('CSS Devel'), False, URL('devel','css_devel'), [],
+        {'icon':URL('static','images/icons/devel.png')}),
+])
+
+response.menu.append(menu_development)
 
 #########################################################################
 ## provide shortcuts for development. remove in production

@@ -1,5 +1,0 @@
-Components structure
-####################
-
-This page describes how components should be structured and work. 
-

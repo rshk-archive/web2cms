@@ -4,10 +4,18 @@ Created on Nov 1, 2011
 @author: samu
 '''
 
-import os
+import os, sys
 from helpers import use_custom_view
+from cms_auth import requires_cms_permission
 
+## The main administration menu, shown in the administrative page
 admin_menu = [
+    (T('Database'), False, URL('admin', 'dbadmin'), [],
+        {'icon':URL('static','images/icons/server-database.png'),
+         'description':T('Administer database')}),
+    (T('Plugins'), False, URL('admin', 'plugins'), [],
+        {'icon':URL('static','images/icons/plugin.png'),
+         'description':T('Administer plugins')}),
     (T('Content'), False, URL('admin','content'), [],
         {'icon': URL('static', 'images/icons/admin-content.png'),
          'description': 'Administer the CMS content.'}),
@@ -17,26 +25,18 @@ admin_menu = [
     (T('Files'), False, URL('admin','files'), [],
         {'icon': URL('static', 'images/icons/folder.png'),
          'description': 'Use the web file manager to administer uploaded files.'}),
-    (T('Database'), False, URL('admin', 'dbadmin'), [],
-        {'icon':URL('static','images/icons/server-database.png'),
-         'description':T('Administer database')})
 ]
 
+@requires_cms_permission(auth, "access admin panel")
 @use_custom_view('generic/menu_page')
 def index():
     links = admin_menu[:]
-    
-#    for i in xrange(8):
-#        links.append((T('Fake %d', i), False, URL('admin','fake_page'), [],
-#            {'icon': URL('static', 'images/icons/folder.png'),
-#             'description' : 'Just a fake menu item, #%d' % i,}))
-    
-    
     return dict(
         title=T('Administration panel'),
         menu_items=links,
         layout='grid')
 
+@requires_cms_permission(auth, "administer", "content")
 def content():
     #[row.type for row in db().select(db.node.type, distinct=True, orderby=db.node.type)]
     import datetime
@@ -114,11 +114,72 @@ def content():
         description=description,
         )
 
+@requires_cms_permission(auth, "administer", "users")
 def users():
-    pass
+    return "TODO: Add the users administration page"
 
+@requires_cms_permission(auth, "administer", "files")
 def files():
-    pass
+    return "TODO: Add the files administration page"
 
+@requires_cms_permission(auth, "administer", "database")
 def dbadmin():
+    ## Everything is done in the view
     return dict()
+
+@requires_cms_permission(auth, "administer", "plugins")
+def plugins():
+    plugins_dir = os.path.abspath(os.path.join(request.folder, 'cms_plugins'))
+    _all_files = os.listdir(plugins_dir)
+    _found = []
+    
+    for f in _all_files:
+        _fullname = os.path.join(plugins_dir, f)
+        if f.endswith('.py'):
+            _found.append(f[:-3])
+        elif os.path.isdir(_fullname) and os.path.isfile(os.path.join(_fullname, '__init__.py')):
+            _found.append(f)
+    
+    _errors = []
+    _loaded_plugins = {}
+    
+    _app_folder = os.path.abspath(request.folder)
+    
+    if not _app_folder in sys.path:
+        sys.path.insert(0, _app_folder)
+    
+    from cms_plugin_def import *
+    
+    for plugin_name in _found:
+        try:
+            _mod = __import__('cms_plugins', globals=globals(), locals=locals(), fromlist=[plugin_name])
+            plugin_module = getattr(_mod, plugin_name)
+            plugin_info = plugin_module.cms_plugin_info
+            plugin_contents = []
+            
+            for elm_name in dir(plugin_module):
+                if elm_name.startswith('_'): continue
+                elm = getattr(plugin_module, elm_name)
+                if type(elm).__name__ == 'classobj':
+                    if issubclass(elm, CustomController) and not elm is CustomController:
+                        plugin_contents.append(('CustomController', elm))
+                    elif issubclass(elm, NodeTypeManager) and not elm is NodeTypeManager:
+                        plugin_contents.append(('NodeTypeManager', elm))
+                    elif issubclass(elm, DynamicBlock) and not elm is DynamicBlock:
+                        plugin_contents.append(('DynamicBlock', elm))
+            
+            _loaded_plugins[plugin_name] = dict(
+                module=plugin_module,
+                info=plugin_info,
+                contents=plugin_contents,
+                )
+            
+            #dir(getattr(plugin_module, 'example_plugin'))
+        except Exception, e:
+            _errors.append((plugin_name, e))
+    
+    return dict(
+        found_plugins=_found,
+        errors=_errors,
+        loaded_plugins=_loaded_plugins,
+        )

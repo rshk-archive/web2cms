@@ -100,53 +100,93 @@ auth.settings.reset_password_requires_verification = True
 import cms_settings
 
 ## Table: node =================================================================
-## Used to store actual content
+## Definition of nodes
 
 db.define_table(
     'node',
     Field('type', 'string', length=128, required=True, requires=IS_NOT_EMPTY()),
-    Field('title', 'string', length=256, required=True, requires=IS_NOT_EMPTY()),
-    Field('body', 'text'),
-    Field('body_format', 'string', length=128),
-    Field('created', 'datetime', default=request.now, required=True),
-    Field('updated', 'datetime', update=request.now, required=True),
-    Field('author', db.auth_user, default=auth.user_id, required=True),
     Field('published', 'boolean', default=True),
     Field('weight', 'integer', default=0),
     )
 
-db.node.body_format.requires = IS_IN_SET(
-    dict([(k,v['label']) for k,v in cms_settings.list_text_formats().items()]))
-db.node.created.requires = IS_DATETIME(T('%Y-%m-%d %H:%M:%S'))    
-db.node.updated.requires = IS_DATETIME(T('%Y-%m-%d %H:%M:%S'))
-db.node.author.requires = IS_IN_DB(db, db.auth_user.id, '%(first_name)s %(last_name)s [#%(id)d]')
-db.node.author.represent = lambda x,y=None: '%(first_name)s %(last_name)s' % x
 db.node.weight.requires = IS_INT_IN_RANGE(-50, 50)
 
-## Table: comment ==============================================================
+## Table: node_version =========================================================
+## Store definition and metadata about versions
+
 db.define_table(
-    'comment',
+    'node_version',
     
-    ## What is commented. Usually something like ('node', 20)
-    Field('object_type', 'string', length=128, required=True, requires=IS_NOT_EMPTY()),
-    Field('object_delta', 'string', length=128, required=True, requires=IS_NOT_EMPTY()),
+    ## Node this version is associated to
+    Field('node', db.node, required=True),
     
-    ## Attributes of the comment
-    Field('title', 'string', length=256),
-    Field('body', 'text'),
-    Field('body_format', 'string', length=128),
+    ## Node revision ID
+    Field('revision_id', 'integer', required=True),
     
-    ## Meta of the comment
-    Field('created', 'datetime', default=request.now, required=True),
-    Field('updated', 'datetime', update=request.now, required=True),
-    Field('author', db.auth_user, default=auth.user_id, required=True),
+    ## Node language
+    Field('language', 'string', length=32, required=True),
+    
+    ## Standard metadata
+    Field('created_by', db.auth_user, default=auth.user_id, required=True),
+    Field('updated_by', db.auth_user, update=auth.user_id, required=True),
+    Field('created_date', 'datetime', default=request.now, required=True),
+    Field('updated_date', 'datetime', update=request.now, required=True),
+    
+    ## Published flag, for translation draft
     Field('published', 'boolean', default=True),
+    
+    ## Flag that indicates this version is the base for other translations
+    Field('is_translation_base', 'boolean', default=True),
     )
 
-db.comment.body_format.requires = IS_IN_SET(
+db.node_version.node.requires = IS_IN_DB(db, db.node.id, "Node %(id)d [%(type)s]: %(title)s")
+db.node_version.created_date.requires = IS_DATETIME(T('%Y-%m-%d %H:%M:%S'))    
+db.node_version.updated_date.requires = IS_DATETIME(T('%Y-%m-%d %H:%M:%S'))
+db.node_version.created_by.requires = IS_IN_DB(db, db.auth_user.id, '%(first_name)s %(last_name)s [#%(id)d]')
+db.node_version.created_by.represent = lambda x,y=None: '%(first_name)s %(last_name)s' % x
+db.node_version.updated_by.requires = IS_IN_DB(db, db.auth_user.id, '%(first_name)s %(last_name)s [#%(id)d]')
+db.node_version.updated_by.represent = lambda x,y=None: '%(first_name)s %(last_name)s' % x
+
+## Table: node_base_fields =====================================================
+## Common fields for all node types
+
+db.define_table(
+    'node_base_fields',
+    Field('node_version', db.node_version, required=True),
+    Field('title', 'string', length=256, required=True, requires=IS_NOT_EMPTY()),
+    Field('body', 'text'),
+    Field('body_format', 'string', length=128),
+    )
+
+db.node_base_fields.node_version.requires = IS_IN_DB(db, db.node_version.id,
+    "VERSION %(id)d of node %(node)d (rev=%(revision_id)d, lang=%(language)s)")
+db.node_base_fields.body_format.requires = IS_IN_SET(
     dict([(k,v['label']) for k,v in cms_settings.list_text_formats().items()]))
-db.comment.author.requires = IS_EMPTY_OR(IS_IN_DB(db, db.auth_user.id, '%(first_name)s %(last_name)s [#%(id)d]'))
-db.comment.author.represent = lambda x,y=None: '%(first_name)s %(last_name)s' % x
+
+## Table: comment ==============================================================
+#db.define_table(
+#    'comment',
+#    
+#    ## What is commented. Usually something like ('node', 20)
+#    Field('object_type', 'string', length=128, required=True, requires=IS_NOT_EMPTY()),
+#    Field('object_delta', 'string', length=128, required=True, requires=IS_NOT_EMPTY()),
+#    
+#    ## Attributes of the comment
+#    Field('title', 'string', length=256),
+#    Field('body', 'text'),
+#    Field('body_format', 'string', length=128),
+#    
+#    ## Meta of the comment
+#    Field('created', 'datetime', default=request.now, required=True),
+#    Field('updated', 'datetime', update=request.now, required=True),
+#    Field('author', db.auth_user, default=auth.user_id, required=True),
+#    Field('published', 'boolean', default=True),
+#    )
+#
+#db.comment.body_format.requires = IS_IN_SET(
+#    dict([(k,v['label']) for k,v in cms_settings.list_text_formats().items()]))
+#db.comment.author.requires = IS_EMPTY_OR(IS_IN_DB(db, db.auth_user.id, '%(first_name)s %(last_name)s [#%(id)d]'))
+#db.comment.author.represent = lambda x,y=None: '%(first_name)s %(last_name)s' % x
 
 
 ## Table: block ================================================================
@@ -166,14 +206,23 @@ db.block.body_format.requires = IS_IN_SET(
 ## Table: variable =============================================================
 ## Used to store configuration variables, as pickled values
 
-db.define_table(
-    'variable',
-    Field('var_name', 'string', length=256, required=True, unique=True),
-    Field('var_value_pickled', 'text'), ## pickled value
-    )
+#db.define_table(
+#    'variable',
+#    Field('var_name', 'string', length=256, required=True, unique=True),
+#    Field('var_value_pickled', 'text'), ## pickled value
+#    )
 
 #import pickle
 #class VirtualFields_variable(object):
 #    def var_value(self):
 #        return pickle.loads(self.variable.var_value_pickled)
 #db.variable.virtualfields.append(VirtualFields_variable())
+
+## CMS-Specific ================================================================
+
+#from cms_tools import *
+#node_manager = NodeManager(db)
+
+from cms_tools import CmsDB
+cmsdb = CmsDB(db)
+
