@@ -1,0 +1,408 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>CMS Elements &mdash; web2py_cms 0.1-alpha documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1-alpha',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="web2py_cms 0.1-alpha documentation" href="../index.html" />
+    <link rel="up" title="Brainstorming" href="index.html" />
+    <link rel="next" title="cms_auth" href="../modules/cms_auth.html" />
+    <link rel="prev" title="Default content types" href="content-types.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../modules/cms_auth.html" title="cms_auth"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="content-types.html" title="Default content types"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">web2py_cms 0.1-alpha documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Brainstorming</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="cms-elements">
+<h1>CMS Elements<a class="headerlink" href="#cms-elements" title="Permalink to this headline">¶</a></h1>
+<p>This is a description of the base elements that should be managed in order
+to build a fully-featured CMS upon it.</p>
+<p>By building a schema to limit element interaction, we should be able to build
+a quite complex structure.</p>
+<ul class="simple">
+<li>Each entity is identified by <tt class="docutils literal"><span class="pre">(type,</span> <span class="pre">id)</span></tt>.</li>
+<li>Entities CRUD must be accessed <strong>only</strong> via an entity manager contained
+in the <tt class="docutils literal"><span class="pre">cms_tools</span></tt> module. No manipulation should be done on the
+database directly.</li>
+</ul>
+<dl class="docutils">
+<dt>User</dt>
+<dd>as defined by auth_user</dd>
+<dt>Group</dt>
+<dd>as defined by auth_group</dd>
+<dt>Node</dt>
+<dd><p class="first">Used to represent content.
+Nodes also support versioning, with each version identified by a
+revision number + language.</p>
+<p class="last">Node storage is spread over several tables.</p>
+</dd>
+<dt>Comment (<tt class="docutils literal"><span class="pre">object</span> <span class="pre">(entity),</span> <span class="pre">author</span> <span class="pre">(user),</span> <span class="pre">comment</span> <span class="pre">details</span></tt>)</dt>
+<dd><p class="first">Comment attached to an entity.</p>
+<ul class="last simple">
+<li><strong>object</strong> (entity)</li>
+<li><strong>author</strong> (entity, type=user)</li>
+<li><strong>creation/update date</strong></li>
+<li>Comment-specific data (usually title and body)</li>
+</ul>
+</dd>
+<dt>Flag</dt>
+<dd><ul class="first last simple">
+<li><strong>object</strong> (the flagged object)</li>
+<li><strong>author</strong> (the flagging object, usually user)</li>
+<li><strong>key/value</strong></li>
+<li>Unique key: <tt class="docutils literal"><span class="pre">object,author,key</span></tt></li>
+</ul>
+</dd>
+<dt>Relationship</dt>
+<dd><ul class="first last simple">
+<li><strong>entity</strong></li>
+<li><strong>other</strong></li>
+<li><strong>relationship</strong> An identifier for the relationship</li>
+<li>Unique key: <tt class="docutils literal"><span class="pre">entity,other,relationship</span></tt></li>
+</ul>
+</dd>
+<dt>Attribute</dt>
+<dd><ul class="first last simple">
+<li><strong>object</strong></li>
+<li><strong>key/value</strong></li>
+<li>Unique key: <tt class="docutils literal"><span class="pre">object,key</span></tt></li>
+</ul>
+</dd>
+<dt>Vocabulary</dt>
+<dd>Used to contain tags. Used to provide some constraint + autogeneration
+of terms (eg. for tagging).</dd>
+<dt>Term</dt>
+<dd><ul class="first last simple">
+<li><strong>vocabulary</strong></li>
+<li><strong>title</strong> [-&gt;SHOULD SUPPORT TRANSLATION!]</li>
+<li><strong>parent</strong></li>
+<li>Definition of constraint on allowed content, etc.</li>
+</ul>
+</dd>
+<dt>Term_membership</dt>
+<dd><ul class="first last simple">
+<li><strong>entity</strong></li>
+<li><strong>tag</strong></li>
+</ul>
+</dd>
+<dt>Tree_organization</dt>
+<dd><p class="first">Used to organize heterogeneous entities in a tree.</p>
+<ul class="last simple">
+<li><strong>entity</strong></li>
+<li><strong>parent</strong></li>
+</ul>
+</dd>
+<dt>Menu</dt>
+<dd><p class="first">Container for menu links</p>
+<ul class="last simple">
+<li><strong>title</strong> [-&gt;SHOULD SUPPORT TRANSLATION!]</li>
+<li><strong>menu_id</strong></li>
+</ul>
+</dd>
+<dt>Menu_link</dt>
+<dd><ul class="first last simple">
+<li><strong>title</strong> [-&gt;SHOULD SUPPORT TRANSLATION!]</li>
+<li><strong>parent</strong></li>
+<li><strong>entity_type</strong> An entity type or &#8216;raw&#8217;</li>
+<li><strong>entity_id</strong> The entity id, or the URL if &#8216;raw&#8217; specified.</li>
+</ul>
+</dd>
+</dl>
+<div class="section" id="user">
+<h2>User<a class="headerlink" href="#user" title="Permalink to this headline">¶</a></h2>
+<p>A CMS user (as defined by <tt class="docutils literal"><span class="pre">auth_user</span></tt>), plus some extra fields
+for the user profile.</p>
+</div>
+<div class="section" id="group">
+<h2>Group<a class="headerlink" href="#group" title="Permalink to this headline">¶</a></h2>
+<p>A group of users (as defined by <tt class="docutils literal"><span class="pre">auth_group</span></tt>)</p>
+</div>
+<div class="section" id="node">
+<h2>Node<a class="headerlink" href="#node" title="Permalink to this headline">¶</a></h2>
+<p>A node is a &#8220;document&#8221;, a piece of content with a type and some
+attributes (&#8220;fields&#8221;).</p>
+<p>Nodes should support history / revisions.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Each node version is uniquely identified by <tt class="docutils literal"><span class="pre">node_version.id</span></tt> or,
+better, by a tuple of the <tt class="docutils literal"><span class="pre">node_version</span></tt> fields <tt class="docutils literal"><span class="pre">node</span></tt>,
+<tt class="docutils literal"><span class="pre">revision_id</span></tt>, <tt class="docutils literal"><span class="pre">language</span></tt>.</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>Beware that for <tt class="docutils literal"><span class="pre">version_id</span></tt>, <tt class="docutils literal"><span class="pre">node_version.id</span></tt> is meant;
+<tt class="docutils literal"><span class="pre">version_id</span></tt> uniquely identifies that exact revision/translation
+for the node.</p>
+<p class="last">To indicate the document <strong>revision</strong>, the term <tt class="docutils literal"><span class="pre">revision_id</span></tt>
+is used instead. Revisions owns multiple translations, versions not.</p>
+</div>
+<div class="section" id="database-model">
+<h3>Database model<a class="headerlink" href="#database-model" title="Permalink to this headline">¶</a></h3>
+<div class="admonition-todo admonition " id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">Use this structure, or something with <tt class="docutils literal"><span class="pre">node</span></tt> plus <tt class="docutils literal"><span class="pre">node_revision</span></tt>?
+And, how to store revisions for other node types?
+Use &#8220;groups&#8221; to group revisions of the same node? -&gt; not very cool!
+Plus, we should find a cool way to manage content translations!</p>
+</div>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">node_id</span></tt> This is <em>not</em> the table id!</li>
+<li><tt class="docutils literal"><span class="pre">node_type</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">revision_id</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">title</span></tt>, <tt class="docutils literal"><span class="pre">body</span></tt></li>
+</ul>
+</div>
+</div>
+<div class="section" id="taxonomy-tags">
+<h2>Taxonomy/tags<a class="headerlink" href="#taxonomy-tags" title="Permalink to this headline">¶</a></h2>
+<p>A &#8220;tag&#8221; is a category that may contain entities, and have a hierarchical
+tree structure.</p>
+<div class="section" id="id1">
+<h3>Database model<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">taxonomy_term</span></tt></dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">id</span></tt> is the Term ID used in references</li>
+<li><tt class="docutils literal"><span class="pre">parent</span></tt> Self-references <tt class="docutils literal"><span class="pre">taxonomy_term</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">label</span></tt> Label to identify the term</li>
+</ul>
+</dd>
+<dt><tt class="docutils literal"><span class="pre">taxonomy_term_membership</span></tt></dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">term_id</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">entity_type</span></tt>, <tt class="docutils literal"><span class="pre">entity_id</span></tt></li>
+</ul>
+</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="comment">
+<h2>Comment<a class="headerlink" href="#comment" title="Permalink to this headline">¶</a></h2>
+<p>A comment is a short text associated to another entity.</p>
+<ul class="simple">
+<li>Usually contains title,body,author and date.</li>
+<li>Comments should support nesting</li>
+</ul>
+<div class="section" id="id2">
+<h3>Database model<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">comment</span></tt></dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">entity_type</span></tt>, <tt class="docutils literal"><span class="pre">entity_id</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">title</span></tt>, <tt class="docutils literal"><span class="pre">body</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">author</span></tt>, <tt class="docutils literal"><span class="pre">created_date</span></tt>, <tt class="docutils literal"><span class="pre">updated_date</span></tt></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition-todo admonition " id="index-1">
+<p class="first admonition-title">Todo</p>
+<p class="last">Support revisions for comments too?</p>
+</div>
+</div>
+</div>
+<div class="section" id="flag">
+<h2>Flag<a class="headerlink" href="#flag" title="Permalink to this headline">¶</a></h2>
+<p>Flags are used to let <tt class="docutils literal"><span class="pre">entity</span></tt> put a <tt class="docutils literal"><span class="pre">key|value</span></tt> on <tt class="docutils literal"><span class="pre">entity</span></tt>.</p>
+<p>Flags should always be placed by their <tt class="docutils literal"><span class="pre">flagged_by_type</span></tt>, <tt class="docutils literal"><span class="pre">flagged_by_id</span></tt>
+user or entity.</p>
+<div class="section" id="id3">
+<h3>Database model<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">flag</span></tt></dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">entity_type</span></tt>, <tt class="docutils literal"><span class="pre">entity_id</span></tt> Flagged entity</li>
+<li><tt class="docutils literal"><span class="pre">flag_name</span></tt>, <tt class="docutils literal"><span class="pre">flag_value</span></tt> Name and value of the placed flag</li>
+<li><tt class="docutils literal"><span class="pre">flagged_by_type</span></tt>, <tt class="docutils literal"><span class="pre">flagged_by_id</span></tt> Entity that put the flag</li>
+<li>Extra stuff, such as set date, ... may be added.</li>
+<li>Comments should be added using comments only.</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="examples">
+<h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
+<p>&#8220;Like&#8221; function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">entity_type</span> <span class="o">=</span> <span class="n">node</span>
+<span class="n">entity_id</span> <span class="o">=</span> <span class="mi">25</span>
+<span class="n">flag_name</span> <span class="o">=</span> <span class="n">like</span>
+<span class="n">flag_value</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
+<span class="n">flagged_by_type</span> <span class="o">=</span> <span class="n">user</span>
+<span class="n">flagged_by_id</span> <span class="o">=</span> <span class="mi">13</span>
+</pre></div>
+</div>
+<p>Fivestar rating:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">entity_type</span> <span class="o">=</span> <span class="n">node</span>
+<span class="n">entity_id</span> <span class="o">=</span> <span class="mi">25</span>
+<span class="n">flag_name</span> <span class="o">=</span> <span class="n">fivestar</span>
+<span class="n">flag_value</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">flagged_by_type</span> <span class="o">=</span> <span class="n">user</span>
+<span class="n">flagged_by_id</span> <span class="o">=</span> <span class="mi">13</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="relationship">
+<h2>Relationship<a class="headerlink" href="#relationship" title="Permalink to this headline">¶</a></h2>
+<p>Relationships are used to link together two entities.
+Relationships usually express more interaction that just placement of a flag,
+anyways this could be easily implemented for non-mutual relationships
+using just a flag.</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">relationship</span></tt></dt>
+<dd><ul class="first last simple">
+<li><tt class="docutils literal"><span class="pre">entity_type</span></tt>, <tt class="docutils literal"><span class="pre">entity_id</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">other_type</span></tt>, <tt class="docutils literal"><span class="pre">other_id</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">relationship</span></tt> The relationship from <tt class="docutils literal"><span class="pre">entity</span></tt> to <tt class="docutils literal"><span class="pre">other</span></tt></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition-todo admonition " id="index-2">
+<p class="first admonition-title">Todo</p>
+<p class="last">How to handle mutual vs non-mutual relationships?</p>
+</div>
+</div>
+<div class="section" id="content-display">
+<h2>Content display<a class="headerlink" href="#content-display" title="Permalink to this headline">¶</a></h2>
+<p>Content displays are &#8220;advanced&#8221; views that define how to pick content
+and render it.
+They should not be placed in the database but in the configuration.
+(Or should we allow both?)</p>
+</div>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<p>Configuration is structured in a &#8220;registry&#8221; way, and stored on filesystem
+and/or database.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">CMS Elements</a><ul>
+<li><a class="reference internal" href="#user">User</a></li>
+<li><a class="reference internal" href="#group">Group</a></li>
+<li><a class="reference internal" href="#node">Node</a><ul>
+<li><a class="reference internal" href="#database-model">Database model</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#taxonomy-tags">Taxonomy/tags</a><ul>
+<li><a class="reference internal" href="#id1">Database model</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#comment">Comment</a><ul>
+<li><a class="reference internal" href="#id2">Database model</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#flag">Flag</a><ul>
+<li><a class="reference internal" href="#id3">Database model</a></li>
+<li><a class="reference internal" href="#examples">Examples</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#relationship">Relationship</a></li>
+<li><a class="reference internal" href="#content-display">Content display</a></li>
+<li><a class="reference internal" href="#configuration">Configuration</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="content-types.html"
+                        title="previous chapter">Default content types</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../modules/cms_auth.html"
+                        title="next chapter">cms_auth</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/brainstorming/elements.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../modules/cms_auth.html" title="cms_auth"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="content-types.html" title="Default content types"
+             >previous</a> |</li>
+        <li><a href="../index.html">web2py_cms 0.1-alpha documentation</a> &raquo;</li>
+          <li><a href="index.html" >Brainstorming</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Samuele Santi &lt;redshadow@hackzine.org&gt;.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.
+    </div>
+  </body>
+</html>

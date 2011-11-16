@@ -1,0 +1,97 @@
+{{left_sidebar_enabled=right_sidebar_enabled=False}}
+{{body_classes='fluid-width'}}
+{{extend 'layout.html'}}
+
+{{
+import random
+
+lipsum = """
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vitae neque nec
+urna luctus sagittis. Quisque eget mi vitae sapien rutrum dictum id eu purus.
+Fusce ligula felis, congue eu sodales sit amet, semper non sapien. Mauris massa
+sapien, venenatis at congue vitae, viverra ornare enim. Proin at sem vitae
+nulla mollis sagittis ut non mauris! Vivamus dapibus porta ligula, quis
+pharetra libero semper in. Quisque ultrices tincidunt turpis, eu scelerisque
+metus consectetur sit amet? Donec ligula justo, suscipit non pulvinar eget,
+lacinia et eros. Ut et euismod nulla. Class aptent taciti sociosqu ad litora
+torquent per conubia nostra, per inceptos himenaeos. Proin porttitor, mauris
+in auctor congue, elit eros euismod tellus, vitae imperdiet risus tortor quis
+felis? Vivamus nec semper mi? Nullam tempus magna sed velit vulputate varius?
+Suspendisse sed metus vel sem gravida porta vel eget est. Praesent venenatis
+nunc ut arcu congue imperdiet? Quisque sodales lobortis cursus.
+Vivamus sollicitudin fringilla ligula; at scelerisque augue egestas id. Nulla
+non orci vitae nisl iaculis euismod at eget tellus! Donec luctus posuere
+tincidunt. Proin id augue massa? Mauris non ullamcorper metus. Ut placerat,
+urna at pharetra interdum, dui enim dictum enim, ut malesuada lorem mi eget
+diam. Mauris scelerisque nibh nisl, a tincidunt lectus. Sed erat augue;
+iaculis ultrices rhoncus sed, feugiat ac justo. Quisque sapien lorem,
+fringilla ac fringilla sed, consequat ac odio.
+Cras non semper ipsum! Curabitur vestibulum bibendum porta. Etiam posuere odio
+non erat facilisis vel commodo odio sagittis. Duis vel metus nec lacus
+malesuada egestas. Etiam.
+"""
+}}
+
+<h1>CSS/Styles development page</h1>
+
+<p>This page is just used to render some example content, in order
+to test CSS / page styling.</p>
+
+<h2>Tables</h2>
+
+<p>Example theming for tables</p>
+
+<h3>Normal table</h3>
+{{_lipsum = lipsum.split()}}
+<table style="width: 100%;">
+    <thead><tr>
+        {{for i in range(5):}}
+        <th>{{=' '.join([_lipsum.pop(0) for i in range(2)])}}</th>
+        {{pass}}
+    </tr></thead>
+    <tbody>
+    {{for x in range(10):}}
+    <tr>
+        {{for i in range(5):}}
+        <td>{{=' '.join([_lipsum.pop(0) for i in range(2)])}}</td>
+        {{pass}}
+    </tr>
+    {{pass}}
+    </tbody>
+</table>
+
+<h3>Zebra table</h3>
+{{_lipsum = lipsum.split()}}
+<table class="zebra" style="width: 100%;">
+    <thead><tr>
+        {{for i in range(5):}}
+        <th>{{=' '.join([_lipsum.pop(0) for i in range(2)])}}</th>
+        {{pass}}
+    </tr></thead>
+    <tbody>
+    {{for x in range(10):}}
+    <tr>
+	    {{for i in range(5):}}
+	    <td>{{=' '.join([_lipsum.pop(0) for i in range(2)])}}</td>
+	    {{pass}}
+    </tr>
+    {{pass}}
+    </tbody>
+</table>
+
+<h2>Messages</h2>
+
+{{_lipsum = lipsum.split()}}
+<div class="messages-box">
+<ul class="messages">
+    <li class="message message-info">{{=' '.join([_lipsum.pop(0) for i in range(15)])}}</li>
+    <li class="message message-warning">{{=' '.join([_lipsum.pop(0) for i in range(15)])}}</li>
+    <li class="message message-error">{{=' '.join([_lipsum.pop(0) for i in range(15)])}}</li>
+    <li class="message message-help">{{=' '.join([_lipsum.pop(0) for i in range(15)])}}</li>
+    {{for i in range(10): }}
+    <li class="message message-{{=random.choice(['info','warning','error','help'])}}">
+        {{=' '.join([_lipsum.pop(0) for i in range(15)])}}
+    </li>
+    {{pass}}
+</ul>
+</div>
