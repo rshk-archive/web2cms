@@ -2,43 +2,8 @@
 {{extend 'layout.html'}}
 
 <h1>{{=T('All nodes')}}</h1>
-<!-- {{=SQLTABLE(nodes)}} -->
 
-{{from gluon.sqlhtml import represent}}
-
-{{=TABLE(
-
-THEAD(TR(
-    TH(T('Node ID')),
-    TH(T('Type')),
-    TH(T('Title')),
-    TH(T('Created')),
-    TH(T('Updated')),
-    TH(T('Author')),
-    TH(T('Actions')),
-)),
-
-TBODY(*[TR(
-    TD(node.id),
-    TD(node.type),
-    TD(A(node.title, _href=URL('default', 'node_read', args=[node.id]))),
-    TD(node.created),
-    TD(node.updated),
-    
-    #TD(represent(db.node.author, node.author, node)),
-    
-    TD(A(
-        represent(db.node.author, node.author, node),
-        _href=URL('default', 'user', args=['profile', node.author]),
-    )),
-    
-    TD([
-        A(T('view'), _href=URL('default', 'node_read', args=[node.id])),' ',
-        A(T('edit'), _href=URL('default', 'node_update', args=[node.id])),' ',
-        A(T('delete'), _href=URL('default', 'node_delete', args=[node.id])),' ',
-    ])
-) for node in nodes]),
-
-_style = 'width:100%;'
-
-)}}
+{{for node in nodes:}}
+{{teaser=True}}
+{{include 'content/node.html'}}
+{{pass}}

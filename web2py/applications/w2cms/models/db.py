@@ -69,6 +69,7 @@ mail.settings.sender = main_cfg.getd('mail','sender')
 mail.settings.login = main_cfg.getd('mail','login')
 
 ## configure auth policy
+##TODO: Read from configuration
 auth.settings.registration_requires_verification = False
 auth.settings.registration_requires_approval = False
 auth.settings.reset_password_requires_verification = True
@@ -99,6 +100,34 @@ auth.settings.reset_password_requires_verification = True
 
 import cms_settings
 
+## Field representation functions ==============================================
+def user_name_represent(value, row=None):
+    if value:
+        try:
+            return '%(first_name)s %(last_name)s' % value
+        except:
+            return "FMTERROR"
+    else:
+        return 'unknown'
+
+
+## Standard signature fields ===================================================
+## This signature table is slightly different from the one defined
+## by Auth inside auth.signature, so we redefine it here.
+signature = db.Table(db, 'cms_signature',
+    Field('created_date', 'datetime', default=request.now),
+    Field('created_by', db.auth_user, default=auth.user_id),
+    Field('updated_date', 'datetime', update=request.now),
+    Field('updated_by', db.auth_user, update=auth.user_id))
+
+signature.created_date.requires = IS_DATETIME(T('%Y-%m-%d %H:%M:%S'))    
+signature.updated_date.requires = IS_DATETIME(T('%Y-%m-%d %H:%M:%S'))
+signature.created_by.requires = IS_IN_DB(db, db.auth_user.id, '%(first_name)s %(last_name)s [#%(id)d]')
+signature.updated_by.requires = IS_IN_DB(db, db.auth_user.id, '%(first_name)s %(last_name)s [#%(id)d]')
+signature.created_by.represent = user_name_represent
+signature.updated_by.represent = user_name_represent
+
+
 ## Table: node =================================================================
 ## Definition of nodes
 
@@ -127,10 +156,13 @@ db.define_table(
     Field('language', 'string', length=32, required=True),
     
     ## Standard metadata
-    Field('created_by', db.auth_user, default=auth.user_id, required=True),
-    Field('updated_by', db.auth_user, update=auth.user_id, required=True),
-    Field('created_date', 'datetime', default=request.now, required=True),
-    Field('updated_date', 'datetime', update=request.now, required=True),
+    #Field('created_by', db.auth_user, default=auth.user_id, notnull=True),
+    #Field('updated_by', db.auth_user, update=auth.user_id, notnull=True),
+    #Field('created_date', 'datetime', default=request.now, notnull=True),
+    #Field('updated_date', 'datetime', update=request.now, notnull=True),
+    
+    ## Signature: {created,updated}_{by,date}
+    signature,
     
     ## Published flag, for translation draft
     Field('published', 'boolean', default=True),
@@ -140,12 +172,20 @@ db.define_table(
     )
 
 db.node_version.node.requires = IS_IN_DB(db, db.node.id, "Node %(id)d [%(type)s]: %(title)s")
-db.node_version.created_date.requires = IS_DATETIME(T('%Y-%m-%d %H:%M:%S'))    
-db.node_version.updated_date.requires = IS_DATETIME(T('%Y-%m-%d %H:%M:%S'))
-db.node_version.created_by.requires = IS_IN_DB(db, db.auth_user.id, '%(first_name)s %(last_name)s [#%(id)d]')
-db.node_version.created_by.represent = lambda x,y=None: '%(first_name)s %(last_name)s' % x
-db.node_version.updated_by.requires = IS_IN_DB(db, db.auth_user.id, '%(first_name)s %(last_name)s [#%(id)d]')
-db.node_version.updated_by.represent = lambda x,y=None: '%(first_name)s %(last_name)s' % x
+
+#db.node_version.created_date.requires = IS_DATETIME(T('%Y-%m-%d %H:%M:%S'))    
+#db.node_version.updated_date.requires = IS_DATETIME(T('%Y-%m-%d %H:%M:%S'))
+#db.node_version.created_by.requires = IS_IN_DB(db, db.auth_user.id, '%(first_name)s %(last_name)s [#%(id)d]')
+#db.node_version.updated_by.requires = IS_IN_DB(db, db.auth_user.id, '%(first_name)s %(last_name)s [#%(id)d]')
+#db.node_version.created_by.represent = user_name_represent
+#db.node_version.updated_by.represent = user_name_represent
+
+class Node_version_VirtualFields:
+    def base_fields(self):
+        #print "@@@CALLED@@@ Node_version_VirtualFields.base_fields"
+        return self.node_version.node_base_fields.select().first()
+
+db.node_version.virtualfields.append(Node_version_VirtualFields())
 
 ## Table: node_base_fields =====================================================
 ## Common fields for all node types

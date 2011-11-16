@@ -5,26 +5,5 @@
 
 {{include 'generic/tabs.html'}}
 
-<div class="node node-type-{{=node.type}} node-full">
-
-<h1>{{=node.title}}</h1>
-
-<div class="submitted">
-{{=XML(T('Submitted by %(author)s on %(date)s', dict(
-    author = A(represent(db.node.author, node.author, node), _href=URL('default', 'user_profile', args=[node.author])),
-    date = represent(db.node.created, node.created, node),
-)))}}
-
-{{if node.created != node.updated:}}
-({{=T('Last update on %(date)s', dict(date=represent(db.node.updated, node.updated, node)))}})
-{{pass}}
-</div>
-
-<div class="node-content">{{=node.body}}</div>
-
-</div>
-
-<!-- {{=BEAUTIFY(node)}} -->
-
-{{block left_sidebar}}New Left Sidebar Content{{end}}
-{{block right_sidebar}}New Right Sidebar Content{{end}}
+{{teaser=False}}
+{{include 'content/node.html'}}

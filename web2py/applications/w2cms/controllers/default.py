@@ -91,6 +91,7 @@ def _node_menu(node_id):
     menu_items = []
     for label, function in [
         (T('View'), 'node_read'),
+        (T('Versions'), 'node_versions'),
         (T('Edit'), 'node_update'),
         (T('Delete'), 'node_delete'),
         ]:
@@ -127,28 +128,64 @@ def _apply_text_format(text, format):
 import cms_settings
 
 def node_create():
-    """Node creation form"""
+    """Node creation form.
+    
+    Here, we need to have:
+    
+    * Fields for db.node:
+    
+      * id (0 for creation)
+      * type (hidden)
+      * published
+      * weight
+      
+    * Fields for db.node_version:
+    
+      * id (0 for creation)
+      * revision_id (0 for creation)
+      * language
+      * {created,updated} {date,by}
+      * published (for the version)
+      * is_translation_base -> hidden, locked!
+    
+    * Fields for db.node_base_fields:
+    
+      * id (0 for creation)
+      * title
+      * body
+      * body_format
+    """
     if len(request.args) > 0:
-        response.view = 'generic/form.'+request.extension
+        ## Return creation form for this node type
+        
         node_type = request.args[0]
         node_types = cms_settings.list_node_types()
         if node_type not in node_types.keys():
             raise HTTP(404)
+        
+        ## Set defaults
         db.node.type.default = node_type
+        
+        ## Generate form. We can't use CRUD here!
+        form = SQLFORM(db.node)
+        #form_node_version = SQLFORM(db.node_version)
+        
+        
+        
+        response.view = 'generic/form.' + request.extension
         return dict(
             title=T('Create %s', node_types[node_type]['label']),
-            form=crud.create(db.node),
-            )
+            form=form)
+    
     else:
+        ## Return selection menu to choose node type to create
         menu_items = [
-            (T('Create "%s" node', type_def['label']), False, URL('default','node_create',args=[node_type]), [])
+            (T('Create "%s" node', type_def['label']), False,
+                URL('default','node_create',args=[node_type]), [])
             for node_type, type_def in cms_settings.list_node_types().items()
         ]
         response.view = 'generic/menu_page.%s' % request.extension
-        return dict(
-            title=T('Create content'),
-            menu_items=menu_items,
-            )
+        return dict(title=T('Create content'), menu_items=menu_items)
     
 @use_custom_view('generic/form')
 def node_update():
@@ -167,13 +204,10 @@ def node_update():
 def node_read():
     """Full-page node display"""
     try:
-        node = _node_load(request.args[0])
+        node = cmsdb.node.read(int(request.args[0]))
     except:
         raise HTTP(404)
     else:
-        
-        node.body = _apply_text_format(node.body, node.body_format)
-        
         return dict(
             node=node,
             tabs=_node_menu(node.id),
@@ -197,9 +231,13 @@ def node_delete():
             form = "Please use the udpate form to delete entries"
         )
 
+def node_versions():
+    """Information on node versions"""
+    return node_read()
+
 def node_list():
     """List all the content"""
-    return dict(nodes=db(db.node).select())
+    return dict(nodes=cmsdb.node.search())
 
 def node_search():
     """Content search page"""

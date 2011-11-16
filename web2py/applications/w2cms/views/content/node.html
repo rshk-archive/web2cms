@@ -6,9 +6,9 @@
 		{{#@todo: Read the list of nodes for which to show calendar from configuration}}
 		{{if node.type in ['article']:}}
 		<div class="node-calendar">
-		    <div class="node-calendar-month">{{=node.created.strftime("%B")}}</div>
-		    <div class="node-calendar-day">{{=node.created.strftime("%-d")}}</div>
-		    <div class="node-calendar-year">{{=node.created.strftime("%Y")}}</div>
+		    <div class="node-calendar-month">{{=node.created_date.strftime("%B")}}</div>
+		    <div class="node-calendar-day">{{=node.created_date.strftime("%-d")}}</div>
+		    <div class="node-calendar-year">{{=node.created_date.strftime("%Y")}}</div>
 		</div>
 		{{pass}}
 	
@@ -18,18 +18,18 @@
 		<h1 class="node-title">{{=node.title}}</h1>
 		{{pass}}
 		
-		<time pubdate datetime="{{=node.created.strftime('%FT%T')}}"></time>
+		<time pubdate datetime="{{=node.created_date.strftime('%FT%T')}}"></time>
 		
 		<div class="submitted">
 		{{=XML(T('Submitted by %(author)s on %(date)s', dict(
-		    author = A(represent(db.node.author, node.author, node), _href=URL('default', 'user_profile', args=[node.author])),
-		    date = represent(db.node.created, node.created, node),
+		    author = A(represent(db.node_version.created_by, node.created_by, node), _href=URL('default', 'user_profile', args=[node.created_by])),
+		    date = represent(db.node_version.created_date, node.first_version.created_date, node),
 		)))}}
 		</div>
 		
-		{{if node.created != node.updated:}}
+		{{if node.created_date != node.updated_date:}}
 		<div class="updated">
-        ({{=T('Last update on %(date)s', dict(date=represent(db.node.updated, node.updated, node)))}})
+        ({{=T('Last update on %(date)s', dict(date=represent(db.node_version.updated_date, node.updated_date, node)))}})
         </div>
         {{pass}}
 		
@@ -48,12 +48,13 @@
 	    </nav>
     </footer>
 
-	{{if (not teaser) and comments_enabled:}}
-	{{from helpers import get_comments}}
-	{{comments=get_comments(db, 'node', str(node.id))}}
-	{{include 'content/comment-list.html'}}
-	{{pass}}
-	
-	
+
+    {{#TODO: Use a component to load comments!}}
+
+	{{#if (not teaser) and comments_enabled:}}
+	{{#from helpers import get_comments}}
+	{{#comments=get_comments(db, 'node', str(node.id))}}
+	{{#include 'content/comment-list.html'}}
+	{{#pass}}
 
 </article>

@@ -752,34 +752,39 @@ body { background:#888; }
 
 .node .submitted { color:#777; font-style: italic; font-size: .8em; }
 
+/** Tabs
+*******************************************************************************/
 ul.tabs-menu {
 	border-bottom: solid 1px #888;
-	padding-left: 5px;
+	padding: 0 5px 1px;
 }
 .tabs-menu li {
 	display: inline;
+    margin: 0 2px 0 0;
 }
 .tabs-menu li a {
-    padding: 3px 8px;
+	padding: 3px 8px;
     background: #eee;
-    margin-right:2px;
-    border:solid 1px #888;
+    border:solid 1px #AAA;
+    border-bottom:none;
     color: #444;
-    /* -moz-border-radius-topleft: 5px;
-    -moz-border-radius-topright: 5px; */
-    /* border-top-left-radius: 5px;
-    border-top-right-radius: 5px; */
 }
 .tabs-menu li a:hover {
     background: #f8f8f8;
     text-decoration: none;
 }
+ul.tabs-menu li.web2py-menu-active{
+	
+}
 ul.tabs-menu li.web2py-menu-active a {
-	border-bottom: solid 1px #fff;
 	background: #fff;
+	border-color: #888;
+	border-bottom: solid 2px #fff;
+	border-top-width: 2px;
 }
 
-/** Grid-layout menu **/
+/** Grid-layout menu
+*******************************************************************************/
 .grid-menu-cell {
 	height:100px;
 	margin:0;
@@ -913,6 +918,40 @@ table.zebra > tbody > tr:nth-child(odd) {
 }
 table.zebra > tbody > tr:nth-child(even) {
     background-color: #eee;
+}
+
+/** Table cell highlighting
+*******************************************************************************/
+table > tbody > tr > td.highlight,
+table > tbody > tr > td.highlight-yellow,
+table.zebra > tbody > tr:nth-child(odd) > td.highlight,
+table.zebra > tbody > tr:nth-child(odd) > td.highlight-yellow {
+	background: #ffe;
+}
+table.zebra > tbody > tr:nth-child(even) > td.highlight,
+table.zebra > tbody > tr:nth-child(even) > td.highlight-yellow {
+	background: #ffd;
+}
+table > tbody > tr > td.highlight-yellow,
+table.zebra > tbody > tr:nth-child(odd) > td.highlight-red {
+    background: #fee;
+}
+table.zebra > tbody > tr:nth-child(even) > td.highlight-red {
+    background: #fdd;
+}
+table > tbody > tr > td.highlight-yellow,
+table.zebra > tbody > tr:nth-child(odd) > td.highlight-green {
+    background: #efe;
+}
+table.zebra > tbody > tr:nth-child(even) > td.highlight-green {
+    background: #dfd;
+}
+
+
+/** Other table styles
+*******************************************************************************/
+table.grid > tbody > tr > td {
+	border: solid 1px #bbb;
 }
 
 /** Messages

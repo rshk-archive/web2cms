@@ -5,10 +5,17 @@ This includes mostly CRUD / management for base elements and all the stuff
 that needs quick importing from a single module.
 
 Also, we should provide ``__all__`` to limit the amount of imported stuff.
+
+.. WARNING:: Language is being intentionally ignored at the moment!
+
+We need to decide exactly how to handle the language selection mechanism,
+so for the moment just one language is used.
+
 '''
 
 __all__ = ['CmsDB']
 
+import gluon.dal
 from gluon import *
 from gluon.storage import Storage
 
@@ -69,12 +76,6 @@ class CmsDB(object):
 ##==============================================================================
 
 class ElementManager(object):
-    ## This allows working as a separate user, for example
-    ## when an administrative task is required to be run by the *system*
-    ## with high privileges, even if the current user will otherways
-    ## unable to perform that action.
-    _working_user = None
-    
     ## To store CMSDB
     _cmsdb = None
     
@@ -84,6 +85,10 @@ class ElementManager(object):
     @property
     def db(self):
         return self._cmsdb._db
+    
+    @property
+    def cmsdb(self):
+        return self._cmsdb
     
     @property
     def current_language(self):
@@ -100,16 +105,30 @@ class ElementManager(object):
     @current_user.setter
     def current_user(self, value):
         self._cmsdb.set_working_user(value)
+
+class ElementEntity(object):
     
-    ## Working user management =================================================
-    def get_working_user(self):
-        if self._working_user is not None:
-            return self._working_user
-        else:
-            return current.user
+    _db_row = None
+    _cmsdb = None
     
-    def set_working_user(self, working_user):
-        self._working_user = working_user
+    def __init__(self, db_row=None, cmsdb=None):
+        self._db_row = db_row
+        self._cmsdb = cmsdb
+    
+    @property
+    def db(self):
+        return self._cmsdb._db
+    
+    def __getattr__(self, name):
+        if self._db_row.has_key(name):
+            return self._db_row[name]
+        raise AttributeError("No such attribute: %r" % name)
+    
+    def __getitem__(self, key):
+        try:
+            return self.__getattr__(key)
+        except AttributeError:
+            raise KeyError(str(key))
 
 
 ##==============================================================================
@@ -142,32 +161,40 @@ class NodeManager(ElementManager):
         
         db = self.db
         
-        row_node = {
-            'type' : values.get('type', ''),
-            'weight' : values.get('weight', 0),
-            'published' : values.get('published', True),
-        }
+        try:
         
-        row_node_version = {
-            'node' : None, # updated later
-            'revision_id' : 1, # first revision for this node
-            'language' : values.get('language', 'neutral'),
-            'published' : values.get('published', True),
-            'is_translation_base' : True,
-        }
+            row_node = {
+                'type' : values.get('type', ''),
+                'weight' : values.get('weight', 0),
+                'published' : values.get('published', True),
+            }
+            
+            node_id = db.node.insert(**row_node)
+            
+            row_node_version = {
+                'node' : node_id,
+                'revision_id' : 1, # first revision for this node
+                'language' : values.get('language', 'neutral'),
+                'published' : values.get('published', True),
+                'is_translation_base' : True,
+            }
+            
+            version_id = db.node_version.insert(**row_node_version)
+            
+            row_node_base_fields = {
+                'node_version' : version_id,
+                'title' : values.get('title', 'Untitled node %d' % node_id),
+                'body' : values.get('body', ''),
+                'body_format' : values.get('body_format', 'html-full'),
+            }
+            
+            db.node_base_fields.insert(**row_node_base_fields)
         
-        row_node_base_fields = {
-            'node_version' : None, # updated later
-            'title' : values.get('title', 'Untitled node %d' % node_id),
-            'body' : values.get('body', ''),
-            'body_format' : values.get('body_format', 'html-full'),
-        }
+        except:
+            db.rollback()
+        else:
+            db.commit()
         
-        node_id = db.node.insert(row_node)
-        row_node_version['node'] = node_id
-        version_id = db.node_version.insert(row_node_version)
-        row_node_base_fields['node_version'] = version_id
-        db.node_base_fields.insert(row_node_base_fields)
         return node_id
     
     def read(self, node_id, revision=None, language=None):
@@ -176,9 +203,7 @@ class NodeManager(ElementManager):
         :return: A ``NodeEntity`` object containing values for the whole node.
         """
         
-        node = Storage()
-        
-        pass
+        return NodeEntity(self.db.node[node_id], self._cmsdb)
     
     def update(self, values, node_id=None):
         """Update the selected node.
@@ -258,25 +283,21 @@ class NodeManager(ElementManager):
         """Search for nodes.
         """
         db = self.db
-        
-        #return db(query).select(db.node.ALL, orderby=orderby)
-        all_nodes = []
-        for row in db().select(db.node.ALL):
-            #max = db.node_version.revision_id.max()
-            #latest_revision = db(db.node_version.node==row.id).select(max).first()[max]
-            _versions = db(db.node_version.node==row).select(db.node_version.ALL)
-            row.versions = {}
-            for _ver in _versions:
-                if not row.versions.has_key(_ver.revision_id):
-                    row.versions[_ver.revision_id] = {}
-                row.versions[_ver.revision_id][_ver.language] = _ver
-            all_nodes.append(row)
-        return all_nodes
+        return [
+            NodeEntity(row, self._cmsdb)
+            for row in db(query).select(db.node.ALL, orderby=orderby)
+            ]
 
-
-class NodeEntity(object):
+class NodeEntity(ElementEntity):
     """\
     Class representing a CMS node.
+    
+    * A __getattr__ (+ __getitem__) should return the current fields
+    * versions contain the versions -> lazy property
+    * Language resolution works checks for:
+    
+      * Requested language or current language or site default
+      * Node translation source
     
     * Versions are structured in a tree, with ``revision_id``
       -> ``list`` of ``versions``.
@@ -286,6 +307,18 @@ class NodeEntity(object):
       queries on update, sice possibily a node may have quite a lot of
       revisions + external tables and it's not a good idea to always
       update them all!
+    
+    
+    Values retrieval + dict-like behavior.
+    All the values for the node will be retrieved from:
+    
+    * self._db_row
+    * self._db_row.node_version.select() --> for the current version [AKA self.latest_version]
+    * For each self.latest_version, all the fields that are a gluon.dal.Set
+      will be select()ed and the field searched inside.
+    
+    .. TODO:: How to get a list of available fields without actually running
+        queries? (-> Exploring the DAL, that's how)
     """
     
     node_id = None
@@ -293,101 +326,149 @@ class NodeEntity(object):
     revision_numbers = None
     languages = None
     
-    def __init__(self):
-        pass
+    _current_language = None
     
-    @classmethod
-    def from_db(cls, db, node_id):
-        """**Constructor:** build the node entity by loading from database"""
-        _node_obj = db.node[node_id]
-        if not _node_obj:
-            return None
-        node = cls()
-        node.node_id = node_id
-        return node
-    
-    def list_versions(self):
-        """List all the versions for this node."""
-        pass
-    
-    def list_languages(self, version_id=None):
-        """List all the languages for this node."""
-        pass
-    
-    def add_version(self, revision_id, language, values):
-        """Add a version to this node.
-        Versions are placed in ``self.versions[revision_id][language]``.
+    @property
+    def versions(self):
+        """Returns all the versions for this node, as database rows.
         """
-        
-        self.versions[revision_id][language] = NodeVersion.from_dict(
-            values,
-            node_id=self.node_id,
-            revision_id=revision_id,
-            language=language)
-        
-        pass
-
-
-class NodeVersion(object):
-    """Class representing a CMS node version."""
+        return self._db_row.node_version.select(orderby=
+                self.db.node_version.revision_id |
+                ~self.db.node_version.is_translation_base |
+                self.db.node_version.language)
     
-    _node_meta = None
-    _node_values = None
+    @property
+    def latest_version(self):
+        return self._get_latest_version()
     
-    def __init__(self, node_id, revision_id, language, version_id, values):
-        self.__dict__['_node_meta'] = {
-            'node_id' : node_id,
-            'revision_id' : revision_id,
-            'language' : language,
-            'version_id' : version_id,
-        }
-        self.__dict__['_node_values'] = {}
-        self.__dict__['_node_values'].update(values)
+    @property
+    def first_version(self):
+        return self._get_first_version()
+    
+    def _get_latest_version(self):
+        """Returns the latest version for this node, looking for:
+        
+        * Published version
+        * Highest revision number
+        * Current language
+        * Default site language
+        * Translation base
+        
+        * If a published version exist, it should be preferred over
+          non-published versions, even if more recent.
+        """
+        db = self.db
+        
+        ## TODO: Make the orderby configurable, even on a per-node-type basis
+        
+        return self._db_row.node_version.select(
+            orderby=~db.node_version.published |
+            ~db.node_version.revision_id |
+            ~(db.node_version.language=='en-en') | ## TODO: Replace 'en-en' with current language(s)!
+            ~(db.node_version.language=='en-en') | ## TODO: Replace 'en-en' with default language!
+            ~db.node_version.is_translation_base 
+            ).first()
+
+        ## If we want to do something more complex:
+        #return db(db.node_version.node==self._db_row)(db.node_version.published==True).select(
+        #    orderby=~self.db.node_version.revision_id | self.db.node_version.language,
+        #    ).first()
+    
+    def _get_first_version(self):
+        db = self.db
+        return self._db_row.node_version.select(
+            orderby=db.node_version.revision_id |
+            ~db.node_version.is_translation_base |
+            db.node_version.id 
+            ).first()
     
     def __getattr__(self, name):
-        if name.startswith('_'):
-            _name = name[1:]
-            return self.__dict__['_node_meta'][_name]
-        else:
-            return self.__dict__['values'][name]
-    
-    def __setattr__(self, name, value):
-        if name.startswith('_'):
-            _name = name[1:]
-            self.__dict__['_node_meta'][_name] = value
-        else:
-            self.__dict__['values'][name] = value
-    
-    def __delattr__(self, key):
-        if name.startswith('_'):
-            _name = name[1:]
-            del self.__dict__['_node_meta'][_name]
-        else:
-            del self.__dict__['values'][name]
-    
-    def __getitem__(self, key):
-        return self.__getattr__(key)
-    
-    def __setitem__(self, key, value):
-        return self.__setattr__(key, value)
-    
-    def __delitem__(self, key):
-        return self.__delattr__(key)
-    
-    def keys(self):
-        return map(lambda x: "_%s" % x, self.__dict__['_node_meta'].keys()) \
-            + self.__dict__['_node_values'].keys()
-    
-    def has_key(self, key):
-        return (key in self.keys())
-    
-    def update(self, values):
-        self.__dict__['_node_values'].update(values)
-    
-    @classmethod
-    def from_dict(cls, values, *args, **kwargs):
-        """**Constructor** Instantiate a new node version
-        from the passed-in values"""
-        node_version = cls(*args, **kwargs)
-        node_version.update(values)
-        return node_version
+        ## Fields from db.node
+        if self._db_row.has_key(name):
+            return self._db_row[name]
+        
+        ## Fields from db.node_version, for the latest version
+        _lv = self._get_latest_version()
+        if _lv.has_key(name):
+            return _lv[name]
+        
+        ## Search in all the back-references
+        for k in _lv.keys():
+            ## TODO: Improve this check a bit!
+            if isinstance(_lv[k], gluon.dal.Set):
+                for r in _lv[k].select():
+                    ## All the rows have the same fields!
+                    ## So, the first one will always return
+                    if r.has_key(name):
+                        return r[name]
+        
+        ## Pass to the default
+        return ElementEntity.__getattr__(self, name)
+
+
+#class NodeVersion(object):
+#    """Class representing a CMS node version.
+#    
+#    .. TODO:: Is this needed anymore?
+#    """
+#    
+#    _node_meta = None
+#    _node_values = None
+#    
+#    def __init__(self, node_id, revision_id, language, version_id, values):
+#        self.__dict__['_node_meta'] = {
+#            'node_id' : node_id,
+#            'revision_id' : revision_id,
+#            'language' : language,
+#            'version_id' : version_id,
+#        }
+#        self.__dict__['_node_values'] = {}
+#        self.__dict__['_node_values'].update(values)
+#    
+#    def __getattr__(self, name):
+#        if name.startswith('_'):
+#            _name = name[1:]
+#            return self.__dict__['_node_meta'][_name]
+#        else:
+#            return self.__dict__['values'][name]
+#    
+#    def __setattr__(self, name, value):
+#        if name.startswith('_'):
+#            _name = name[1:]
+#            self.__dict__['_node_meta'][_name] = value
+#        else:
+#            self.__dict__['values'][name] = value
+#    
+#    def __delattr__(self, key):
+#        if name.startswith('_'):
+#            _name = name[1:]
+#            del self.__dict__['_node_meta'][_name]
+#        else:
+#            del self.__dict__['values'][name]
+#    
+#    def __getitem__(self, key):
+#        return self.__getattr__(key)
+#    
+#    def __setitem__(self, key, value):
+#        return self.__setattr__(key, value)
+#    
+#    def __delitem__(self, key):
+#        return self.__delattr__(key)
+#    
+#    def keys(self):
+#        return map(lambda x: "_%s" % x, self.__dict__['_node_meta'].keys()) \
+#            + self.__dict__['_node_values'].keys()
+#    
+#    def has_key(self, key):
+#        return (key in self.keys())
+#    
+#    def update(self, values):
+#        self.__dict__['_node_values'].update(values)
+#    
+#    @classmethod
+#    def from_dict(cls, values, *args, **kwargs):
+#        """**Constructor** Instantiate a new node version
+#        from the passed-in values"""
+#        node_version = cls(*args, **kwargs)
+#        node_version.update(values)
+#        return node_version

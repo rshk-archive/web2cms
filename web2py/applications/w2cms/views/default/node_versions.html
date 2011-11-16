@@ -1,0 +1,63 @@
+{{left_sidebar_enabled=right_sidebar_enabled=False}}
+{{extend 'layout.html'}}
+
+{{from gluon.sqlhtml import represent}}
+
+{{include 'generic/tabs.html'}}
+
+<h1>Node versions</h1>
+
+<h2>db.node</h2>
+{{=BEAUTIFY(node._db_row)}}
+
+<h2>db.node_version</h2>
+
+{{
+def _represent_user(u):
+    return A(
+        "%(first_name)s %(last_name)s" % u,
+        _href=URL('default', 'user_profile', args=[u.id]))
+}}
+
+<table class="zebra grid">
+<thead>
+<tr>
+    <th>Version ID</th>
+    <th>Node ID</th>
+    <th>Revision ID</th>
+    <th>Language</th>
+    <th>Created by</th>
+    <th>Created on</th>
+    <th>Updated by</th>
+    <th>Updated on</th>
+    <th>Published</th>
+    <th>Translation base</th>
+</tr>
+</thead>
+<tbody>
+{{for version in node.versions:}}
+    <tr style="{{="border: solid 2px #f00;" if version.id == node.latest_version.id else ""}}">
+        <td class="highlight-red">{{=version.id}}</td>
+        <td class="highlight">{{=version.node.id}}</td>
+        <td class="highlight">{{=version.revision_id}}</td>
+        <td class="highlight">{{=version.language}}</td>
+        <td>{{=_represent_user(version.created_by)}}</td>
+        <td>{{=version.created_date}}</td>
+        <td>{{=_represent_user(version.updated_by)}}</td>
+        <td>{{=version.updated_date}}</td>
+        <td>{{=version.published}}</td>
+        <td>{{=version.is_translation_base}}</td>
+    </tr>
+{{pass}}
+</tbody>
+</table>
+
+<h2>db.node_base_fields</h2>
+{{for version in node.versions:}}
+{{=BEAUTIFY(version.node_base_fields.select())}}
+{{pass}}
+
+
+
+{{#=BEAUTIFY(node)}}
+

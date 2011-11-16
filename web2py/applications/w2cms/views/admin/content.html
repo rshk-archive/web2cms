@@ -26,9 +26,10 @@ THEAD(TR(
     TH(T('Node ID')),
     TH(T('Type')),
     TH(T('Title')),
-    TH(T('Created')),
-    TH(T('Updated')),
-    TH(T('Author')),
+    TH(T('Created on')),
+    TH(T('Created by')),
+    TH(T('Updated on')),
+    TH(T('Updated by')),
     TH(T('Actions')),
 )),
 
@@ -36,15 +37,19 @@ TBODY(*[TR(
     TD(node.id),
     TD(node.type),
     TD(A(node.title, _href=URL('default', 'node_read', args=[node.id]))),
-    TD(node.created),
-    TD(node.updated),
-    
-    #TD(represent(db.node.author, node.author, node)),
-    
+    TD(node.created_date),
     TD(A(
-        represent(db.node.author, node.author, node),
-        _href=URL('default', 'user', args=['profile', node.author]),
+        #represent(db.node.created_by, node.created_by, node),
+        node.created_by,
+        _href=URL('default', 'user', args=['profile', node.created_by]),
     )),
+    TD(node.updated_date),
+    TD(A(
+        #represent(db.node.updated_by, node.updated_by, node),
+        node.created_by,
+        _href=URL('default', 'user', args=['profile', node.updated_by]),
+    )),
+    
     
     TD([
         A(T('view'), _href=URL('default', 'node_read', args=[node.id])),' ',

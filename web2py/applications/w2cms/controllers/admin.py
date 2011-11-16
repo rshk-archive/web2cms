@@ -108,8 +108,10 @@ def content():
         query = reduce(lambda x, y: x & y, query)
     else:
         query=None
+    
+    
     return dict(
-        nodes=db(query).select(db.node.ALL),
+        nodes=cmsdb.node.search(query=query),
         filter_form=form,
         description=description,
         )
