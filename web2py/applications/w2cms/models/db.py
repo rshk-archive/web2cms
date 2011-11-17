@@ -263,6 +263,6 @@ db.block.body_format.requires = IS_IN_SET(
 #from cms_tools import *
 #node_manager = NodeManager(db)
 
-from cms_tools import CmsDB
+from cms_tools import CmsDB, CMS_URL
 cmsdb = CmsDB(db)
 

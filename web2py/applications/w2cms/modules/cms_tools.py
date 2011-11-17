@@ -13,11 +13,20 @@ so for the moment just one language is used.
 
 '''
 
-__all__ = ['CmsDB']
+__all__ = ['CmsDB', 'CMS_URL']
 
 import gluon.dal
 from gluon import *
 from gluon.storage import Storage
+
+##==============================================================================
+## Utility functions
+##==============================================================================
+
+def CMS_URL(entity_type, entity_id=None, action='read', args=None, vars=None):
+    if entity_id is not None:
+        args = [entity_id] + (args or [])
+    return URL('default', '%s_%s' % (entity_type, action), args=args, vars=vars)
 
 ##==============================================================================
 ## CMS Database object

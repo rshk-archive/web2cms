@@ -103,7 +103,11 @@ def _node_menu(node_id):
     return menu_items
 
 def _apply_text_format(text, format):
-    """Apply text format conversion to some text."""
+    """Apply text format conversion to some text.
+    
+    .. TODO:: Improve this to use configurable input formats with multiple
+        filters, in a way similar to what Drupal does.
+    """
     if format == 'plain_text':
         ## In plain text, quote all tags
         text = text.replace('&', '&amp;')
