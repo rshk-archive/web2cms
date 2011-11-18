@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-# this file is released under public domain and you can use without limitations
+
+## Avoid warnings from eclipse
+if False: from web2py_globals import *
 
 #########################################################################
 ## This is a samples controller
@@ -8,6 +10,12 @@
 ## - download is for downloading files uploaded in the db (does streaming)
 ## - call exposes all registered services (none by default)
 #########################################################################
+
+##@todo: this should be loaded in a model
+import cms_settings
+
+import helpers
+from helpers import use_custom_view
 
 def index():
     """
@@ -71,13 +79,6 @@ def data():
 
 ## Node CRUD -------------------------------------------------------------------
 
-#helpers = local_import('helpers')
-#helpers.request = request
-#helpers.response = response
-
-import helpers
-from helpers import use_custom_view
-
 def _node_load(node_id):
     """Load a node from database.
     Raises an exception if no node was found,
@@ -129,7 +130,7 @@ def _apply_text_format(text, format):
         pass
     return text
 
-import cms_settings
+
 
 def node_create():
     """Node creation form.
@@ -159,23 +160,14 @@ def node_create():
       * body
       * body_format
     """
+    
     if len(request.args) > 0:
         ## Return creation form for this node type
-        
         node_type = request.args[0]
         node_types = cms_settings.list_node_types()
         if node_type not in node_types.keys():
             raise HTTP(404)
-        
-        ## Set defaults
-        db.node.type.default = node_type
-        
-        ## Generate form. We can't use CRUD here!
-        form = SQLFORM(db.node)
-        #form_node_version = SQLFORM(db.node_version)
-        
-        
-        
+        form = cmsdb.node.form_create(node_type)
         response.view = 'generic/form.' + request.extension
         return dict(
             title=T('Create %s', node_types[node_type]['label']),
@@ -190,7 +182,7 @@ def node_create():
         ]
         response.view = 'generic/menu_page.%s' % request.extension
         return dict(title=T('Create content'), menu_items=menu_items)
-    
+
 @use_custom_view('generic/form')
 def node_update():
     """Node update form"""
@@ -273,7 +265,10 @@ def view():
 
 @use_custom_view('generic/form')
 def comment_create():
-    """Comment creation form"""
+    """Comment creation form.
+    
+    .. TODO:: Use a component
+    """
     
     if len(request.args) >= 2:
         ## We need object_type,object_delta to create comment

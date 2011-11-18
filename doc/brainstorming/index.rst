@@ -41,6 +41,7 @@ Table of Contents
    component-structure
    content-types
    elements
+   translations
 
 
 

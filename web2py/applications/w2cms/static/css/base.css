@@ -988,3 +988,20 @@ ul.messages > li.message.message-help {
     border: solid 1px #00A;
     color: #006;
 }
+
+/** Exanding form
+*******************************************************************************/
+.expanding-form .w2p_fw {
+	width: 100%;
+}
+.expanding-form .w2p_fw input,
+.expanding-form .w2p_fw textarea,
+.expanding-form .w2p_fw select {
+	width: 100%;
+	margin: 0;
+}
+.expanding-form input.datetime {
+	width:280px;
+	margin: 2px 15px 2px 5px; /*The default*/
+}
+

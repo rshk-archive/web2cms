@@ -65,8 +65,8 @@ class SC_Response(gluon.storage.Storage):
     def toolbar(self): pass
     def xmlrpc(self,request,methods): pass
     def write(self,text): pass
-    
-    
+
+class T(): pass
 
 request = SC_Request()
 response = SC_Response()

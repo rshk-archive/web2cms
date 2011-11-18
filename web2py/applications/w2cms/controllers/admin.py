@@ -1,8 +1,4 @@
-'''
-Created on Nov 1, 2011
-
-@author: samu
-'''
+# -*- coding: utf-8 -*-
 
 import os, sys
 from helpers import use_custom_view

@@ -8,7 +8,21 @@ import os
 from ConfigParser import RawConfigParser, NoSectionError, NoOptionError
 
 from gluon import *
-T = current.T
+
+## This is needed to avoid sphinx complaining when importing the module
+try:
+    T = current.T
+    request = current.request
+    response = current.response
+except:
+#    class VoidClass(object):
+#        def __init__(self,*a,**kw): pass
+#        def __getattr__(self, name): return None
+#    class T(VoidClass): pass
+#    class request(VoidClass): pass
+#    class response(VoidClass): pass
+    pass
+
 from cms_exceptions import w2cSettingsException
 
 def list_node_types():
@@ -29,7 +43,7 @@ def list_text_formats():
 
 cfg_parsers = {}
 cfg_dir = [
-    os.path.join(current.request.folder,'private','settings'),
+#    os.path.join(request.folder,'private','settings'),
     ]
 
 
@@ -140,6 +154,12 @@ class CfgOptionManager(object):
 
 
 def cfg_parser(cfg_file, force_reload=False):
+    global cfg_parsers,cfg_dir
+    
+    cfg_dir = [
+    os.path.join(current.request.folder,'private','settings'),
+    ]
+    
     if not force_reload and cfg_parsers.has_key(cfg_file):
         return cfg_parsers[cfg_file]
     

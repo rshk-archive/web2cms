@@ -61,6 +61,14 @@ Documentation topics
 Indices and tables
 ==================
 
+.. toctree::
+    :hidden:
+    
+    brainstorming/index
+    modules/index
+    structure/cms-plugins
+    use-cases/index
+
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`

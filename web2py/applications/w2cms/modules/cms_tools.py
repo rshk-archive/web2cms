@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 Miscellaneous tools for the CMS.
 
@@ -13,11 +14,14 @@ so for the moment just one language is used.
 
 '''
 
-__all__ = ['CmsDB', 'CMS_URL']
+## Beware that by using __all__, classes not included here gets undocumented
+#__all__ = ['CmsDB', 'CMS_URL']
+
 
 import gluon.dal
 from gluon import *
 from gluon.storage import Storage
+import cms_settings
 
 ##==============================================================================
 ## Utility functions
@@ -27,6 +31,47 @@ def CMS_URL(entity_type, entity_id=None, action='read', args=None, vars=None):
     if entity_id is not None:
         args = [entity_id] + (args or [])
     return URL('default', '%s_%s' % (entity_type, action), args=args, vars=vars)
+
+def descend_tree(tree, childrenattr='components', ilev=0):
+    """Generator that yields all the children by exploring a tree.
+    
+    :param tree: The tree of objects to be explored.
+        Usually a gluon.storage.Storage
+    :param childrenattr: The attribute of the branches containing
+        children elements.
+    :param ilev: Used internally to track the indentation level
+        of the current branch.
+    
+    :return: ``ilev, element`` for each found element.
+    """
+    if not isinstance(tree, list):
+        tree = [tree]
+    for branch in tree:
+        yield (ilev, branch)
+        if hasattr(branch, childrenattr):
+            for elm in getattr(branch, childrenattr):
+                for x in descend_tree(elm, childrenattr, ilev+1):
+                    yield x
+
+def split_query_varname(varname):
+    """Split query variable name"""
+    _split = varname.split('[',1)
+    if len(_split) < 2:
+        return _split[0]
+    else:
+        return [_split[0]] + _split[1][:-1].split('][')
+
+def place_into(container, keys, value):
+    """Recursively place stuff into ad dict"""
+    if len(keys) == 1:
+        container[keys[0]] = value
+        return
+    else:
+        place_into(container[keys[0]], keys[1:], value)
+
+def vars_to_tree(vars):
+    """Reorganize vars from query string into a tree"""
+    pass
 
 ##==============================================================================
 ## CMS Database object
@@ -296,6 +341,126 @@ class NodeManager(ElementManager):
             NodeEntity(row, self._cmsdb)
             for row in db(query).select(db.node.ALL, orderby=orderby)
             ]
+    
+    ## CRUD functions ==========================================================
+    
+    def form_create(self, node_type=None, defaults=None):
+        """Node creation form.
+        
+        :param type: The node type of the newly created node
+        :param defaults: A dict of dicts containing values for fields
+            on the different pages on which the node will be stored.
+        """
+        
+        db = self.db
+        T = current.T
+        
+        ## Validate arguments
+        node_types = cms_settings.list_node_types()
+        if node_type not in node_types.keys():
+            raise ValueError, "Wrong node type %r must be one of %s" % (node_type, ", ".join(node_types.keys()))
+        
+        ## Generate form. We can't use standard CRUD here!
+        ## Why does fields get named the same way, unregarding of table name?
+        
+        ##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+        ##                               WARNING!
+        ##                                
+        ##          The current SQLFORM is too limited to handle this!          
+        ##     Form generation needs to be done by hand, in order to avoid      
+        ##                               problems                               
+        ##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+        
+        ## Dict that will contain all the components to be placed in the form
+        _form_components = {}
+        _component_tables = ['node', 'node_version', 'node_base_fields']
+        
+        ## Set defaults --------------------------------------------------------
+        db.node.type.default = node_type
+        db.node.type.readable = \
+        db.node.type.writable = False
+        
+        db.node_version.node.requires = None
+        db.node_version.node.readable = \
+        db.node_version.node.writable = False
+        
+        db.node_version.revision_id.default = 0
+        
+        db.node_version.language.default = 'neutral'
+        
+        db.node_version.is_translation_base.default = True #For creation or new revision
+        db.node_version.is_translation_base.readable = \
+        db.node_version.is_translation_base.writable = False
+        
+        db.node_version.revision_id.default = 0 #Means "create new"
+        db.node_version.revision_id.readable = \
+        db.node_version.revision_id.writable = False
+        
+        db.node_version.language.requires = IS_IN_SET(['neutral', 'en-en', 'it-it'])
+        
+        db.node_base_fields.node_version.requires = None
+        db.node_base_fields.node_version.readable = \
+        db.node_base_fields.node_version.writable = False
+        
+        ## Retrieve components from tables -------------------------------------
+        for table in _component_tables:
+            _form_components[table] = SQLFORM.factory(db[table], buttons=[], formstyle='divs').components
+            for ilev, comp in descend_tree(_form_components[table]):
+                if isinstance(comp, INPUT) and comp.attributes.has_key('_name'):
+                    comp.attributes['_name'] = '%s--%s' % (table, comp.attributes['_name'])
+        
+        ## Build the form ------------------------------------------------------
+        
+        ## TODO: We need a custom SQLFORM to generate this!
+        
+        form = FORM(
+            *([
+                ## Fields from the tables
+                FIELDSET(
+                    LEGEND(table.replace('_', ' ').title()),
+                    #*_components_node,
+                    *_form_components[table],
+                    _class='collapsible')
+                for table in _component_tables
+            ] + [
+                ## Other fields that will not stored directly
+                FIELDSET(
+                    LEGEND('Control fields'),
+                    *SQLFORM.factory(DAL(None).define_table('no_table',
+                        Field('create_new_revision', 'boolean', default=False),
+                    ), buttons=[]).components,
+                     _class='collapsible'
+                ),
+                INPUT(_type='submit', _value=T('Submit'))
+            ]),
+            hidden = {
+                'action': 'create',
+            },
+            _class='expanding-form'
+        )
+        
+        ## Process the form ----------------------------------------------------
+        if form.process().accepted:
+            ## Split vars into their original groups
+            _var_groups = {}
+            
+            for var, val in form.vars.items():
+                if var.find('--') > 0:
+                    group,var = var.split('--', 2)
+                else:
+                    group='default'
+                if not _var_groups.has_key(group):
+                    _var_groups[group] = {}
+                _var_groups[group][var] = val
+            
+            ## Here, insert stuff into tables, etc.
+            form.components.append(BEAUTIFY(_var_groups))
+        
+        return form
+    
+    def form_update(self, node, revision=None, language=None):
+        pass
+    
 
 class NodeEntity(ElementEntity):
     """\

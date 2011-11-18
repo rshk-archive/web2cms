@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-# this file is released under public domain and you can use without limitations
+
+## Avoid warnings from eclipse
+if False: from web2py_globals import *
 
 #########################################################################
 ## Customize your APP title, subtitle and menus here

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-## Avoid warnings from eclipse -------------------------------------------------
+## Avoid warnings from eclipse
 if False: from web2py_globals import *
 
 ## Automatically track changes and reload modules ------------------------------
@@ -15,25 +15,23 @@ track_changes(True)
 from cms_settings import cfg_parser
 main_cfg = cfg_parser('cms-settings', force_reload=True)
 
-db_connection_url = main_cfg.getd('database','connection_url')
-db = DAL(db_connection_url)
-
-#if not request.env.web2py_runtime_gae:     
-#    ## if NOT running on Google App Engine use SQLite or other DB
-#    db = DAL('sqlite://storage.sqlite')
-#else:
-#    ## connect to Google BigTable (optional 'google:datastore://namespace')
-#    db = DAL('google:datastore') 
-#    ## store sessions and tickets there
-#    session.connect(request, response, db = db) 
-#    ## or store session in Memcache, Redis, etc.
-#    ## from gluon.contrib.memdb import MEMDB
-#    ## from google.appengine.api.memcache import Client
-#    ## session.connect(request, response, db = MEMDB(Client()))
+if not request.env.web2py_runtime_gae:     
+    db_connection_url = main_cfg.getd('database','connection_url')
+    db = DAL(db_connection_url)
+else:
+    ## connect to Google BigTable (optional 'google:datastore://namespace')
+    db = DAL('google:datastore') 
+    ## store sessions and tickets there
+    session.connect(request, response, db = db) 
+    ## or store session in Memcache, Redis, etc.
+    ## from gluon.contrib.memdb import MEMDB
+    ## from google.appengine.api.memcache import Client
+    ## session.connect(request, response, db = MEMDB(Client()))
 
 ## by default give a view/generic.extension to all actions from localhost
 ## none otherwise. a pattern can be 'controller/function.extension'
-response.generic_patterns = ['*'] if request.is_local else []
+#response.generic_patterns = ['*'] if request.is_local else []
+response.generic_patterns = []
 
 ################################################################################
 ## Here is sample code if you need for
@@ -49,7 +47,7 @@ from gluon.tools import Auth, Crud, Service, PluginManager, prettydate
 auth = Auth(db, hmac_key=Auth.get_or_create_key()) 
 crud, service, plugins = Crud(db), Service(), PluginManager()
 
-## @see: http://www.web2py.com/book/default/chapter/08#Authorization-and-CRUDm
+## @see: http://www.web2py.com/book/default/chapter/08#Authorization-and-CRUD
 ## "Another way to implement access control is to always use CRUD
 ## (as opposed to SQLFORM) to access the database and to ask CRUD to enforce
 ## access control on database tables and records."
@@ -60,6 +58,7 @@ crud, service, plugins = Crud(db), Service(), PluginManager()
 auth.define_tables()
 
 ## configure email
+##TODO: Read from configuration
 mail=auth.settings.mailer
 #mail.settings.server = 'logging' or 'smtp.gmail.com:587'
 #mail.settings.sender = 'you@gmail.com'
@@ -102,6 +101,7 @@ import cms_settings
 
 ## Field representation functions ==============================================
 def user_name_represent(value, row=None):
+    """Used to represent user names"""
     if value:
         try:
             return '%(first_name)s %(last_name)s' % value
@@ -155,12 +155,6 @@ db.define_table(
     ## Node language
     Field('language', 'string', length=32, required=True),
     
-    ## Standard metadata
-    #Field('created_by', db.auth_user, default=auth.user_id, notnull=True),
-    #Field('updated_by', db.auth_user, update=auth.user_id, notnull=True),
-    #Field('created_date', 'datetime', default=request.now, notnull=True),
-    #Field('updated_date', 'datetime', update=request.now, notnull=True),
-    
     ## Signature: {created,updated}_{by,date}
     signature,
     
@@ -171,18 +165,14 @@ db.define_table(
     Field('is_translation_base', 'boolean', default=True),
     )
 
-db.node_version.node.requires = IS_IN_DB(db, db.node.id, "Node %(id)d [%(type)s]: %(title)s")
-
-#db.node_version.created_date.requires = IS_DATETIME(T('%Y-%m-%d %H:%M:%S'))    
-#db.node_version.updated_date.requires = IS_DATETIME(T('%Y-%m-%d %H:%M:%S'))
-#db.node_version.created_by.requires = IS_IN_DB(db, db.auth_user.id, '%(first_name)s %(last_name)s [#%(id)d]')
-#db.node_version.updated_by.requires = IS_IN_DB(db, db.auth_user.id, '%(first_name)s %(last_name)s [#%(id)d]')
-#db.node_version.created_by.represent = user_name_represent
-#db.node_version.updated_by.represent = user_name_represent
+db.node_version.node.requires = IS_IN_DB(db, db.node.id, "Node %(id)d [%(type)s]")
 
 class Node_version_VirtualFields:
     def base_fields(self):
         #print "@@@CALLED@@@ Node_version_VirtualFields.base_fields"
+        ##TODO: modify this so that this method is called only when
+        ##      the attribute is actually required!
+        ##      (Improvements to core needed?)
         return self.node_version.node_base_fields.select().first()
 
 db.node_version.virtualfields.append(Node_version_VirtualFields())
@@ -199,34 +189,18 @@ db.define_table(
     )
 
 db.node_base_fields.node_version.requires = IS_IN_DB(db, db.node_version.id,
-    "VERSION %(id)d of node %(node)d (rev=%(revision_id)d, lang=%(language)s)")
+    "VERSION %(id)d of node %(node)s (rev=%(revision_id)s, lang=%(language)s)")
 db.node_base_fields.body_format.requires = IS_IN_SET(
     dict([(k,v['label']) for k,v in cms_settings.list_text_formats().items()]))
 
-## Table: comment ==============================================================
-#db.define_table(
-#    'comment',
-#    
-#    ## What is commented. Usually something like ('node', 20)
-#    Field('object_type', 'string', length=128, required=True, requires=IS_NOT_EMPTY()),
-#    Field('object_delta', 'string', length=128, required=True, requires=IS_NOT_EMPTY()),
-#    
-#    ## Attributes of the comment
-#    Field('title', 'string', length=256),
-#    Field('body', 'text'),
-#    Field('body_format', 'string', length=128),
-#    
-#    ## Meta of the comment
-#    Field('created', 'datetime', default=request.now, required=True),
-#    Field('updated', 'datetime', update=request.now, required=True),
-#    Field('author', db.auth_user, default=auth.user_id, required=True),
-#    Field('published', 'boolean', default=True),
-#    )
-#
-#db.comment.body_format.requires = IS_IN_SET(
-#    dict([(k,v['label']) for k,v in cms_settings.list_text_formats().items()]))
-#db.comment.author.requires = IS_EMPTY_OR(IS_IN_DB(db, db.auth_user.id, '%(first_name)s %(last_name)s [#%(id)d]'))
-#db.comment.author.represent = lambda x,y=None: '%(first_name)s %(last_name)s' % x
+
+
+
+
+
+
+
+
 
 
 ## Table: block ================================================================
@@ -242,6 +216,7 @@ db.define_table(
 
 db.block.body_format.requires = IS_IN_SET(
     dict([(k,v['label']) for k,v in cms_settings.list_text_formats().items()]))
+
 
 ## Table: variable =============================================================
 ## Used to store configuration variables, as pickled values

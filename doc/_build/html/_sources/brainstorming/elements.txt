@@ -13,19 +13,6 @@ a quite complex structure.
   in the ``cms_tools`` module. No manipulation should be done on the
   database directly.
 
-User
-    as defined by auth_user
-
-Group
-    as defined by auth_group
-
-Node
-    Used to represent content.
-    Nodes also support versioning, with each version identified by a
-    revision number + language.
-    
-    Node storage is spread over several tables.
-
 Comment (``object (entity), author (user), comment details``)
     Comment attached to an entity.
     
@@ -66,41 +53,93 @@ Term_membership
     * **tag**  
 
 Tree_organization
-    Used to organize heterogeneous entities in a tree.
-    
-    * **entity**
-    * **parent**
+    The tree organization can be accomplished just using relationships.
 
-Menu
-    Container for menu links
-    
-    * **title** [->SHOULD SUPPORT TRANSLATION!]
-    * **menu_id**
 
-Menu_link
-    * **title** [->SHOULD SUPPORT TRANSLATION!]
-    * **parent**
-    * **entity_type** An entity type or 'raw'
-    * **entity_id** The entity id, or the URL if 'raw' specified.
-    
+Generic, re-used fields
+=======================
 
+These are virtual tables, to be re-used where needed.
+
+Table: ``signature``
+    * Field('created_date', 'datetime', default=request.now),
+    * Field('created_by', db.auth_user, default=auth.user_id),
+    * Field('updated_date', 'datetime', update=request.now),
+    * Field('updated_by', db.auth_user, update=auth.user_id))
+
+
+    
 User
-====
+==========
 A CMS user (as defined by ``auth_user``), plus some extra fields
 for the user profile.
 
 
+
 Group
-=====
+==========
 A group of users (as defined by ``auth_group``)
 
 
+
 Node
-====
+==========
 A node is a "document", a piece of content with a type and some
 attributes ("fields").
 
-Nodes should support history / revisions.
+The node is the most complex object to be handled in the CMS, since
+it must support revisions, custom fields and of course translation.
+
+Database model
+--------------
+
+Table: ``node``
+    Metadata information on the node.
+    
+    * **type** ``string(64)`` - Identifier of the node type
+    * **published** ``boolean`` - Whether the node is published or not
+    * **weight** ``integer`` - Weight is used to reorder nodes in lists.
+    * -> signature
+
+Table: ``node_revision``
+    Information about node revisions.
+
+    * **node** ``reference node``
+    * **published** - Whether the revision is published or not
+    * **translation_base** - Language this revision was first written in
+    * ->signature
+
+Table: ``node_fields_base``
+    Base fields, shared between all the node types.
+    
+    * **id**
+    * **node_revision** ``reference node_revision``
+    * **title** ``string(128)``
+    * **body** ``text``
+    * **body_format** ``string(64)``
+
+Table: ``t9n_node_fields_base``
+    Translation for ``node_fields_base``.
+    
+    * **record** ``reference node_fields_base`` - The record to be translated
+    * **language** ``string(32)`` - Language code
+    * Node revision is fixed, cannot be translated!
+    * **title** ``string(128)``
+    * **body** ``text``
+    * **body_format** ``string(64)``
+
+Table: ``node_fields_<name>``
+
+Table: ``node_<type>_fields_<name>``
+    Where usually ``<name>`` is the name of the CMS Plugin defining
+    the extra fields for all nodes / a given node type.
+    
+    Minimum fields are:
+    
+    * **version** ``reference node_translation``
+
+Then, of course, ``node_fields_<name>`` and ``node_<type>_fields_<name>``
+tables can have their ``t9n_<tablename>`` translations.
 
 .. NOTE::
     Each node version is uniquely identified by ``node_version.id`` or,
@@ -128,7 +167,7 @@ Database model
 * ``node_type``
 * ``revision_id``
 * ``title``, ``body``
-    
+
 
 Taxonomy/tags
 =============
@@ -213,13 +252,74 @@ Relationships usually express more interaction that just placement of a flag,
 anyways this could be easily implemented for non-mutual relationships
 using just a flag.
 
-``relationship``
+Table: ``relationship``
     * ``entity_type``, ``entity_id``
     * ``other_type``, ``other_id``
-    * ``relationship`` The relationship from ``entity`` to ``other``
+    * ``relationship_name`` The relationship from ``entity`` to ``other``
 
+.. TODO:: Possibly, we could add other fields to relationships -> ?
 .. TODO:: How to handle mutual vs non-mutual relationships?
 
+Examples
+--------
+
+Tree structure organization of nodes (book, ..):
+
+===========  =========  ==========  ========  =================
+entity_type  entity_id  other_type  other_id  relationship_name
+===========  =========  ==========  ========  =================
+ node         2          node        1         child
+ node         3          node        1         child
+ node         4          node        3         child
+ node         5          node        3         child
+ node         6          node        4         child
+===========  =========  ==========  ========  =================
+
+This can be used to create a structure like this::
+
+    node 1
+    |-- node 2
+    '-- node 3
+        |-- node 4
+        |-- '-- node 6
+        '-- node 5
+
+.. WARNING:: Beware that this way we cannot be absolutely sure there aren't
+    infinite loops or other problems in the tree, therefore we should
+    either enforce checks before inserting, or find a way to handle such cases.
+
+
+Menu
+====
+Container for menu links
+
+Table: ``menu``
+    * **title** ``string``
+    * **menu_name** [UNIQUE,REQUIRED] - The internal name to be used to refer to this menu
+
+Table: ``menu_translation``
+    * **menu** ``menu.id``
+    * **language** ``string`` [REQUIRED] - The language code
+    * **title**
+
+
+Menu link
+=========
+
+Menu link spawns over two tables: ``menu_link`` and ``menu_link_translation``.
+
+Table: ``menu_link``
+    * **id** The usual ID
+    * **title** ``string``
+    * **parent** ``menu_link.id`` (self-reference)
+    * **entity_type** An entity type or literal 'raw'.
+    * **entity_id** The entity id, or the URL if 'raw' specified.
+
+Table: ``menu_link_translation``
+    * **menu_link** ``menu_link.id`` [REQUIRED]
+    * **language** ``string`` [REQUIRED] - The language code
+    * **entity_type** (Possible rewrite for this language)
+    * **entity_id** (Possible rewrite for this language)
 
 Content display
 ===============
@@ -233,3 +333,5 @@ Configuration
 =============
 Configuration is structured in a "registry" way, and stored on filesystem
 and/or database.
+
+

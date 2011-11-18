@@ -5,8 +5,12 @@ Created on Nov 3, 2011
 '''
 
 from gluon import *
-response = current.response
-request = current.request
+
+## Avoid problems with sphinx
+try:
+    response = current.response
+    request = current.request
+except: pass
 
 def render_view(view_name, view_args, view_vars, db):
     handlers = {

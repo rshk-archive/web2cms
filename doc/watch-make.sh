@@ -1,4 +1,5 @@
 #!/bin/bash
+
 ## Automatically build Sphinx documentation upon file change
 ## Copyright (c) 2011 Samuele ~redShadow~ Santi - Under GPL
 
@@ -19,7 +20,13 @@ fi
 
 while :; do
     ## Wait for changes
+    echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+    echo "  Watching ${WATCHDIR} for changes"
+    echo "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
     inotifywait -e modify,create,delete -r "$WATCHDIR"
+
     ## Make html documentation
     make -C "$WORKDIR" html
+
+    echo;echo
 done

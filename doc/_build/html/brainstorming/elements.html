@@ -27,7 +27,7 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="top" title="web2py_cms 0.1-alpha documentation" href="../index.html" />
     <link rel="up" title="Brainstorming" href="index.html" />
-    <link rel="next" title="cms_auth" href="../modules/cms_auth.html" />
+    <link rel="next" title="Translation support" href="translations.html" />
     <link rel="prev" title="Default content types" href="content-types.html" /> 
   </head>
   <body>
@@ -41,7 +41,7 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="../modules/cms_auth.html" title="cms_auth"
+          <a href="translations.html" title="Translation support"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="content-types.html" title="Default content types"
@@ -69,16 +69,6 @@ in the <tt class="docutils literal"><span class="pre">cms_tools</span></tt> modu
 database directly.</li>
 </ul>
 <dl class="docutils">
-<dt>User</dt>
-<dd>as defined by auth_user</dd>
-<dt>Group</dt>
-<dd>as defined by auth_group</dd>
-<dt>Node</dt>
-<dd><p class="first">Used to represent content.
-Nodes also support versioning, with each version identified by a
-revision number + language.</p>
-<p class="last">Node storage is spread over several tables.</p>
-</dd>
 <dt>Comment (<tt class="docutils literal"><span class="pre">object</span> <span class="pre">(entity),</span> <span class="pre">author</span> <span class="pre">(user),</span> <span class="pre">comment</span> <span class="pre">details</span></tt>)</dt>
 <dd><p class="first">Comment attached to an entity.</p>
 <ul class="last simple">
@@ -129,28 +119,22 @@ of terms (eg. for tagging).</dd>
 </ul>
 </dd>
 <dt>Tree_organization</dt>
-<dd><p class="first">Used to organize heterogeneous entities in a tree.</p>
-<ul class="last simple">
-<li><strong>entity</strong></li>
-<li><strong>parent</strong></li>
-</ul>
-</dd>
-<dt>Menu</dt>
-<dd><p class="first">Container for menu links</p>
-<ul class="last simple">
-<li><strong>title</strong> [-&gt;SHOULD SUPPORT TRANSLATION!]</li>
-<li><strong>menu_id</strong></li>
-</ul>
-</dd>
-<dt>Menu_link</dt>
+<dd>The tree organization can be accomplished just using relationships.</dd>
+</dl>
+<div class="section" id="generic-re-used-fields">
+<h2>Generic, re-used fields<a class="headerlink" href="#generic-re-used-fields" title="Permalink to this headline">¶</a></h2>
+<p>These are virtual tables, to be re-used where needed.</p>
+<dl class="docutils">
+<dt>Table: <tt class="docutils literal"><span class="pre">signature</span></tt></dt>
 <dd><ul class="first last simple">
-<li><strong>title</strong> [-&gt;SHOULD SUPPORT TRANSLATION!]</li>
-<li><strong>parent</strong></li>
-<li><strong>entity_type</strong> An entity type or &#8216;raw&#8217;</li>
-<li><strong>entity_id</strong> The entity id, or the URL if &#8216;raw&#8217; specified.</li>
+<li>Field(&#8216;created_date&#8217;, &#8216;datetime&#8217;, default=request.now),</li>
+<li>Field(&#8216;created_by&#8217;, db.auth_user, default=auth.user_id),</li>
+<li>Field(&#8216;updated_date&#8217;, &#8216;datetime&#8217;, update=request.now),</li>
+<li>Field(&#8216;updated_by&#8217;, db.auth_user, update=auth.user_id))</li>
 </ul>
 </dd>
 </dl>
+</div>
 <div class="section" id="user">
 <h2>User<a class="headerlink" href="#user" title="Permalink to this headline">¶</a></h2>
 <p>A CMS user (as defined by <tt class="docutils literal"><span class="pre">auth_user</span></tt>), plus some extra fields
@@ -164,7 +148,64 @@ for the user profile.</p>
 <h2>Node<a class="headerlink" href="#node" title="Permalink to this headline">¶</a></h2>
 <p>A node is a &#8220;document&#8221;, a piece of content with a type and some
 attributes (&#8220;fields&#8221;).</p>
-<p>Nodes should support history / revisions.</p>
+<p>The node is the most complex object to be handled in the CMS, since
+it must support revisions, custom fields and of course translation.</p>
+<div class="section" id="database-model">
+<h3>Database model<a class="headerlink" href="#database-model" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt>Table: <tt class="docutils literal"><span class="pre">node</span></tt></dt>
+<dd><p class="first">Metadata information on the node.</p>
+<ul class="last simple">
+<li><strong>type</strong> <tt class="docutils literal"><span class="pre">string(64)</span></tt> - Identifier of the node type</li>
+<li><strong>published</strong> <tt class="docutils literal"><span class="pre">boolean</span></tt> - Whether the node is published or not</li>
+<li><strong>weight</strong> <tt class="docutils literal"><span class="pre">integer</span></tt> - Weight is used to reorder nodes in lists.</li>
+<li>-&gt; signature</li>
+</ul>
+</dd>
+<dt>Table: <tt class="docutils literal"><span class="pre">node_revision</span></tt></dt>
+<dd><p class="first">Information about node revisions.</p>
+<ul class="last simple">
+<li><strong>node</strong> <tt class="docutils literal"><span class="pre">reference</span> <span class="pre">node</span></tt></li>
+<li><strong>published</strong> - Whether the revision is published or not</li>
+<li><strong>translation_base</strong> - Language this revision was first written in</li>
+<li>-&gt;signature</li>
+</ul>
+</dd>
+<dt>Table: <tt class="docutils literal"><span class="pre">node_fields_base</span></tt></dt>
+<dd><p class="first">Base fields, shared between all the node types.</p>
+<ul class="last simple">
+<li><strong>id</strong></li>
+<li><strong>node_revision</strong> <tt class="docutils literal"><span class="pre">reference</span> <span class="pre">node_revision</span></tt></li>
+<li><strong>title</strong> <tt class="docutils literal"><span class="pre">string(128)</span></tt></li>
+<li><strong>body</strong> <tt class="docutils literal"><span class="pre">text</span></tt></li>
+<li><strong>body_format</strong> <tt class="docutils literal"><span class="pre">string(64)</span></tt></li>
+</ul>
+</dd>
+<dt>Table: <tt class="docutils literal"><span class="pre">t9n_node_fields_base</span></tt></dt>
+<dd><p class="first">Translation for <tt class="docutils literal"><span class="pre">node_fields_base</span></tt>.</p>
+<ul class="last simple">
+<li><strong>record</strong> <tt class="docutils literal"><span class="pre">reference</span> <span class="pre">node_fields_base</span></tt> - The record to be translated</li>
+<li><strong>language</strong> <tt class="docutils literal"><span class="pre">string(32)</span></tt> - Language code</li>
+<li>Node revision is fixed, cannot be translated!</li>
+<li><strong>title</strong> <tt class="docutils literal"><span class="pre">string(128)</span></tt></li>
+<li><strong>body</strong> <tt class="docutils literal"><span class="pre">text</span></tt></li>
+<li><strong>body_format</strong> <tt class="docutils literal"><span class="pre">string(64)</span></tt></li>
+</ul>
+</dd>
+</dl>
+<p>Table: <tt class="docutils literal"><span class="pre">node_fields_&lt;name&gt;</span></tt></p>
+<dl class="docutils">
+<dt>Table: <tt class="docutils literal"><span class="pre">node_&lt;type&gt;_fields_&lt;name&gt;</span></tt></dt>
+<dd><p class="first">Where usually <tt class="docutils literal"><span class="pre">&lt;name&gt;</span></tt> is the name of the CMS Plugin defining
+the extra fields for all nodes / a given node type.</p>
+<p>Minimum fields are:</p>
+<ul class="last simple">
+<li><strong>version</strong> <tt class="docutils literal"><span class="pre">reference</span> <span class="pre">node_translation</span></tt></li>
+</ul>
+</dd>
+</dl>
+<p>Then, of course, <tt class="docutils literal"><span class="pre">node_fields_&lt;name&gt;</span></tt> and <tt class="docutils literal"><span class="pre">node_&lt;type&gt;_fields_&lt;name&gt;</span></tt>
+tables can have their <tt class="docutils literal"><span class="pre">t9n_&lt;tablename&gt;</span></tt> translations.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">Each node version is uniquely identified by <tt class="docutils literal"><span class="pre">node_version.id</span></tt> or,
@@ -179,8 +220,9 @@ for the node.</p>
 <p class="last">To indicate the document <strong>revision</strong>, the term <tt class="docutils literal"><span class="pre">revision_id</span></tt>
 is used instead. Revisions owns multiple translations, versions not.</p>
 </div>
-<div class="section" id="database-model">
-<h3>Database model<a class="headerlink" href="#database-model" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="id1">
+<h3>Database model<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <div class="admonition-todo admonition " id="index-0">
 <p class="first admonition-title">Todo</p>
 <p class="last">Use this structure, or something with <tt class="docutils literal"><span class="pre">node</span></tt> plus <tt class="docutils literal"><span class="pre">node_revision</span></tt>?
@@ -200,8 +242,8 @@ Plus, we should find a cool way to manage content translations!</p>
 <h2>Taxonomy/tags<a class="headerlink" href="#taxonomy-tags" title="Permalink to this headline">¶</a></h2>
 <p>A &#8220;tag&#8221; is a category that may contain entities, and have a hierarchical
 tree structure.</p>
-<div class="section" id="id1">
-<h3>Database model<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id2">
+<h3>Database model<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <dl class="docutils">
 <dt><tt class="docutils literal"><span class="pre">taxonomy_term</span></tt></dt>
 <dd><ul class="first last simple">
@@ -226,8 +268,8 @@ tree structure.</p>
 <li>Usually contains title,body,author and date.</li>
 <li>Comments should support nesting</li>
 </ul>
-<div class="section" id="id2">
-<h3>Database model<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id3">
+<h3>Database model<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
 <dl class="docutils">
 <dt><tt class="docutils literal"><span class="pre">comment</span></tt></dt>
 <dd><ul class="first last simple">
@@ -248,8 +290,8 @@ tree structure.</p>
 <p>Flags are used to let <tt class="docutils literal"><span class="pre">entity</span></tt> put a <tt class="docutils literal"><span class="pre">key|value</span></tt> on <tt class="docutils literal"><span class="pre">entity</span></tt>.</p>
 <p>Flags should always be placed by their <tt class="docutils literal"><span class="pre">flagged_by_type</span></tt>, <tt class="docutils literal"><span class="pre">flagged_by_id</span></tt>
 user or entity.</p>
-<div class="section" id="id3">
-<h3>Database model<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id4">
+<h3>Database model<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <dl class="docutils">
 <dt><tt class="docutils literal"><span class="pre">flag</span></tt></dt>
 <dd><ul class="first last simple">
@@ -291,18 +333,131 @@ Relationships usually express more interaction that just placement of a flag,
 anyways this could be easily implemented for non-mutual relationships
 using just a flag.</p>
 <dl class="docutils">
-<dt><tt class="docutils literal"><span class="pre">relationship</span></tt></dt>
+<dt>Table: <tt class="docutils literal"><span class="pre">relationship</span></tt></dt>
 <dd><ul class="first last simple">
 <li><tt class="docutils literal"><span class="pre">entity_type</span></tt>, <tt class="docutils literal"><span class="pre">entity_id</span></tt></li>
 <li><tt class="docutils literal"><span class="pre">other_type</span></tt>, <tt class="docutils literal"><span class="pre">other_id</span></tt></li>
-<li><tt class="docutils literal"><span class="pre">relationship</span></tt> The relationship from <tt class="docutils literal"><span class="pre">entity</span></tt> to <tt class="docutils literal"><span class="pre">other</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">relationship_name</span></tt> The relationship from <tt class="docutils literal"><span class="pre">entity</span></tt> to <tt class="docutils literal"><span class="pre">other</span></tt></li>
 </ul>
 </dd>
 </dl>
 <div class="admonition-todo admonition " id="index-2">
 <p class="first admonition-title">Todo</p>
+<p class="last">Possibly, we could add other fields to relationships -&gt; ?</p>
+</div>
+<div class="admonition-todo admonition " id="index-3">
+<p class="first admonition-title">Todo</p>
 <p class="last">How to handle mutual vs non-mutual relationships?</p>
 </div>
+<div class="section" id="id5">
+<h3>Examples<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
+<p>Tree structure organization of nodes (book, ..):</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="20%" />
+<col width="16%" />
+<col width="18%" />
+<col width="15%" />
+<col width="31%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">entity_type</th>
+<th class="head">entity_id</th>
+<th class="head">other_type</th>
+<th class="head">other_id</th>
+<th class="head">relationship_name</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>node</td>
+<td>2</td>
+<td>node</td>
+<td>1</td>
+<td>child</td>
+</tr>
+<tr class="row-odd"><td>node</td>
+<td>3</td>
+<td>node</td>
+<td>1</td>
+<td>child</td>
+</tr>
+<tr class="row-even"><td>node</td>
+<td>4</td>
+<td>node</td>
+<td>3</td>
+<td>child</td>
+</tr>
+<tr class="row-odd"><td>node</td>
+<td>5</td>
+<td>node</td>
+<td>3</td>
+<td>child</td>
+</tr>
+<tr class="row-even"><td>node</td>
+<td>6</td>
+<td>node</td>
+<td>4</td>
+<td>child</td>
+</tr>
+</tbody>
+</table>
+<p>This can be used to create a structure like this:</p>
+<div class="highlight-python"><pre>node 1
+|-- node 2
+'-- node 3
+    |-- node 4
+    |-- '-- node 6
+    '-- node 5</pre>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Beware that this way we cannot be absolutely sure there aren&#8217;t
+infinite loops or other problems in the tree, therefore we should
+either enforce checks before inserting, or find a way to handle such cases.</p>
+</div>
+</div>
+</div>
+<div class="section" id="menu">
+<h2>Menu<a class="headerlink" href="#menu" title="Permalink to this headline">¶</a></h2>
+<p>Container for menu links</p>
+<dl class="docutils">
+<dt>Table: <tt class="docutils literal"><span class="pre">menu</span></tt></dt>
+<dd><ul class="first last simple">
+<li><strong>title</strong> <tt class="docutils literal"><span class="pre">string</span></tt></li>
+<li><strong>menu_name</strong> [UNIQUE,REQUIRED] - The internal name to be used to refer to this menu</li>
+</ul>
+</dd>
+<dt>Table: <tt class="docutils literal"><span class="pre">menu_translation</span></tt></dt>
+<dd><ul class="first last simple">
+<li><strong>menu</strong> <tt class="docutils literal"><span class="pre">menu.id</span></tt></li>
+<li><strong>language</strong> <tt class="docutils literal"><span class="pre">string</span></tt> [REQUIRED] - The language code</li>
+<li><strong>title</strong></li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="menu-link">
+<h2>Menu link<a class="headerlink" href="#menu-link" title="Permalink to this headline">¶</a></h2>
+<p>Menu link spawns over two tables: <tt class="docutils literal"><span class="pre">menu_link</span></tt> and <tt class="docutils literal"><span class="pre">menu_link_translation</span></tt>.</p>
+<dl class="docutils">
+<dt>Table: <tt class="docutils literal"><span class="pre">menu_link</span></tt></dt>
+<dd><ul class="first last simple">
+<li><strong>id</strong> The usual ID</li>
+<li><strong>title</strong> <tt class="docutils literal"><span class="pre">string</span></tt></li>
+<li><strong>parent</strong> <tt class="docutils literal"><span class="pre">menu_link.id</span></tt> (self-reference)</li>
+<li><strong>entity_type</strong> An entity type or literal &#8216;raw&#8217;.</li>
+<li><strong>entity_id</strong> The entity id, or the URL if &#8216;raw&#8217; specified.</li>
+</ul>
+</dd>
+<dt>Table: <tt class="docutils literal"><span class="pre">menu_link_translation</span></tt></dt>
+<dd><ul class="first last simple">
+<li><strong>menu_link</strong> <tt class="docutils literal"><span class="pre">menu_link.id</span></tt> [REQUIRED]</li>
+<li><strong>language</strong> <tt class="docutils literal"><span class="pre">string</span></tt> [REQUIRED] - The language code</li>
+<li><strong>entity_type</strong> (Possible rewrite for this language)</li>
+<li><strong>entity_id</strong> (Possible rewrite for this language)</li>
+</ul>
+</dd>
+</dl>
 </div>
 <div class="section" id="content-display">
 <h2>Content display<a class="headerlink" href="#content-display" title="Permalink to this headline">¶</a></h2>
@@ -327,26 +482,33 @@ and/or database.</p>
   <h3><a href="../index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">CMS Elements</a><ul>
+<li><a class="reference internal" href="#generic-re-used-fields">Generic, re-used fields</a></li>
 <li><a class="reference internal" href="#user">User</a></li>
 <li><a class="reference internal" href="#group">Group</a></li>
 <li><a class="reference internal" href="#node">Node</a><ul>
 <li><a class="reference internal" href="#database-model">Database model</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#taxonomy-tags">Taxonomy/tags</a><ul>
 <li><a class="reference internal" href="#id1">Database model</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#comment">Comment</a><ul>
+<li><a class="reference internal" href="#taxonomy-tags">Taxonomy/tags</a><ul>
 <li><a class="reference internal" href="#id2">Database model</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#flag">Flag</a><ul>
+<li><a class="reference internal" href="#comment">Comment</a><ul>
 <li><a class="reference internal" href="#id3">Database model</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#flag">Flag</a><ul>
+<li><a class="reference internal" href="#id4">Database model</a></li>
 <li><a class="reference internal" href="#examples">Examples</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#relationship">Relationship</a></li>
+<li><a class="reference internal" href="#relationship">Relationship</a><ul>
+<li><a class="reference internal" href="#id5">Examples</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#menu">Menu</a></li>
+<li><a class="reference internal" href="#menu-link">Menu link</a></li>
 <li><a class="reference internal" href="#content-display">Content display</a></li>
 <li><a class="reference internal" href="#configuration">Configuration</a></li>
 </ul>
@@ -357,8 +519,8 @@ and/or database.</p>
   <p class="topless"><a href="content-types.html"
                         title="previous chapter">Default content types</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="../modules/cms_auth.html"
-                        title="next chapter">cms_auth</a></p>
+  <p class="topless"><a href="translations.html"
+                        title="next chapter">Translation support</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../_sources/brainstorming/elements.txt"
@@ -391,7 +553,7 @@ and/or database.</p>
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="../modules/cms_auth.html" title="cms_auth"
+          <a href="translations.html" title="Translation support"
              >next</a> |</li>
         <li class="right" >
           <a href="content-types.html" title="Default content types"

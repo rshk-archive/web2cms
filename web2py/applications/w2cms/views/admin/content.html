@@ -63,15 +63,3 @@ _style = 'width:100%;'
 )}}
 </div>
 
-<script type="text/javascript">
-$(document).ready(function() {
-	// -- Collapse collapsible fieldsets
-    $("fieldset.collapsible").collapse({'speed':'fast'});
-    
-    // -- Add blank button right of datetime fields
-    $('input.datetime').each(function(){
-    	oc = "$('#"+this.id+"').val('');return false;"
-    	$(this).after('<button class="blank-btn" onclick="'+oc+'">BLANK</button>');
-    });
-});
-</script>

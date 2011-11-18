@@ -25,9 +25,7 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="web2py_cms 0.1-alpha documentation" href="../index.html" />
-    <link rel="next" title="cms_views" href="cms_views.html" />
-    <link rel="prev" title="cms_populate" href="cms_populate.html" /> 
+    <link rel="top" title="web2py_cms 0.1-alpha documentation" href="../index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -39,12 +37,6 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="cms_views.html" title="cms_views"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="cms_populate.html" title="cms_populate"
-             accesskey="P">previous</a> |</li>
         <li><a href="../index.html">web2py_cms 0.1-alpha documentation</a> &raquo;</li> 
       </ul>
     </div>  
@@ -78,6 +70,293 @@ so for the moment just one language is used.</p>
 <dd><p>Wrapper for DB, to be used to access CMS entities.</p>
 </dd></dl>
 
+<dl class="class">
+<dt id="cms_tools.NodeEntity">
+<em class="property">class </em><tt class="descclassname">cms_tools.</tt><tt class="descname">NodeEntity</tt><big>(</big><em>db_row=None</em>, <em>cmsdb=None</em><big>)</big><a class="headerlink" href="#cms_tools.NodeEntity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class representing a CMS node.</p>
+<ul class="simple">
+<li>A __getattr__ (+ __getitem__) should return the current fields</li>
+<li>versions contain the versions -&gt; lazy property</li>
+<li>Language resolution works checks for:<ul>
+<li>Requested language or current language or site default</li>
+<li>Node translation source</li>
+</ul>
+</li>
+<li>Versions are structured in a tree, with <tt class="docutils literal"><span class="pre">revision_id</span></tt>
+-&gt; <tt class="docutils literal"><span class="pre">list</span></tt> of <tt class="docutils literal"><span class="pre">versions</span></tt>.</li>
+<li>We should use lazy loaders for the node entities, in order to
+minimize queries and memory usage</li>
+<li>We should mark modified fields / versions in order to minimize
+queries on update, sice possibily a node may have quite a lot of
+revisions + external tables and it&#8217;s not a good idea to always
+update them all!</li>
+</ul>
+<p>Values retrieval + dict-like behavior.
+All the values for the node will be retrieved from:</p>
+<ul class="simple">
+<li>self._db_row</li>
+<li>self._db_row.node_version.select() &#8211;&gt; for the current version [AKA self.latest_version]</li>
+<li>For each self.latest_version, all the fields that are a gluon.dal.Set
+will be select()ed and the field searched inside.</li>
+</ul>
+<div class="admonition-todo admonition " id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">How to get a list of available fields without actually running
+queries? (-&gt; Exploring the DAL, that&#8217;s how)</p>
+</div>
+<dl class="attribute">
+<dt id="cms_tools.NodeEntity.versions">
+<tt class="descname">versions</tt><a class="headerlink" href="#cms_tools.NodeEntity.versions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all the versions for this node, as database rows.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cms_tools.NodeManager">
+<em class="property">class </em><tt class="descclassname">cms_tools.</tt><tt class="descname">NodeManager</tt><big>(</big><em>cmsdb</em><big>)</big><a class="headerlink" href="#cms_tools.NodeManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to be used when interacting with nodes.
+All the node handling / CRUD / .. should pass from this class
+instead of using the DAL directly, in order to correctly handle
+revisions / language and multi-table data storage.</p>
+<dl class="method">
+<dt id="cms_tools.NodeManager.create">
+<tt class="descname">create</tt><big>(</big><em>values</em>, <em>language=None</em><big>)</big><a class="headerlink" href="#cms_tools.NodeManager.create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new node, using values from the <tt class="docutils literal"><span class="pre">values</span></tt> object.</p>
+<p>If <tt class="docutils literal"><span class="pre">values</span></tt> is a <tt class="docutils literal"><span class="pre">NodeEntity</span></tt>, multiple versions may be created,
+else, just a first revision containing selected data is created
+and set as translation source.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>values</strong> (one of (<tt class="docutils literal"><span class="pre">NodeEntity</span></tt>, <tt class="docutils literal"><span class="pre">NodeVersion</span></tt>,
+<tt class="docutils literal"><span class="pre">gluon.storage.Storage</span></tt>, <tt class="docutils literal"><span class="pre">dict</span></tt>)) &#8211; Values to be stored for the first version of the node.</li>
+<li><strong>language</strong> &#8211; The initial language for the node. Defaults
+to <tt class="docutils literal"><span class="pre">values._language</span></tt>, if set, or to the current language.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the ID of the newly created node</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cms_tools.NodeManager.create_version">
+<tt class="descname">create_version</tt><big>(</big><em>values</em>, <em>node_id=None</em>, <em>revision_id=None</em>, <em>language=None</em><big>)</big><a class="headerlink" href="#cms_tools.NodeManager.create_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new veersion for the node.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>values</strong> (<tt class="docutils literal"><span class="pre">NodeVersion</span></tt> or <tt class="docutils literal"><span class="pre">gluon.storage.Storage</span></tt> or <tt class="docutils literal"><span class="pre">dict</span></tt>) &#8211; Values to be stored for the new version.</li>
+<li><strong>node_id</strong> &#8211; Node for which to create version.
+Defaults to <tt class="docutils literal"><span class="pre">values._node_id</span></tt>. This is <strong>requried</strong></li>
+<li><strong>revision_id</strong> &#8211; The revision ID for which to create new version.
+* If set to <tt class="docutils literal"><span class="pre">None</span></tt>, defaults to latest revision
+* If set to <tt class="docutils literal"><span class="pre">-1</span></tt>, create a new revision
+* If set to an <tt class="docutils literal"><span class="pre">int</span></tt>, check that is a valid revision_id.</li>
+<li><strong>language</strong> &#8211; The language of the new version.
+Defaults to current language.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cms_tools.NodeManager.delete">
+<tt class="descname">delete</tt><big>(</big><em>node_id</em><big>)</big><a class="headerlink" href="#cms_tools.NodeManager.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a whole node, including all its version / related data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>node_id</strong> &#8211; Id of the node to be deleted</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cms_tools.NodeManager.delete_version">
+<tt class="descname">delete_version</tt><big>(</big><em>node_id</em>, <em>revision_id=None</em>, <em>language=None</em><big>)</big><a class="headerlink" href="#cms_tools.NodeManager.delete_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete the selected node version / revision / translation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>node_id</strong> &#8211; The node for which to delete version(s)</li>
+<li><strong>revision_id</strong> &#8211; Limit deletion to versions for this revision</li>
+<li><strong>language</strong> &#8211; Limit deletion to versions for this language</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cms_tools.NodeManager.form_create">
+<tt class="descname">form_create</tt><big>(</big><em>node_type=None</em>, <em>defaults=None</em><big>)</big><a class="headerlink" href="#cms_tools.NodeManager.form_create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node creation form.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>type</strong> &#8211; The node type of the newly created node</li>
+<li><strong>defaults</strong> &#8211; A dict of dicts containing values for fields
+on the different pages on which the node will be stored.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cms_tools.NodeManager.read">
+<tt class="descname">read</tt><big>(</big><em>node_id</em>, <em>revision=None</em>, <em>language=None</em><big>)</big><a class="headerlink" href="#cms_tools.NodeManager.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a given node object, by id.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A <tt class="docutils literal"><span class="pre">NodeEntity</span></tt> object containing values for the whole node.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cms_tools.NodeManager.read_version">
+<tt class="descname">read_version</tt><big>(</big><em>node_id</em>, <em>revision_id=None</em>, <em>language=None</em><big>)</big><a class="headerlink" href="#cms_tools.NodeManager.read_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the selected version for the selected node.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>node_id</strong> &#8211; Selected node id.</li>
+<li><strong>revision_id</strong> &#8211; Selected node revision. Defaults to latest
+published version.</li>
+<li><strong>language</strong> &#8211; Selected language. Defaults to the first found in:
+* Current language
+* Default site language (?)
+* Translation source for the revision</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cms_tools.NodeManager.search">
+<tt class="descname">search</tt><big>(</big><em>query=None</em>, <em>orderby=None</em>, <em>language=None</em><big>)</big><a class="headerlink" href="#cms_tools.NodeManager.search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Search for nodes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cms_tools.NodeManager.update">
+<tt class="descname">update</tt><big>(</big><em>values</em>, <em>node_id=None</em><big>)</big><a class="headerlink" href="#cms_tools.NodeManager.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the selected node.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>values</strong> &#8211; a <tt class="docutils literal"><span class="pre">NodeEntity</span></tt></li>
+<li><strong>node_id</strong> &#8211; Id of the node to be updated.
+Defaults to <tt class="docutils literal"><span class="pre">values._node_id</span></tt></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cms_tools.NodeManager.update_version">
+<tt class="descname">update_version</tt><big>(</big><em>values</em>, <em>node_id=None</em>, <em>revision_id=None</em>, <em>language=None</em><big>)</big><a class="headerlink" href="#cms_tools.NodeManager.update_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the selected node/version/translation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>values</strong> (<tt class="docutils literal"><span class="pre">NodeVersion</span></tt> or <tt class="docutils literal"><span class="pre">gluon.storage.Storage</span></tt> or <tt class="docutils literal"><span class="pre">dict</span></tt>) &#8211; Values to be set for the node.</li>
+<li><strong>node_id</strong> &#8211; Id of the node to be updated
+Defaults to <tt class="docutils literal"><span class="pre">values.node_id</span></tt></li>
+<li><strong>revision_id</strong> &#8211; Node revision to be updated.
+Defaults to <tt class="docutils literal"><span class="pre">values._revision_id</span></tt>.</li>
+<li><strong>language</strong> &#8211; Language to be updated.
+Defaults to values._language</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Allowing optional <tt class="docutils literal"><span class="pre">revision_id</span></tt> and <tt class="docutils literal"><span class="pre">language</span></tt> is
+potentially risky -&gt; should we allow that?</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cms_tools.descend_tree">
+<tt class="descclassname">cms_tools.</tt><tt class="descname">descend_tree</tt><big>(</big><em>tree</em>, <em>childrenattr='components'</em>, <em>ilev=0</em><big>)</big><a class="headerlink" href="#cms_tools.descend_tree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generator that yields all the children by exploring a tree.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tree</strong> &#8211; The tree of objects to be explored.
+Usually a gluon.storage.Storage</li>
+<li><strong>childrenattr</strong> &#8211; The attribute of the branches containing
+children elements.</li>
+<li><strong>ilev</strong> &#8211; Used internally to track the indentation level
+of the current branch.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><tt class="docutils literal"><span class="pre">ilev,</span> <span class="pre">element</span></tt> for each found element.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cms_tools.place_into">
+<tt class="descclassname">cms_tools.</tt><tt class="descname">place_into</tt><big>(</big><em>container</em>, <em>keys</em>, <em>value</em><big>)</big><a class="headerlink" href="#cms_tools.place_into" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursively place stuff into ad dict</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cms_tools.split_query_varname">
+<tt class="descclassname">cms_tools.</tt><tt class="descname">split_query_varname</tt><big>(</big><em>varname</em><big>)</big><a class="headerlink" href="#cms_tools.split_query_varname" title="Permalink to this definition">¶</a></dt>
+<dd><p>Split query variable name</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cms_tools.vars_to_tree">
+<tt class="descclassname">cms_tools.</tt><tt class="descname">vars_to_tree</tt><big>(</big><em>vars</em><big>)</big><a class="headerlink" href="#cms_tools.vars_to_tree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reorganize vars from query string into a tree</p>
+</dd></dl>
+
 </div>
 
 
@@ -86,12 +365,6 @@ so for the moment just one language is used.</p>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-  <h4>Previous topic</h4>
-  <p class="topless"><a href="cms_populate.html"
-                        title="previous chapter">cms_populate</a></p>
-  <h4>Next topic</h4>
-  <p class="topless"><a href="cms_views.html"
-                        title="next chapter">cms_views</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../_sources/modules/cms_tools.txt"
@@ -123,12 +396,6 @@ so for the moment just one language is used.</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="right" >
-          <a href="cms_views.html" title="cms_views"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="cms_populate.html" title="cms_populate"
-             >previous</a> |</li>
         <li><a href="../index.html">web2py_cms 0.1-alpha documentation</a> &raquo;</li> 
       </ul>
     </div>
