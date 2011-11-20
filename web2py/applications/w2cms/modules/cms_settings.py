@@ -178,3 +178,19 @@ def cfg_parser(cfg_file, force_reload=False):
     cfg_parsers[cfg_file] = cfp
     
     return cfp
+
+
+
+
+
+## === MISC SETTINGS ===========================================================
+content_languages = {
+    '' : T('Language neutral'),
+    'en':'English',
+    'it':'Italian',
+    }
+content_default_language = 'neutral'
+
+
+
+

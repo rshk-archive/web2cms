@@ -16,6 +16,7 @@ import cms_settings
 
 import helpers
 from helpers import use_custom_view
+from cms_exceptions import *
 
 def index():
     """
@@ -188,7 +189,7 @@ def node_update():
     """Node update form"""
     try:
         node = _node_load(request.args[0])
-    except:
+    except EntityNotFound:
         raise HTTP(404)
     else:
         return dict(
@@ -200,14 +201,14 @@ def node_update():
 def node_read():
     """Full-page node display"""
     try:
-        node = cmsdb.node.read(int(request.args[0]))
-    except:
+        node = cmsdb.node.read(int(request.args[0]),
+            language=request.vars.get('language'))
+    except EntityNotFound:
         raise HTTP(404)
     else:
         return dict(
             node=node,
-            tabs=_node_menu(node.id),
-            )
+            tabs=_node_menu(node.id))
 
 @use_custom_view('generic/form')
 def node_delete():
@@ -229,6 +230,8 @@ def node_delete():
 
 def node_versions():
     """Information on node versions"""
+    ## We need a node, like in node_read();
+    ## the thing that changes is the view
     return node_read()
 
 def node_list():
@@ -239,48 +242,48 @@ def node_search():
     """Content search page"""
     pass
 
-from cms_views import render_view
+#from cms_views import render_view
 
-def view():
-    """Expose visualizations of content, in a way similar to what
-    Drupal views does.
-    
-    .. NOTE::
-        At the moment, all the code needed to generate views is temporarily
-        here. Then, in the future, we'll find a way to move it to
-        configuration files. Problem is how to define possibly complex
-        database queries in a flexible way inside configuration files.
-        
-        @todo: find a way to represent and parse ldap-like search filters
-    """
-    
-    view_name = request.args(0)
-    view_args = request.args[1:]
-    view_vars = request.vars
-    
-    data = render_view(view_name, view_args, view_vars, db)
-    if data.has_key('_view'):
-        response.view = data['_view']
-    return data
+#def view():
+#    """Expose visualizations of content, in a way similar to what
+#    Drupal views does.
+#    
+#    .. NOTE::
+#        At the moment, all the code needed to generate views is temporarily
+#        here. Then, in the future, we'll find a way to move it to
+#        configuration files. Problem is how to define possibly complex
+#        database queries in a flexible way inside configuration files.
+#        
+#        @todo: find a way to represent and parse ldap-like search filters
+#    """
+#    
+#    view_name = request.args(0)
+#    view_args = request.args[1:]
+#    view_vars = request.vars
+#    
+#    data = render_view(view_name, view_args, view_vars, db)
+#    if data.has_key('_view'):
+#        response.view = data['_view']
+#    return data
 
-@use_custom_view('generic/form')
-def comment_create():
-    """Comment creation form.
-    
-    .. TODO:: Use a component
-    """
-    
-    if len(request.args) >= 2:
-        ## We need object_type,object_delta to create comment
-        ##@todo: check that the object we are commenting exists and is commentable!!
-        db.comment.object_type.default=request.args[0]
-        db.comment.object_delta.default=request.args[1]
-        return dict(
-            title=T('Add comment'),
-            form=crud.create(db.comment),
-            )
-    else:
-        raise HTTP(404)
+#@use_custom_view('generic/form')
+#def comment_create():
+#    """Comment creation form.
+#    
+#    .. TODO:: Use a component
+#    """
+#    
+#    if len(request.args) >= 2:
+#        ## We need object_type,object_delta to create comment
+#        ##@todo: check that the object we are commenting exists and is commentable!!
+#        db.comment.object_type.default=request.args[0]
+#        db.comment.object_delta.default=request.args[1]
+#        return dict(
+#            title=T('Add comment'),
+#            form=crud.create(db.comment),
+#            )
+#    else:
+#        raise HTTP(404)
         
 
 

@@ -1,12 +1,13 @@
-<!-- Template for blocks -->
+{{### Template for blocks ###}}
 <div class="block" id="block-{{=block.id}}">
+    
     <h3 class="block-title">{{=block.title}}</h3>
-    <div class="block-admin-links">
-        <ul>
+    
+    <div class="block-content">{{=block.body}}</div>
+    
+    <nav class="block-admin-links">
+        <ul class="inline-links">
             <li>{{=A('edit', _href=URL('admin', 'dbadmin', args=['block', 'edit', 'block', str(block.id)]))}}</li>
         </ul>
-    </div>
-    <div class="block-content">
-    {{=block.body}}
-    </div>
+    </nav>
 </div>

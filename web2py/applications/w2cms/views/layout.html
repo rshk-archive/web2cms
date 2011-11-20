@@ -102,8 +102,10 @@
 
     <div id="container">                        
       
-    <div id="wrapper">        
+    <div id="wrapper"> 
+    <div id="page-upper">       
     {{try:}}{{=auth.navbar(action=URL('default','user'))}}{{except:pass}}
+    </div>
     
     <div id="header"> <!-- header and login nav -->
       {{block header}} <!-- this is default header -->

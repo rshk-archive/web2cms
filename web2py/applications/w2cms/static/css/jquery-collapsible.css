@@ -4,14 +4,16 @@ body {
 fieldset, fieldset.collapsible {
     padding: 10px;
     margin-bottom: 1em;
-    border-color: #888;
+    border-color: #AAA;
 }
 fieldset.collapsed {
     border-bottom-width: 0;
     border-left-width: 0;
     border-right-width: 0;
     margin-bottom: 0;
-    border-color: #888;
+    margin-top:0;
+    padding-bottom:0;
+    padding-top:0;
 }
 
 legend.collapsible {

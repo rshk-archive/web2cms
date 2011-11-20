@@ -419,13 +419,12 @@ body.fluid-width #wrapper {width:95%;}
 #content { float: left; /*width: 740px;*//*width: 63%;*/ /*width: 640px; float:left;*/ } /* uncomment this if you are going to use sidebars */
 
 .auth_navbar {
-    top: 0px;
-    float: right;
+    /* top: 0px;
+    float: right; */
+    /* opacity: 0.80; */
     width: 100%;
-    background-color: white;
-    opacity: 0.80; 
+    display:block;
     text-align: right;
-    color: black;
     line-height: 1.4em;
 }
 
@@ -746,41 +745,69 @@ a.button:hover {
 *******************************************************************************/
 body { background:#888; }
 .app-subtitle { padding: 0 10px; color: #ddd; }
-#header h1 {margin-top:10px;padding:10px 10px;}
+#header h1 {
+	margin-top:10px;
+	padding:10px 10px;
+	text-shadow: #666 2px 2px 2px;
+	color: #eee;
+}
 #header h1 #appname {color:#aaa;}
 #header {background:#222;color:#ddd;padding:5px 0;}
+#container{margin-top:5px;}
+h1, h2, h3, h4, h5, h6 {text-shadow: #BBB 2px 1px 1px;}
 
-.node .submitted { color:#777; font-style: italic; font-size: .8em; }
+/* #page-upper {
+    background: #333;
+    padding-right:5px;
+    color: #fff;
+}
+#page-upper a {
+    color: #BDF;
+} */
+#page-upper {
+    background: #EAEAEA;
+    padding-right:5px;
+}
+
+#wrapper{
+	border:solid 1px #444;
+	box-shadow: #444 0 0 15px;
+}
+
 
 /** Tabs
 *******************************************************************************/
 ul.tabs-menu {
 	border-bottom: solid 1px #888;
-	padding: 0 5px 1px;
+	padding: 1px 5px;
 }
 .tabs-menu li {
 	display: inline;
-    margin: 0 2px 0 0;
+    margin: 0 3px 0 0;
+    padding: 0;
 }
 .tabs-menu li a {
 	padding: 3px 8px;
     background: #eee;
-    border:solid 1px #AAA;
+    border: solid 1px #CCC;
     border-bottom:none;
     color: #444;
+    /* border-top-left-radius: 5px;
+    border-top-right-radius: 5px; */
 }
 .tabs-menu li a:hover {
     background: #f8f8f8;
     text-decoration: none;
 }
-ul.tabs-menu li.web2py-menu-active{
-	
-}
+ul.tabs-menu li.web2py-menu-active{}
 ul.tabs-menu li.web2py-menu-active a {
 	background: #fff;
 	border-color: #888;
-	border-bottom: solid 2px #fff;
-	border-top-width: 2px;
+	border-bottom: none;
+	padding-bottom: 4px;
+	/* border-top: solid 2px #2E6DAB;
+	border-top-left-radius: 5px 2px;
+	border-top-right-radius: 5px 2px; */
 }
 
 /** Grid-layout menu
@@ -846,9 +873,27 @@ button.blank-btn:hover {
 *******************************************************************************/
 
 .node.node-teaser {
-	border: solid 1px #ddd;
+	border-bottom: solid 1px #ddd;
 	margin-bottom: 10px;
-	padding: 5px;
+	padding-bottom: 5px;
+}
+.node .submitted {
+	color:#777;
+	font-style: italic;
+	font-size: .8em;
+}
+.node.node-full footer {
+	border-top: solid 1px #AAA;
+	margin-top: 10px;
+}
+
+.node nav {
+	font-size: .8em;
+	margin: 2px 0;
+	display: inline-block;
+}
+.node .node-body {
+	margin: 5px 0;
 }
 
 /** w2cms node teaser date "calendar" display
@@ -858,8 +903,9 @@ button.blank-btn:hover {
 	float:right;
 	display: block;
 	width: 60px;
-	border: solid 1px #888;
+	margin-top:5px;
 	text-align: center;
+	border: solid 1px #888;
 	background: #fff;
 }
 .node-calendar .node-calendar-month {
@@ -880,7 +926,8 @@ button.blank-btn:hover {
 	color: #777;
 }
 
-/** PAGER **/
+/** Pager
+*******************************************************************************/
 .pager-container {
 	text-align: center;
 }
@@ -1005,3 +1052,13 @@ ul.messages > li.message.message-help {
 	margin: 2px 15px 2px 5px; /*The default*/
 }
 
+/** Inline links
+*******************************************************************************/ 
+ul.inline-links {
+	list-style: none;
+	padding: 3px 5px;
+}
+ul.inline-links li {
+	margin-right: 5px;
+	display: inline;
+}

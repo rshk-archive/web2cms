@@ -57,7 +57,7 @@ def split_query_varname(varname):
     """Split query variable name"""
     _split = varname.split('[',1)
     if len(_split) < 2:
-        return _split[0]
+        return [_split[0]]
     else:
         return [_split[0]] + _split[1][:-1].split('][')
 
@@ -65,13 +65,18 @@ def place_into(container, keys, value):
     """Recursively place stuff into ad dict"""
     if len(keys) == 1:
         container[keys[0]] = value
-        return
     else:
+        if not container.has_key(keys[0]):
+            container[keys[0]] = {}
         place_into(container[keys[0]], keys[1:], value)
 
 def vars_to_tree(vars):
     """Reorganize vars from query string into a tree"""
-    pass
+    vars_new = {}
+    for k,v in vars.items():
+        ksplit = split_query_varname(k)
+        place_into(vars_new, ksplit, v)
+    return vars_new
 
 ##==============================================================================
 ## CMS Database object
@@ -235,14 +240,14 @@ class NodeManager(ElementManager):
             
             version_id = db.node_version.insert(**row_node_version)
             
-            row_node_base_fields = {
+            row_node_fields_base = {
                 'node_version' : version_id,
                 'title' : values.get('title', 'Untitled node %d' % node_id),
                 'body' : values.get('body', ''),
                 'body_format' : values.get('body_format', 'html-full'),
             }
             
-            db.node_base_fields.insert(**row_node_base_fields)
+            db.node_fields_base.insert(**row_node_fields_base)
         
         except:
             db.rollback()
@@ -257,7 +262,7 @@ class NodeManager(ElementManager):
         :return: A ``NodeEntity`` object containing values for the whole node.
         """
         
-        return NodeEntity(self.db.node[node_id], self._cmsdb)
+        return NodeEntity(self.db.node[node_id], self._cmsdb, default_language=language, default_revision=revision)
     
     def update(self, values, node_id=None):
         """Update the selected node.
@@ -345,11 +350,28 @@ class NodeManager(ElementManager):
     ## CRUD functions ==========================================================
     
     def form_create(self, node_type=None, defaults=None):
-        """Node creation form.
+        return self.edit_form('create', node_type=node_type, defaults=defaults)
+    
+    def form_update(self, node_id, revision_id=None, language=None):
+        return self.edit_form('update', node_id=node_id, revision_id=revision_id, language=language)
+    
+    def edit_form(self, action, node_type=None, node_id=None, revision_id=None,
+                  language=None, defaults=None):
+        """Node manipulation form.
         
-        :param type: The node type of the newly created node
-        :param defaults: A dict of dicts containing values for fields
-            on the different pages on which the node will be stored.
+        :param action: The action to be performed on node:
+            create,update,translate
+        :param node_type: Only for ``create``, the type of node
+            to be created
+        :param node_id: Only for ``update|translate``, the id of node
+            to be updated
+        :param revision_id: Only for ``update|translate``, the id
+            of the revision on which to work. Defaults to latest revision.
+            Must be a valid revision id for this node.
+        :param language: The language in which to write/translate the node.
+            Defaults to current language or 'neutral'.
+        :param defaults: A dict or dict-like of values to be set as
+            defaults for node creation.
         """
         
         db = self.db
@@ -360,51 +382,32 @@ class NodeManager(ElementManager):
         if node_type not in node_types.keys():
             raise ValueError, "Wrong node type %r must be one of %s" % (node_type, ", ".join(node_types.keys()))
         
-        ## Generate form. We can't use standard CRUD here!
-        ## Why does fields get named the same way, unregarding of table name?
-        
-        ##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-        ##                               WARNING!
-        ##                                
-        ##          The current SQLFORM is too limited to handle this!          
-        ##     Form generation needs to be done by hand, in order to avoid      
-        ##                               problems                               
-        ##@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-        
-        ## Dict that will contain all the components to be placed in the form
+        ## To store components of the form
         _form_components = {}
-        _component_tables = ['node', 'node_version', 'node_base_fields']
+        
+        ## Tables to be used to generate form.
+        ## TODO: Load all the db.tables matching node_fields_* and node_<type>_fields_*
+        _component_tables = ['node', 'node_revision', 'node_fields_base']
         
         ## Set defaults --------------------------------------------------------
         db.node.type.default = node_type
         db.node.type.readable = \
         db.node.type.writable = False
         
-        db.node_version.node.requires = None
-        db.node_version.node.readable = \
-        db.node_version.node.writable = False
+        db.node_revision.node.requires = None
+        db.node_revision.node.readable = \
+        db.node_revision.node.writable = False
         
-        db.node_version.revision_id.default = 0
+        db.node_fields_base.node_revision.requires = None
+        db.node_fields_base.node_revision.readable = \
+        db.node_fields_base.node_revision.writable = False
         
-        db.node_version.language.default = 'neutral'
-        
-        db.node_version.is_translation_base.default = True #For creation or new revision
-        db.node_version.is_translation_base.readable = \
-        db.node_version.is_translation_base.writable = False
-        
-        db.node_version.revision_id.default = 0 #Means "create new"
-        db.node_version.revision_id.readable = \
-        db.node_version.revision_id.writable = False
-        
-        db.node_version.language.requires = IS_IN_SET(['neutral', 'en-en', 'it-it'])
-        
-        db.node_base_fields.node_version.requires = None
-        db.node_base_fields.node_version.readable = \
-        db.node_base_fields.node_version.writable = False
+        ##TODO: set defaults from the `defaults` variable.
         
         ## Retrieve components from tables -------------------------------------
         for table in _component_tables:
-            _form_components[table] = SQLFORM.factory(db[table], buttons=[], formstyle='divs').components
+            _form_components[table] = SQLFORM.factory(db[table], buttons=[],
+                formstyle='divs' if table not in ['node','node_revision'] else 'table3cols').components
             for ilev, comp in descend_tree(_form_components[table]):
                 if isinstance(comp, INPUT) and comp.attributes.has_key('_name'):
                     comp.attributes['_name'] = '%s--%s' % (table, comp.attributes['_name'])
@@ -414,29 +417,44 @@ class NodeManager(ElementManager):
         ## TODO: We need a custom SQLFORM to generate this!
         
         form = FORM(
-            *([
-                ## Fields from the tables
-                FIELDSET(
-                    LEGEND(table.replace('_', ' ').title()),
-                    #*_components_node,
-                    *_form_components[table],
-                    _class='collapsible')
-                for table in _component_tables
-            ] + [
-                ## Other fields that will not stored directly
-                FIELDSET(
-                    LEGEND('Control fields'),
-                    *SQLFORM.factory(DAL(None).define_table('no_table',
-                        Field('create_new_revision', 'boolean', default=False),
-                    ), buttons=[]).components,
-                     _class='collapsible'
-                ),
-                INPUT(_type='submit', _value=T('Submit'))
-            ]),
+                    
+            ## Fields from node_fields_base table
+            DIV(*_form_components['node_fields_base'],
+                _class='expanding-form'),
+            
+            ## Standard fields from node/node_revision
+            FIELDSET(
+                    LEGEND('Node'),
+                    DIV(*_form_components['node']),
+                    _class='collapsible start-collapsed'),
+            FIELDSET(
+                    LEGEND('Node revision'),
+                    DIV(*_form_components['node_revision']),
+                    _class='collapsible start-collapsed'),
+            
+            ## Other control fields
+            FIELDSET(
+                LEGEND('Control fields'),
+                *SQLFORM.factory(DAL(None).define_table('no_table',
+                    Field('create_new_revision', 'boolean', default=False),
+                    Field('content_language', 'string',
+                          default=cms_settings.content_default_language,
+                          requires=IS_IN_SET(cms_settings.content_languages, zero=None)),
+                ), buttons=[]).components,
+                _class='collapsible start-collapsed'
+            ),
+            
+            ## Submit button
+            INPUT(_type='submit', _value=T('Submit')),
+            
+            ## Hidden fields
             hidden = {
-                'action': 'create',
+                'action': action,
+                'node_id' : node_id,
+                'revision_id' : revision_id,
+                'language' : language,
             },
-            _class='expanding-form'
+            
         )
         
         ## Process the form ----------------------------------------------------
@@ -455,61 +473,91 @@ class NodeManager(ElementManager):
             
             ## Here, insert stuff into tables, etc.
             form.components.append(BEAUTIFY(_var_groups))
+            
+            if action == 'create':
+                ## Create a new node
+                
+                try:
+                    ## Create node
+                    content_language = _var_groups['default']['content_language']
+                    _var_groups['node']['type'] = node_type
+                    node_id = db.node.insert(**_var_groups['node'])
+                    
+                    _var_groups['node_revision']['node'] = node_id
+                    _var_groups['node_revision']['translation_base'] = content_language
+                    node_revision_id = db.node_revision.insert(**_var_groups['node_revision'])
+                    
+                    ## Create node revision
+                    _var_groups['node_fields_base']['node_revision'] = node_revision_id
+                    
+                    ## Insert into node_fields_base
+                    if content_language:
+                        ## Insert data in t9n_node_fields_base too, with new language
+                        _vals = {'node_revision':node_revision_id}
+                        _t9n_vals = _var_groups['node_fields_base'].copy()
+                        
+                        ## Create empty record in node_fields_base (language neutral)
+                        node_fields_base_id = db.node_fields_base.insert(**_vals)
+                        
+                        ## Create translated record in t9n_node_fields_base
+                        del _t9n_vals['node_revision'] 
+                        _t9n_vals['record'] = node_fields_base_id
+                        _t9n_vals['language'] = content_language
+                        db.t9n_node_fields_base.insert(**_t9n_vals)
+                    else:
+                        ## Insert just in node_fields_base (language neutral)
+                        _vals = _var_groups['node_fields_base'].copy()
+                        db.node_fields_base.insert(**_vals)
+                except Exception,e:
+                    current.response.flash = "Something went wrong!"
+                    db.rollback()
+                    raise
+                else:
+                    current.session.flash = "New node was created - id %d" % node_id
+                    db.commit()
+                    ## Go to node page
+                    from gluon.tools import redirect
+                    redirect(CMS_URL('node', node_id))
         
         return form
     
-    def form_update(self, node, revision=None, language=None):
-        pass
+    
     
 
 class NodeEntity(ElementEntity):
     """\
     Class representing a CMS node.
     
-    * A __getattr__ (+ __getitem__) should return the current fields
-    * versions contain the versions -> lazy property
-    * Language resolution works checks for:
-    
-      * Requested language or current language or site default
-      * Node translation source
-    
-    * Versions are structured in a tree, with ``revision_id``
-      -> ``list`` of ``versions``.
-    * We should use lazy loaders for the node entities, in order to
-      minimize queries and memory usage
-    * We should mark modified fields / versions in order to minimize
-      queries on update, sice possibily a node may have quite a lot of
-      revisions + external tables and it's not a good idea to always
-      update them all!
-    
-    
-    Values retrieval + dict-like behavior.
-    All the values for the node will be retrieved from:
-    
-    * self._db_row
-    * self._db_row.node_version.select() --> for the current version [AKA self.latest_version]
-    * For each self.latest_version, all the fields that are a gluon.dal.Set
-      will be select()ed and the field searched inside.
-    
-    .. TODO:: How to get a list of available fields without actually running
-        queries? (-> Exploring the DAL, that's how)
+    * Each node is a record from db.node
+    * Each node have some associated revisions, as a Set inside node_revision
+    * Each node revision have some associated fields, mostly inside
+      node_fields_base, but in other attributes too.
+    * Each node_fields_base has some translations, contained inside
+      t9n_node_fields_base.
     """
     
     node_id = None
-    versions = None
-    revision_numbers = None
-    languages = None
     
-    _current_language = None
+    default_revision = None
+    default_language = None
+    
+    def __init__(self, *args, **kwargs):
+        if kwargs.has_key('default_language'):
+            self.default_language = kwargs['default_language']
+            del kwargs['default_language']
+        
+        if kwargs.has_key('default_revision'):
+            ##TODO: Validate revision id
+            self.default_revision = kwargs['default_revision']
+            del kwargs['default_revision']
+        
+        ElementEntity.__init__(self, *args, **kwargs)
     
     @property
     def versions(self):
-        """Returns all the versions for this node, as database rows.
-        """
-        return self._db_row.node_version.select(orderby=
-                self.db.node_version.revision_id |
-                ~self.db.node_version.is_translation_base |
-                self.db.node_version.language)
+        return self._db_row.node_revision.select(orderby=
+                ~self.db.node_revision.published |
+                ~self.db.node_revision.id)
     
     @property
     def latest_version(self):
@@ -532,21 +580,9 @@ class NodeEntity(ElementEntity):
           non-published versions, even if more recent.
         """
         db = self.db
-        
-        ## TODO: Make the orderby configurable, even on a per-node-type basis
-        
-        return self._db_row.node_version.select(
-            orderby=~db.node_version.published |
-            ~db.node_version.revision_id |
-            ~(db.node_version.language=='en-en') | ## TODO: Replace 'en-en' with current language(s)!
-            ~(db.node_version.language=='en-en') | ## TODO: Replace 'en-en' with default language!
-            ~db.node_version.is_translation_base 
-            ).first()
-
-        ## If we want to do something more complex:
-        #return db(db.node_version.node==self._db_row)(db.node_version.published==True).select(
-        #    orderby=~self.db.node_version.revision_id | self.db.node_version.language,
-        #    ).first()
+        return NodeVersion(self._db_row.node_revision.select(
+            orderby= ~db.node_revision.published | ~db.node_revision.id
+            ).first())
     
     def _get_first_version(self):
         db = self.db
@@ -555,94 +591,42 @@ class NodeEntity(ElementEntity):
             ~db.node_version.is_translation_base |
             db.node_version.id 
             ).first()
+
+class NodeVersion(object):
+    search_tables = ['node_fields_base']
+    _row=None
     
-    def __getattr__(self, name):
-        ## Fields from db.node
-        if self._db_row.has_key(name):
-            return self._db_row[name]
-        
-        ## Fields from db.node_version, for the latest version
-        _lv = self._get_latest_version()
-        if _lv.has_key(name):
-            return _lv[name]
-        
-        ## Search in all the back-references
-        for k in _lv.keys():
-            ## TODO: Improve this check a bit!
-            if isinstance(_lv[k], gluon.dal.Set):
-                for r in _lv[k].select():
-                    ## All the rows have the same fields!
-                    ## So, the first one will always return
-                    if r.has_key(name):
-                        return r[name]
-        
-        ## Pass to the default
-        return ElementEntity.__getattr__(self, name)
+    def __init__(self, row):
+        self._row=row
+    
+    def __getattr__(self,name):
+        if hasattr(self._row, name):
+            return getattr(self._row, name)
+        for t in self.search_tables:
+            _values = getattr(self._row, t).select().first()
+            if hasattr(_values, name):
+                return getattr(_values, name)
+        raise AttributeError('Attribute %r not found' % name)
 
-
-#class NodeVersion(object):
-#    """Class representing a CMS node version.
-#    
-#    .. TODO:: Is this needed anymore?
-#    """
-#    
-#    _node_meta = None
-#    _node_values = None
-#    
-#    def __init__(self, node_id, revision_id, language, version_id, values):
-#        self.__dict__['_node_meta'] = {
-#            'node_id' : node_id,
-#            'revision_id' : revision_id,
-#            'language' : language,
-#            'version_id' : version_id,
-#        }
-#        self.__dict__['_node_values'] = {}
-#        self.__dict__['_node_values'].update(values)
-#    
 #    def __getattr__(self, name):
-#        if name.startswith('_'):
-#            _name = name[1:]
-#            return self.__dict__['_node_meta'][_name]
-#        else:
-#            return self.__dict__['values'][name]
-#    
-#    def __setattr__(self, name, value):
-#        if name.startswith('_'):
-#            _name = name[1:]
-#            self.__dict__['_node_meta'][_name] = value
-#        else:
-#            self.__dict__['values'][name] = value
-#    
-#    def __delattr__(self, key):
-#        if name.startswith('_'):
-#            _name = name[1:]
-#            del self.__dict__['_node_meta'][_name]
-#        else:
-#            del self.__dict__['values'][name]
-#    
-#    def __getitem__(self, key):
-#        return self.__getattr__(key)
-#    
-#    def __setitem__(self, key, value):
-#        return self.__setattr__(key, value)
-#    
-#    def __delitem__(self, key):
-#        return self.__delattr__(key)
-#    
-#    def keys(self):
-#        return map(lambda x: "_%s" % x, self.__dict__['_node_meta'].keys()) \
-#            + self.__dict__['_node_values'].keys()
-#    
-#    def has_key(self, key):
-#        return (key in self.keys())
-#    
-#    def update(self, values):
-#        self.__dict__['_node_values'].update(values)
-#    
-#    @classmethod
-#    def from_dict(cls, values, *args, **kwargs):
-#        """**Constructor** Instantiate a new node version
-#        from the passed-in values"""
-#        node_version = cls(*args, **kwargs)
-#        node_version.update(values)
-#        return node_version
+#        ## Fields from db.node
+#        if self._db_row.has_key(name):
+#            return self._db_row[name]
+#        
+#        ## Fields from db.node_version, for the latest version
+#        _lv = self._get_latest_version()
+#        if _lv.has_key(name):
+#            return _lv[name]
+#        
+#        ## Search in all the back-references
+#        for k in _lv.keys():
+#            ## TODO: Improve this check a bit!
+#            if isinstance(_lv[k], gluon.dal.Set):
+#                for r in _lv[k].select():
+#                    ## All the rows have the same fields!
+#                    ## So, the first one will always return
+#                    if r.has_key(name):
+#                        return r[name]
+#        
+#        ## Pass to the default
+#        return ElementEntity.__getattr__(self, name)

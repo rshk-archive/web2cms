@@ -1,0 +1,213 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Translation support &mdash; web2py_cms 0.1-alpha documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1-alpha',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="web2py_cms 0.1-alpha documentation" href="../index.html" />
+    <link rel="up" title="Brainstorming" href="index.html" />
+    <link rel="next" title="CMS-Specific Modules" href="../modules/index.html" />
+    <link rel="prev" title="CMS Elements" href="elements.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../modules/index.html" title="CMS-Specific Modules"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="elements.html" title="CMS Elements"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">web2py_cms 0.1-alpha documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">Brainstorming</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="translation-support">
+<h1>Translation support<a class="headerlink" href="#translation-support" title="Permalink to this headline">¶</a></h1>
+<p><strong>web2cms</strong> must support translation for all the content, etc.; feature
+that&#8217;s missing or badly implemented in other CMS.</p>
+<p>In order to support this, most tables will have a <tt class="docutils literal"><span class="pre">&lt;tablename&gt;_translation</span></tt>
+equivalent, containing translation for some fields of the table.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Interface langugage and content language should be kept separated,
+since the user may want to visit the content in an other language while
+keeping all the controls etc. in his own language!</p>
+</div>
+<div class="admonition-todo admonition " id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">Find a way to use path prefixes for translation
+-&gt; And then avoid controllers named with two-letter names!</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>Problem with this is: how to implement quickly this database-side
+in order to allow quick searches on content? We need to search on
+the translated table instead of the real one, but only for some
+fields that are translated..</p>
+<p class="last">Maybe, can be done by several filtering levels, or by massive indexing.</p>
+</div>
+<div class="section" id="desired-language-discovery">
+<h2>Desired language discovery<a class="headerlink" href="#desired-language-discovery" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>At the moment we consider only two-character language codes,
+such as &#8220;en&#8221;, &#8220;it&#8221;, etc. but then we should add support for
+country-codes too, such as &#8220;en_GB&#8221;, &#8220;en_US&#8221;, &#8220;it_IT&#8221;, &#8220;it_CH&#8221;, etc.
+How to handle this?</p>
+<ul class="last simple">
+<li>If a user wants &#8220;en_US&#8221; and we only have &#8220;en&#8221;, we should return that.</li>
+<li>If a user wants &#8220;en_US&#8221; and we only have &#8220;en_GB&#8221;, we may return that.</li>
+<li>What if a user wants &#8220;en_US&#8221; or &#8220;en&#8221; and we have only &#8220;en_GB&#8221; and &#8220;en_CA&#8221;?</li>
+<li>Then, a browser may send a list of supported languages instead of just one,
+so should we return the first available, the most matching, or what?</li>
+</ul>
+</div>
+<p>The wanted language is determined this way:</p>
+<ul class="simple">
+<li>Forced language: either by path prefix or cookie setting, manually
+selected by the user, takes the absolute precedence.</li>
+<li>User preferred language: configured in the user settings</li>
+<li>One of the languages specified by the browser (contained in
+<tt class="docutils literal"><span class="pre">T.accepted_language</span></tt>).</li>
+<li>Site default language.</li>
+<li>Language neutral -&gt; no translation, pick values directly from the table.</li>
+</ul>
+</div>
+<div class="section" id="generic-table-translation">
+<h2>Generic table translation<a class="headerlink" href="#generic-table-translation" title="Permalink to this headline">¶</a></h2>
+<p>Each table <tt class="docutils literal"><span class="pre">mytable</span></tt> fields values can be translated using a corespondent
+<tt class="docutils literal"><span class="pre">t9n_mytable</span></tt> table. Structure is like this:</p>
+<dl class="docutils">
+<dt><strong>mytable</strong></dt>
+<dd><ul class="first last simple">
+<li><strong>id</strong> - Serial auto-increment primary key</li>
+<li><em>field0</em> - Language neutral value for field0</li>
+<li><em>field1</em> - Language neutral value for field1</li>
+<li><em>field2</em> - Language neutral value for field2</li>
+<li>...</li>
+<li><em>fieldN</em> - Language neutral value for fieldN</li>
+</ul>
+</dd>
+<dt><strong>t9n_mytable</strong></dt>
+<dd><ul class="first simple">
+<li><strong>id</strong> - Serial auto-increment primary key</li>
+<li><strong>language</strong> - Language code</li>
+<li><strong>record</strong> - Reference to the original table</li>
+<li><em>field0</em> - Translated value for field0, or NULL if no translation</li>
+<li><em>field1</em> - Translated value for field1, or NULL if no translation</li>
+<li><em>field2</em> - Translated value for field2, or NULL if no translation</li>
+<li>...</li>
+<li><em>fieldN</em> - Translated value for fieldN, or NULL if no translation</li>
+</ul>
+<div class="last admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">We need an unique key on <tt class="docutils literal"><span class="pre">(record,</span> <span class="pre">language)</span></tt></p>
+</div>
+</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Translation support</a><ul>
+<li><a class="reference internal" href="#desired-language-discovery">Desired language discovery</a></li>
+<li><a class="reference internal" href="#generic-table-translation">Generic table translation</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="elements.html"
+                        title="previous chapter">CMS Elements</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../modules/index.html"
+                        title="next chapter">CMS-Specific Modules</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/brainstorming/translations.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../modules/index.html" title="CMS-Specific Modules"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="elements.html" title="CMS Elements"
+             >previous</a> |</li>
+        <li><a href="../index.html">web2py_cms 0.1-alpha documentation</a> &raquo;</li>
+          <li><a href="index.html" >Brainstorming</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Samuele Santi &lt;redshadow@hackzine.org&gt;.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.
+    </div>
+  </body>
+</html>

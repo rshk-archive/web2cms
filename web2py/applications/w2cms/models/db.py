@@ -99,6 +99,8 @@ auth.settings.reset_password_requires_verification = True
 
 import cms_settings
 
+
+
 ## Field representation functions ==============================================
 def user_name_represent(value, row=None):
     """Used to represent user names"""
@@ -128,72 +130,79 @@ signature.created_by.represent = user_name_represent
 signature.updated_by.represent = user_name_represent
 
 
-## Table: node =================================================================
-## Definition of nodes
+t9n_fields = db.Table(db, 'cms_t9n_fields',
+    #Field('record','reference...'),
+    Field('language','string',length=32))
 
+
+## Table: node =================================================================
 db.define_table(
     'node',
-    Field('type', 'string', length=128, required=True, requires=IS_NOT_EMPTY()),
+    Field('type', 'string', length=128, required=True),
     Field('published', 'boolean', default=True),
     Field('weight', 'integer', default=0),
+    signature,
     )
 
+##TODO: Add IS_IN_SET() validator for type!
+db.node.type.requires = IS_NOT_EMPTY()
 db.node.weight.requires = IS_INT_IN_RANGE(-50, 50)
 
 ## Table: node_version =========================================================
-## Store definition and metadata about versions
-
 db.define_table(
-    'node_version',
-    
-    ## Node this version is associated to
+    'node_revision',
     Field('node', db.node, required=True),
-    
-    ## Node revision ID
-    Field('revision_id', 'integer', required=True),
-    
-    ## Node language
-    Field('language', 'string', length=32, required=True),
-    
-    ## Signature: {created,updated}_{by,date}
-    signature,
-    
-    ## Published flag, for translation draft
     Field('published', 'boolean', default=True),
     
-    ## Flag that indicates this version is the base for other translations
-    Field('is_translation_base', 'boolean', default=True),
+    ## Base language for the translation
+    Field('translation_base', 'string', length=32, required=True),
+    
+    ## Comment about the revision
+    Field('log_message', 'text'),
+    
+    signature,
     )
 
-db.node_version.node.requires = IS_IN_DB(db, db.node.id, "Node %(id)d [%(type)s]")
+db.node_revision.node.requires = IS_IN_DB(db, db.node.id, "Node %(id)d [%(type)s]")
 
-class Node_version_VirtualFields:
-    def base_fields(self):
-        #print "@@@CALLED@@@ Node_version_VirtualFields.base_fields"
-        ##TODO: modify this so that this method is called only when
-        ##      the attribute is actually required!
-        ##      (Improvements to core needed?)
-        return self.node_version.node_base_fields.select().first()
+###TODO: Improve these virtual fields management
+#class Node_revision_VirtualFields:
+#    def base_fields(self):
+#        #print "@@@CALLED@@@ Node_version_VirtualFields.base_fields"
+#        ##TODO: modify this so that this method is called only when
+#        ##      the attribute is actually required!
+#        ##      (Improvements to core needed?)
+#        return self.node_revision.node_fields_base.select().first()
+#
+#db.node_revision.virtualfields.append(Node_version_VirtualFields())
 
-db.node_version.virtualfields.append(Node_version_VirtualFields())
-
-## Table: node_base_fields =====================================================
-## Common fields for all node types
-
+## Table: node_fields_base =====================================================
 db.define_table(
-    'node_base_fields',
-    Field('node_version', db.node_version, required=True),
-    Field('title', 'string', length=256, required=True, requires=IS_NOT_EMPTY()),
+    'node_fields_base',
+    Field('node_revision', db.node_revision, required=True),
+    Field('title', 'string', length=256),
     Field('body', 'text'),
     Field('body_format', 'string', length=128),
     )
 
-db.node_base_fields.node_version.requires = IS_IN_DB(db, db.node_version.id,
-    "VERSION %(id)d of node %(node)s (rev=%(revision_id)s, lang=%(language)s)")
-db.node_base_fields.body_format.requires = IS_IN_SET(
+db.node_fields_base.node_revision.requires = \
+    IS_IN_DB(db, db.node_revision.id, "VERSION %(id)d of node %(node)s")
+db.node_fields_base.body_format.requires = IS_IN_SET(
     dict([(k,v['label']) for k,v in cms_settings.list_text_formats().items()]))
 
-
+db.define_table(
+    't9n_node_fields_base',
+    
+    ## Standard language fields
+    Field('record', db.node_fields_base,
+          requires=IS_IN_DB(db, db.node_fields_base.id, "node_fields_base[%(id)d]")),
+    t9n_fields,
+    
+    ## Fields to be translated
+    db.node_fields_base.title,
+    db.node_fields_base.body,
+    db.node_fields_base.body_format,
+    )
 
 
 

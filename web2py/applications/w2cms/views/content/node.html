@@ -1,6 +1,7 @@
-{{teaser=globals().get('teaser',False)}}
+{{teaser=globals().get('teaser', False)}}
 {{comments_enabled = True}}
 {{from gluon.sqlhtml import represent}}
+
 <article class="node {{='node-teaser' if teaser else 'node-full'}} node-type-{{=node.type}}">
     <header>
 		{{#@todo: Read the list of nodes for which to show calendar from configuration}}
@@ -13,35 +14,53 @@
 		{{pass}}
 	
 		{{if teaser:}}
-		<h2 class="node-title">{{=A(node.title, _href=URL('default', 'view', args=['node', node.id]))}}</h2>
+		<h2 class="node-title">{{=A(node.latest_version.title, _href=CMS_URL('node', node.id))}}</h2>
 		{{else:}}
-		<h1 class="node-title">{{=node.title}}</h1>
+		<h1 class="node-title">{{=node.latest_version.title}}</h1>
 		{{pass}}
 		
 		<time pubdate datetime="{{=node.created_date.strftime('%FT%T')}}"></time>
 		
 		<div class="submitted">
 		{{=XML(T('Submitted by %(author)s on %(date)s', dict(
-		    author = A(represent(db.node_version.created_by, node.created_by, node), _href=URL('default', 'user_profile', args=[node.created_by])),
-		    date = represent(db.node_version.created_date, node.first_version.created_date, node),
+		    author = A(represent(db.node.created_by, node.created_by, node), _href=CMS_URL('user', node.created_by)),
+		    date = represent(db.node.created_date, node.created_date, node),
 		)))}}
 		</div>
 		
 		{{if node.created_date != node.updated_date:}}
 		<div class="updated">
-        ({{=T('Last update on %(date)s', dict(date=represent(db.node_version.updated_date, node.updated_date, node)))}})
+        ({{=T('Last update on %(date)s', dict(date=represent(db.node.updated_date, node.updated_date, node)))}})
         </div>
         {{pass}}
 		
     </header>
-
+    
+    <div style='border-bottom: solid 1px #aaa;border-top: solid 1px #aaa;font-size:.8em;'>
+        <strong>Language:</strong> {{=node.default_language}} -
+        <strong>Revision:</strong> {{=node.default_revision}}
+    </div>
+    
     <div class="node-body">
-        {{=node.body}}
+        {{=node.latest_version.body}}
     </div>
 
     <footer>
-	    <nav>
-	       <ul>
+        {{if not teaser:}}
+	    <nav class="node-translations">
+	    <ul class="inline-links">
+	    <li><strong>Language:</strong></li>
+	    {{for langcode, lang in cms_settings.content_languages.items():}}
+	        <li>{{=A(IMG(_src=URL('static', 'images/icons/flags/%s.png' % (langcode if langcode else 'neutral')), _alt=lang, _title=lang),
+	            _href=CMS_URL('node', node.id, vars=dict(language=langcode)))}}</li>
+	    {{pass}}
+	    </ul>
+	    </nav>
+	    {{pass}}
+	    
+	    <nav class="node-actions">
+	       <ul class="inline-links">
+	           <li><strong>Actions:</strong></li>
 	           <li>{{=A(T('Edit'), _href=URL('default','node_update',args=[node.id]))}}</li>
 	           <li>{{=A(T('Add comment'), _href=URL('default','comment_create',args=['node', node.id]))}}</li>
 	       </ul>

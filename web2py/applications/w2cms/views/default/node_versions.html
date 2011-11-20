@@ -1,4 +1,3 @@
-{{left_sidebar_enabled=right_sidebar_enabled=False}}
 {{extend 'layout.html'}}
 
 {{from gluon.sqlhtml import represent}}
@@ -7,57 +6,59 @@
 
 <h1>Node versions</h1>
 
-<h2>db.node</h2>
-{{=BEAUTIFY(node._db_row)}}
+<h2>Details</h2>
 
-<h2>db.node_version</h2>
+<ul>
+    <li><strong>Node:</strong> {{=node.type}}</li>
+    <li><strong>ID:</strong> {{=node.id}}</li>
+    <li>Created by
+        {{=A(represent(db.node.created_by, node.created_by, node), _href=CMS_URL('user', node.created_by))}}
+        on {{=node.created_date}}</li>
+    <li>Latest update by
+        {{=A(represent(db.node.updated_by, node.updated_by, node), _href=CMS_URL('user', node.updated_by))}}
+        on {{=node.updated_date}}</li>
+    <li><strong>Revisions:</strong> {{=node.node_revision.count()}}</li>
+    <li><strong>Published:</strong> {{='Yes' if node.published else 'No'}}</li>
+    <li><strong>Weight:</strong> {{=node.weight}}</li>
+</ul>
 
-{{
-def _represent_user(u):
-    return A(
-        "%(first_name)s %(last_name)s" % u,
-        _href=URL('default', 'user_profile', args=[u.id]))
-}}
+<h2>Revisions</h2>
 
-<table class="zebra grid">
-<thead>
-<tr>
-    <th>Version ID</th>
-    <th>Node ID</th>
-    <th>Revision ID</th>
-    <th>Language</th>
-    <th>Created by</th>
-    <th>Created on</th>
-    <th>Updated by</th>
-    <th>Updated on</th>
-    <th>Published</th>
-    <th>Translation base</th>
-</tr>
-</thead>
-<tbody>
-{{for version in node.versions:}}
-    <tr style="{{="border: solid 2px #f00;" if version.id == node.latest_version.id else ""}}">
-        <td class="highlight-red">{{=version.id}}</td>
-        <td class="highlight">{{=version.node.id}}</td>
-        <td class="highlight">{{=version.revision_id}}</td>
-        <td class="highlight">{{=version.language}}</td>
-        <td>{{=_represent_user(version.created_by)}}</td>
-        <td>{{=version.created_date}}</td>
-        <td>{{=_represent_user(version.updated_by)}}</td>
-        <td>{{=version.updated_date}}</td>
-        <td>{{=version.published}}</td>
-        <td>{{=version.is_translation_base}}</td>
-    </tr>
+{{for revision in node.node_revision.select(orderby=db.node_revision.id):}}
+<h3>Revision {{=revision.id}}</h3>
+
+<fieldset class="collapsible start-collapsed">
+<legend>Revision information</legend>
+<ul>
+    <li><strong>Revision id:</strong> {{=revision.id}}</li>
+    <li>Created by
+        {{=A(represent(db.node.created_by, node.created_by, node), _href=CMS_URL('user', revision.created_by))}}
+        on {{=revision.created_date}}</li>
+    <li>Latest update by
+        {{=A(represent(db.node.updated_by, node.updated_by, node), _href=CMS_URL('user', revision.updated_by))}}
+        on {{=revision.updated_date}}</li>
+    <li><strong>Published:</strong> {{='Yes' if revision.published else 'No'}}</li>
+    <li><strong>Base language:</strong> {{=revision.translation_base}}</li>
+    <li><strong>Log message:</strong> {{=revision.log_message}}</li>
+</ul>
+</fieldset>
+
+{{for extra_table in ['node_fields_base']:}}
+{{extra_fields = revision[extra_table].select().first()}}
+<fieldset class="collapsible start-collapsed">
+<legend>{{=extra_table.replace('_',' ').title()}}</legend>
+
+<h4>Language neutral version</h4>
+<p>{{=BEAUTIFY(extra_fields)}}</p>
+
+{{if extra_fields.has_key('t9n_%s' % extra_table):}}
+{{for translation in extra_fields['t9n_%s' % extra_table].select():}}
+<h4>{{="%s version" % cms_settings.content_languages.get(translation.language,translation.language)}}</h4>
+<p>{{=BEAUTIFY(translation)}}</p>
 {{pass}}
-</tbody>
-</table>
-
-<h2>db.node_base_fields</h2>
-{{for version in node.versions:}}
-{{=BEAUTIFY(version.node_base_fields.select())}}
 {{pass}}
 
+</fieldset>
+{{pass}}
 
-
-{{#=BEAUTIFY(node)}}
-
+{{pass}}
