@@ -46,12 +46,13 @@
     </div>
 
     <footer>
-        {{if not teaser:}}
+        {{if not teaser and node.translations:}}
 	    <nav class="node-translations">
 	    <ul class="inline-links">
 	    <li><strong>Language:</strong></li>
-	    {{for langcode, lang in cms_settings.content_languages.items():}}
-	        <li>{{=A(IMG(_src=URL('static', 'images/icons/flags/%s.png' % (langcode if langcode else 'neutral')), _alt=lang, _title=lang),
+	    {{for langcode in node.translations:}}
+	    {{langname = cms_settings.content_languages[langcode]}}
+	        <li>{{=A(IMG(_src=URL('static', 'images/icons/flags/%s.png' % (langcode if langcode else 'neutral')), _alt=langname, _title=langname),
 	            _href=CMS_URL('node', node.id, vars=dict(language=langcode)))}}</li>
 	    {{pass}}
 	    </ul>

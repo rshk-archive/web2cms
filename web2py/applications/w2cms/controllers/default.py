@@ -95,6 +95,7 @@ def _node_menu(node_id):
         (T('View'), 'node_read'),
         (T('Versions'), 'node_versions'),
         (T('Edit'), 'node_update'),
+        (T('Translate'), 'node_translate'),
         (T('Delete'), 'node_delete'),
         ]:
         menu_items.append((
@@ -188,15 +189,22 @@ def node_create():
 def node_update():
     """Node update form"""
     try:
-        node = _node_load(request.args[0])
-    except EntityNotFound:
-        raise HTTP(404)
+        node_id = int(request.args[0])
+        node_revision = request.vars.get('revision')
+        node_language = request.vars.get('language')
+    except:
+        raise HTTP(404, 'Wrong arguments')
     else:
-        return dict(
-            title=T('Node #%d (%s): update', (node.id, node.title)),
-            tabs=_node_menu(node.id),
-            form = crud.update(db.node, node)
-        )
+        pass
+    response.view = 'generic/form.' + request.extension
+    return dict(
+        title = T('Update node #%(id)d') % dict(id=node_id),
+        tabs = _node_menu(node_id),
+        form = cmsdb.node.form_update(
+            node_id=node_id,
+            revision_id=node_revision,
+            language=node_language),
+    )
 
 def node_read():
     """Full-page node display"""
