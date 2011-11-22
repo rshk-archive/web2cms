@@ -25,7 +25,10 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <link rel="top" title="web2py_cms 0.1-alpha documentation" href="../index.html" /> 
+    <link rel="top" title="web2py_cms 0.1-alpha documentation" href="../index.html" />
+    <link rel="up" title="CMS-Specific Modules" href="index.html" />
+    <link rel="next" title="cms_views" href="cms_views.html" />
+    <link rel="prev" title="cms_settings" href="cms_settings.html" /> 
   </head>
   <body>
     <div class="related">
@@ -37,7 +40,14 @@
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">web2py_cms 0.1-alpha documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="cms_views.html" title="cms_views"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="cms_settings.html" title="cms_settings"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">web2py_cms 0.1-alpha documentation</a> &raquo;</li>
+          <li><a href="index.html" accesskey="U">CMS-Specific Modules</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -72,42 +82,38 @@ so for the moment just one language is used.</p>
 
 <dl class="class">
 <dt id="cms_tools.NodeEntity">
-<em class="property">class </em><tt class="descclassname">cms_tools.</tt><tt class="descname">NodeEntity</tt><big>(</big><em>db_row=None</em>, <em>cmsdb=None</em><big>)</big><a class="headerlink" href="#cms_tools.NodeEntity" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">cms_tools.</tt><tt class="descname">NodeEntity</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#cms_tools.NodeEntity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class representing a CMS node.</p>
 <ul class="simple">
-<li>A __getattr__ (+ __getitem__) should return the current fields</li>
-<li>versions contain the versions -&gt; lazy property</li>
-<li>Language resolution works checks for:<ul>
-<li>Requested language or current language or site default</li>
-<li>Node translation source</li>
+<li>Each node is a record from db.node</li>
+<li>Each node have some associated revisions, as a Set inside node_revision</li>
+<li>Each node revision have some associated fields, mostly inside
+node_fields_base, but in other attributes too.</li>
+<li>Each node_fields_base has some translations, contained inside
+t9n_node_fields_base.</li>
 </ul>
-</li>
-<li>Versions are structured in a tree, with <tt class="docutils literal"><span class="pre">revision_id</span></tt>
--&gt; <tt class="docutils literal"><span class="pre">list</span></tt> of <tt class="docutils literal"><span class="pre">versions</span></tt>.</li>
-<li>We should use lazy loaders for the node entities, in order to
-minimize queries and memory usage</li>
-<li>We should mark modified fields / versions in order to minimize
-queries on update, sice possibily a node may have quite a lot of
-revisions + external tables and it&#8217;s not a good idea to always
-update them all!</li>
-</ul>
-<p>Values retrieval + dict-like behavior.
-All the values for the node will be retrieved from:</p>
-<ul class="simple">
-<li>self._db_row</li>
-<li>self._db_row.node_version.select() &#8211;&gt; for the current version [AKA self.latest_version]</li>
-<li>For each self.latest_version, all the fields that are a gluon.dal.Set
-will be select()ed and the field searched inside.</li>
-</ul>
-<div class="admonition-todo admonition " id="index-0">
-<p class="first admonition-title">Todo</p>
-<p class="last">How to get a list of available fields without actually running
-queries? (-&gt; Exploring the DAL, that&#8217;s how)</p>
-</div>
 <dl class="attribute">
-<dt id="cms_tools.NodeEntity.versions">
-<tt class="descname">versions</tt><a class="headerlink" href="#cms_tools.NodeEntity.versions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns all the versions for this node, as database rows.</p>
+<dt id="cms_tools.NodeEntity.first_version">
+<tt class="descname">first_version</tt><a class="headerlink" href="#cms_tools.NodeEntity.first_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;DEPRECATED</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cms_tools.NodeEntity.get_revision">
+<tt class="descname">get_revision</tt><big>(</big><em>revision_id=None</em>, <em>language=None</em><big>)</big><a class="headerlink" href="#cms_tools.NodeEntity.get_revision" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a specific revision for the node</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cms_tools.NodeEntity.latest_version">
+<tt class="descname">latest_version</tt><a class="headerlink" href="#cms_tools.NodeEntity.latest_version" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#64;DEPRECATED</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cms_tools.NodeEntity.values">
+<tt class="descname">values</tt><a class="headerlink" href="#cms_tools.NodeEntity.values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return values for the selected revision</p>
 </dd></dl>
 
 </dd></dl>
@@ -204,17 +210,27 @@ Defaults to current language.</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="cms_tools.NodeManager.form_create">
-<tt class="descname">form_create</tt><big>(</big><em>node_type=None</em>, <em>defaults=None</em><big>)</big><a class="headerlink" href="#cms_tools.NodeManager.form_create" title="Permalink to this definition">¶</a></dt>
-<dd><p>Node creation form.</p>
+<dt id="cms_tools.NodeManager.edit_form">
+<tt class="descname">edit_form</tt><big>(</big><em>action</em>, <em>node_type=None</em>, <em>node_id=None</em>, <em>revision_id=None</em>, <em>language=None</em>, <em>defaults=None</em><big>)</big><a class="headerlink" href="#cms_tools.NodeManager.edit_form" title="Permalink to this definition">¶</a></dt>
+<dd><p>Node manipulation form.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>type</strong> &#8211; The node type of the newly created node</li>
-<li><strong>defaults</strong> &#8211; A dict of dicts containing values for fields
-on the different pages on which the node will be stored.</li>
+<li><strong>action</strong> &#8211; The action to be performed on node:
+one of <tt class="docutils literal"><span class="pre">create|update|translate</span></tt></li>
+<li><strong>node_type</strong> &#8211; Only for <tt class="docutils literal"><span class="pre">create</span></tt>, the type of node
+to be created</li>
+<li><strong>node_id</strong> &#8211; Only for <tt class="docutils literal"><span class="pre">update|translate</span></tt>, the id of node
+to be updated</li>
+<li><strong>revision_id</strong> &#8211; Only for <tt class="docutils literal"><span class="pre">update|translate</span></tt>, the id
+of the revision on which to work. Defaults to latest revision.
+Must be a valid revision id for this node.</li>
+<li><strong>language</strong> &#8211; The language in which to write/translate the node.
+Defaults to current language or &#8216;neutral&#8217;.</li>
+<li><strong>defaults</strong> &#8211; A dict or dict-like of values to be set as
+defaults for node creation.</li>
 </ul>
 </td>
 </tr>
@@ -365,6 +381,12 @@ of the current branch.</li>
       </div>
       <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="cms_settings.html"
+                        title="previous chapter">cms_settings</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="cms_views.html"
+                        title="next chapter">cms_views</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../_sources/modules/cms_tools.txt"
@@ -396,7 +418,14 @@ of the current branch.</li>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="../index.html">web2py_cms 0.1-alpha documentation</a> &raquo;</li> 
+        <li class="right" >
+          <a href="cms_views.html" title="cms_views"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="cms_settings.html" title="cms_settings"
+             >previous</a> |</li>
+        <li><a href="../index.html">web2py_cms 0.1-alpha documentation</a> &raquo;</li>
+          <li><a href="index.html" >CMS-Specific Modules</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

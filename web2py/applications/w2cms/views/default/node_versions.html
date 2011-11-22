@@ -1,6 +1,7 @@
 {{extend 'layout.html'}}
 
 {{from gluon.sqlhtml import represent}}
+{{from cms_settings import content_languages}}
 
 {{include 'generic/tabs.html'}}
 
@@ -17,16 +18,16 @@
     <li>Latest update by
         {{=A(represent(db.node.updated_by, node.updated_by, node), _href=CMS_URL('user', node.updated_by))}}
         on {{=node.updated_date}}</li>
-    <li><strong>Revisions:</strong> {{=node.node_revision.count()}}</li>
     <li><strong>Published:</strong> {{='Yes' if node.published else 'No'}}</li>
     <li><strong>Weight:</strong> {{=node.weight}}</li>
-    <li><strong>Revision numbers:</strong> {{=node.revision_numbers}}</li>
-    <li><strong>Translations:</strong> {{=node.translations}}</li>
+    <li><strong>Revisions:</strong> {{=len(node.revision_numbers)}}</li>
+    <li><strong>Revision numbers:</strong> {{=", ".join([str(x) for x in sorted(node.revision_numbers)])}}</li>
+    <li><strong>Translations:</strong> {{=", ".join(content_languages.get(l,l) for l in node.translations)}}</li>
 </ul>
 
 <h2>Revisions</h2>
 
-{{for revision in node.node_revision.select(orderby=db.node_revision.id):}}
+{{for revision in node.revisions(orderby=db.node_revision.id):}}
 <h3>Revision {{=revision.id}}</h3>
 
 <fieldset class="collapsible start-collapsed">

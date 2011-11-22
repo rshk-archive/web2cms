@@ -4,10 +4,9 @@ Created on Oct 30, 2011
 '''
 
 from helpers import use_custom_view
-from cms_auth import requires_cms_permission
 from gluon.contrib.populate import populate
 
-@auth.requires_permission('access development tools')
+@cms_auth.requires_permission(auth, "access development tools")
 @use_custom_view('generic/menu_page')
 def index():
     links = menu_development[3][:]
@@ -16,7 +15,7 @@ def index():
         menu_items=links,
         layout='grid')
 
-@auth.requires_permission('access development tools')
+@cms_auth.requires_permission(auth, "access development tools")
 def status():
     """
     This controller just displays the current status of the CMS:
@@ -35,7 +34,7 @@ def status():
         nodes_per_type = nodes_per_type,
         )
 
-@auth.requires_permission('access development tools')
+@cms_auth.requires_permission(auth, "access development tools")
 @use_custom_view('generic/form')
 def generate():
     """Content generation function"""
@@ -83,7 +82,13 @@ def generate():
         form=form,
         )
 
-@auth.requires_permission('access development tools')
+@cms_auth.requires_permission(auth, "access development tools")
 def css_devel():
     """Controller for CSS development"""
     return dict()
+
+@cms_auth.requires_permission(auth, "access development tools")
+def print_information():
+    return DIV(
+        BEAUTIFY(request),
+    )

@@ -774,6 +774,15 @@ h1, h2, h3, h4, h5, h6 {text-shadow: #BBB 2px 1px 1px;}
 	box-shadow: #444 0 0 15px;
 }
 
+.subtitle {
+	font-style: italic;
+	font-size: 1.1em;
+	margin-bottom: 5px;
+}
+form {
+	padding:0;
+	margin: 0;
+}
 
 /** Tabs
 *******************************************************************************/
@@ -1046,6 +1055,11 @@ ul.messages > li.message.message-help {
 .expanding-form .w2p_fw select {
 	width: 100%;
 	margin: 0;
+}
+.expanding-form .w2p_fw textarea {
+	/* This limits resizing for textareas */
+	min-width: 120px;
+	max-width: 100%;
 }
 .expanding-form input.datetime {
 	width:280px;

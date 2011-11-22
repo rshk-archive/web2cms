@@ -22,9 +22,11 @@ import gluon.dal
 from gluon import *
 from gluon.storage import Storage
 import cms_settings
+from UserDict import DictMixin
 
 ##==============================================================================
 ## Utility functions
+## TODO: Move to helpers
 ##==============================================================================
 
 def CMS_URL(entity_type, entity_id=None, action='read', args=None, vars=None):
@@ -165,7 +167,7 @@ class ElementManager(object):
     def current_user(self, value):
         self._cmsdb.set_working_user(value)
 
-class ElementEntity(object):
+class ElementEntity(object, DictMixin):
     
     _db_row = None
     _cmsdb = None
@@ -178,16 +180,19 @@ class ElementEntity(object):
     def db(self):
         return self._cmsdb._db
     
-    def __getattr__(self, name):
-        if self._db_row.has_key(name):
-            return self._db_row[name]
-        raise AttributeError("No such attribute: %r" % name)
+    @property
+    def row(self):
+        return self._db_row
+    
+#    def __getattr__(self, name):
+#        if self._db_row.has_key(name):
+#            return self._db_row[name]
+#        raise AttributeError("No such attribute: %r" % name)
     
     def __getitem__(self, key):
-        try:
-            return self.__getattr__(key)
-        except AttributeError:
-            raise KeyError(str(key))
+        if self._db_row.has_key(key):
+            return self._db_row[key]
+        raise KeyError(str(key))
 
 
 ##==============================================================================
@@ -377,6 +382,9 @@ class NodeManager(ElementManager):
         db = self.db
         T = current.T
         
+        if not defaults:
+            defaults = {}
+        
         ## Validate arguments
         node_types = cms_settings.list_node_types()
         
@@ -389,7 +397,7 @@ class NodeManager(ElementManager):
             ## if specified, revision_id must be a valid revision for this node
             ## if specified, language must exist
             node = self.read(node_id=node_id, revision=revision_id, language=language)
-            pass
+            defaults.update(node.values)
         elif action=='translate':
             ## We need a language in which to translate plus a language
             ## to be used as "translation base" to read values from.
@@ -419,10 +427,25 @@ class NodeManager(ElementManager):
         
         ## Retrieve components from tables -------------------------------------
         for table in _component_tables:
+            
+            ## Prepare default values for fields
+            print "Setting defaults", defaults
+            if defaults.has_key(table):
+                for field in db[table].fields:
+                    try:
+                        db[table][field].default = defaults[table][field]
+                    except KeyError, e:
+                        print e
+                        pass
+            
+            ## Create SQLFORM from the table
             _form_components[table] = SQLFORM.factory(db[table], buttons=[],
                 formstyle='divs' if table not in ['node','node_revision'] else 'table3cols').components
+            
+            ## Change field names by adding ``<tablename>--`` prefix
             for ilev, comp in descend_tree(_form_components[table]):
                 if isinstance(comp, INPUT) and comp.attributes.has_key('_name'):
+                    ## Change field name
                     comp.attributes['_name'] = '%s--%s' % (table, comp.attributes['_name'])
         
         ## Build the form ------------------------------------------------------
@@ -522,6 +545,9 @@ class NodeManager(ElementManager):
                         _vals = _var_groups['node_fields_base'].copy()
                         db.node_fields_base.insert(**_vals)
                 except Exception,e:
+                    ## Error while trying to create node.
+                    ## Rollback and display error message
+                    ## -> we should present prefilled form to the user!
                     current.response.flash = "Something went wrong!"
                     db.rollback()
                     raise
@@ -531,7 +557,22 @@ class NodeManager(ElementManager):
                     ## Go to node page
                     from gluon.tools import redirect
                     redirect(CMS_URL('node', node_id))
-        
+            
+            elif action == 'update':
+                ## * Ensure the node exists
+                ## * Ensure the node revision exists
+                ## * Ensure there already is a version for that language!
+                ##   -> this may be tricky.. shoud we handle this or just
+                ##      add the new translation for the specified language?
+                ##   In the latter case, we don't need the 'translate' action
+                ##   anymore..
+                ## * If the create_new_revision checkbox is checked,
+                ##   we should create a new revision.
+                pass
+            
+            elif action == 'translate':
+                pass
+            
         return form
     
     
@@ -547,6 +588,15 @@ class NodeEntity(ElementEntity):
       node_fields_base, but in other attributes too.
     * Each node_fields_base has some translations, contained inside
       t9n_node_fields_base.
+    
+    node.values, as well as the dict-like interface, returns values for
+    the selected version / language, grouped by table name.
+    
+    We then need a quick way to access fields by name, by looking for
+    their values in all the tables. Of course, there might be problems
+    in case of duplicate field names, but it would be a lot quicker
+    to reference to node title as ``node.title`` instead
+    of ``node['node_fields_base']['title']``.
     """
     
     default_revision = None
@@ -576,19 +626,55 @@ class NodeEntity(ElementEntity):
                 ~self.db.node_revision.published |
                 ~self.db.node_revision.id)
     
-    @property
-    def latest_version(self):
-        """@DEPRECATED"""
-        return self._get_latest_version()
+    def keys(self):
+        return self.list_tables()
     
-    def _get_latest_version(self):
-        """@DEPRECATED"""
-        return self._get_latest_revision()
+    def __getitem__(self, name):
+        if name in self.list_tables():
+            ## Look in table names
+            if name == 'node':
+                return self._db_row.as_dict()
+            else:
+                return self.get_revision(self.default_revision).get_values()[name]
+        
+        else:
+            ## Look in field names
+            try:
+                return self._db_row[name]
+            except: pass
+            
+            for table in self.list_tables():
+                try:
+                    self.get_revision(self.default_revision).get_values()[table][name]
+                except: pass
+        
+        ## Nothing found!
+        raise KeyError, str(name)
     
-    @property
-    def first_version(self):
-        """@DEPRECATED"""
-        return self._get_first_version()
+    def __setitem__(self, name, value):
+        ## How to handle this? In no way ATM
+        raise NotImplementedError
+    
+    def __delitem__(self, name):
+        raise NotImplementedError
+    
+    def list_tables(self):
+        """Return a list of tables this node came from"""
+        return sorted(['node', 'node_revision'] + NodeVersion.search_tables)
+    
+#    @property
+#    def latest_version(self):
+#        """@DEPRECATED"""
+#        return self._get_latest_version()
+#    
+#    def _get_latest_version(self):
+#        """@DEPRECATED"""
+#        return self._get_latest_revision()
+#    
+#    @property
+#    def first_version(self):
+#        """@DEPRECATED"""
+#        return self._get_first_version()
     
     @property
     def latest_revision(self):
@@ -596,8 +682,14 @@ class NodeEntity(ElementEntity):
 
     @property
     def values(self):
+        return self.get_values()
+    
+    def get_values(self):
         """Return values for the selected revision"""
-        return self.get_revision(self.default_revision, language=self.default_language)
+        _values = {}
+        _values['node'] = dict(self._db_row.as_dict())
+        _values.update(self.get_revision(self.default_revision).get_values())
+        return _values
 
     @property
     def translations(self):
@@ -616,6 +708,16 @@ class NodeEntity(ElementEntity):
             _rev_numbers.append(row.id)
         return _rev_numbers
     
+    def revisions(self, *args, **kwargs):
+        """Returns a Rows object containing all the revisions
+        records for this node, from ``node_revision`` table.
+        
+        Passed-in arguments and keywords are passed directly
+        to ``select()``.
+        """
+        db = self.db
+        return db(db.node_revision.node==self.node_id).select(*args, **kwargs)
+    
     def _get_latest_revision(self):
         """Returns the latest version for this node, looking for:
         
@@ -628,15 +730,13 @@ class NodeEntity(ElementEntity):
         * If a published version exist, it should be preferred over
           non-published versions, even if more recent.
         """
-#        db = self.db
-#        return NodeVersion(self._cmsdb, self._db_row.node_revision.select(
-#            orderby= ~db.node_revision.published | ~db.node_revision.id
-#            ).first(), language=self.default_language)
         return self.get_revision(None, self.default_language)
     
     def get_revision(self, revision_id=None, language=None):
         """Returns a specific revision for the node"""
         db = self.db
+        if not language:
+            language = self.default_language
         if revision_id is None:
             ## Return latest revision
             results = self._db_row.node_revision.select(
@@ -655,8 +755,14 @@ class NodeEntity(ElementEntity):
             ~db.node_version.is_translation_base |
             db.node_version.id 
             ).first()
+    
+    def __getattr__(self, name):
+        try:
+            return self[name]
+        except:
+            raise KeyError, str(name)
 
-class NodeVersion(object):
+class NodeVersion(object, DictMixin):
     search_tables = ['node_fields_base']
     _row=None
     _language=None
@@ -665,51 +771,60 @@ class NodeVersion(object):
     def __init__(self, cmsdb, row, language=None):
         self._cmsdb=cmsdb
         self._row=row
-        self._language = language
+        ##TODO: Read default language from configuration
+        self._language = language or 'en'
     
     @property
     def db(self):
         return self._cmsdb._db
     
-    def __getattr__(self,name):
-        db=self.db
-        
-        if hasattr(self._row, name):
-            return getattr(self._row, name)
-        
-        for t in self.search_tables:
-            _values = getattr(self._row, t).select().first()
-            
-            ## Try to get translated value
-            if _values.has_key('t9n_%s' % t) and self._language:
-                _table_t = db['t9n_%s' % t]
-                _values_t = db(_table_t.id.belongs(_values['t9n_%s' % t]._select(_table_t.id)))(_table_t.language==self._language).select().first()
-                if hasattr(_values_t, name):
-                    val = getattr(_values_t, name)
-                    if val is not None: return val
-            
-            ## Try to return the language neutral value
-            if hasattr(_values, name):
-                return getattr(_values, name)
-        
-        ## Nothing found. fail
-        raise AttributeError('Attribute %r not found' % name)
+#    def __getattr__(self,name):
+#        db=self.db
+#        
+#        if hasattr(self._row, name):
+#            return getattr(self._row, name)
+#        
+#        for t in self.search_tables:
+#            _values = getattr(self._row, t).select().first()
+#            
+#            ## Try to get translated value
+#            if _values.has_key('t9n_%s' % t) and self._language:
+#                _table_t = db['t9n_%s' % t]
+#                _values_t = db(_table_t.id.belongs(_values['t9n_%s' % t]._select(_table_t.id)))(_table_t.language==self._language).select().first()
+#                if hasattr(_values_t, name):
+#                    val = getattr(_values_t, name)
+#                    if val is not None: return val
+#            
+#            ## Try to return the language neutral value
+#            if hasattr(_values, name):
+#                return getattr(_values, name)
+#        
+#        ## Nothing found. fail
+#        raise AttributeError('Attribute %r not found' % name)
     
     def get_values(self, language=None):
         if language is None:
             language=self._language
         
-        _values = getattr(self._row, t).select().first()
-        values = _values.as_dict()
-            
-        ## Translate fields
-        if _values.has_key('t9n_%s' % t) and language:
-            _table_t = db['t9n_%s' % t]
-            _values_t = db(_table_t.id.belongs(_values['t9n_%s' % t]._select(_table_t.id)))\
-                (_table_t.language==self._language).select().first().as_dict()
-            for key,val in _values_t.items():
-                if val is not None:
-                    values[key] = val
+        db = self.db
+        values = {}
+        
+        values['node_revision'] = self._row.as_dict()
+        
+        for t in self.search_tables:
+            _values = getattr(self._row, t).select().first()
+            values[t] = _values.as_dict()
+                
+            ## Translate fields
+            if _values.has_key('t9n_%s' % t) and language:
+                _table_t = db['t9n_%s' % t]
+                _row_t = db(_table_t.id.belongs(_values['t9n_%s' % t]._select(_table_t.id)))\
+                    (_table_t.language==self._language).select().first()
+                if _row_t:
+                    _values_t = _row_t.as_dict()
+                    for key,val in _values_t.items():
+                        if val is not None:
+                            values[t][key] = val
         
         return values
     

@@ -2,6 +2,9 @@
 
 {{include 'generic/tabs.html'}}
 {{if 'title' in globals() and title:}}<h1>{{=title}}</h1>{{pass}}
+{{if 'subtitle' in globals() and subtitle:}}
+<div class="subtitle">{{=subtitle}}</div>
+{{pass}}
 {{=form if 'form' in globals() else T('Undefined form')}}
 
 

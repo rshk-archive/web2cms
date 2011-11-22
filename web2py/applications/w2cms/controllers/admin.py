@@ -23,7 +23,7 @@ admin_menu = [
          'description': 'Use the web file manager to administer uploaded files.'}),
 ]
 
-@requires_cms_permission(auth, "access admin panel")
+@cms_auth.requires_permission(auth, "access admin panel")
 @use_custom_view('generic/menu_page')
 def index():
     links = admin_menu[:]
@@ -32,7 +32,7 @@ def index():
         menu_items=links,
         layout='grid')
 
-@requires_cms_permission(auth, "administer", "content")
+@cms_auth.requires_permission(auth, "administer", "content")
 def content():
     #[row.type for row in db().select(db.node.type, distinct=True, orderby=db.node.type)]
     import datetime
@@ -112,20 +112,20 @@ def content():
         description=description,
         )
 
-@requires_cms_permission(auth, "administer", "users")
+@cms_auth.requires_permission(auth, "administer", "users")
 def users():
     return "TODO: Add the users administration page"
 
-@requires_cms_permission(auth, "administer", "files")
+@cms_auth.requires_permission(auth, "administer", "files")
 def files():
     return "TODO: Add the files administration page"
 
-@requires_cms_permission(auth, "administer", "database")
+@cms_auth.requires_permission(auth, "administer", "database")
 def dbadmin():
     ## Everything is done in the view
     return dict()
 
-@requires_cms_permission(auth, "administer", "plugins")
+@cms_auth.requires_permission(auth, "administer", "plugins")
 def plugins():
     plugins_dir = os.path.abspath(os.path.join(request.folder, 'cms_plugins'))
     _all_files = os.listdir(plugins_dir)

@@ -14,9 +14,9 @@
 		{{pass}}
 	
 		{{if teaser:}}
-		<h2 class="node-title">{{=A(node.latest_version.title, _href=CMS_URL('node', node.id))}}</h2>
+		<h2 class="node-title">{{=A(node.values['node_fields_base']['title'], _href=CMS_URL('node', node.id))}}</h2>
 		{{else:}}
-		<h1 class="node-title">{{=node.latest_version.title}}</h1>
+		<h1 class="node-title">{{=node.values['node_fields_base']['title']}}</h1>
 		{{pass}}
 		
 		<time pubdate datetime="{{=node.created_date.strftime('%FT%T')}}"></time>
@@ -42,7 +42,7 @@
     </div>
     
     <div class="node-body">
-        {{=node.latest_version.body}}
+        {{=node.values['node_fields_base']['body']}}
     </div>
 
     <footer>

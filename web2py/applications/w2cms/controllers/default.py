@@ -17,6 +17,7 @@ import cms_settings
 import helpers
 from helpers import use_custom_view
 from cms_exceptions import *
+from cms_auth import requires_cms_permission
 
 def index():
     """
@@ -80,14 +81,7 @@ def data():
 
 ## Node CRUD -------------------------------------------------------------------
 
-def _node_load(node_id):
-    """Load a node from database.
-    Raises an exception if no node was found,
-    """
-    node = db.node[node_id]
-    if not node: raise Exception
-    return node
-
+@cms_auth.requires_permission('access content')
 def _node_menu(node_id):
     """Generate actions menu for the selected node"""
     menu_items = []
@@ -105,6 +99,7 @@ def _node_menu(node_id):
             []))
     return menu_items
 
+@cms_auth.requires_permission('access content')
 def _apply_text_format(text, format):
     """Apply text format conversion to some text.
     
@@ -133,7 +128,7 @@ def _apply_text_format(text, format):
     return text
 
 
-
+@cms_auth.requires_permission('access content')
 def node_create():
     """Node creation form.
     
@@ -185,6 +180,7 @@ def node_create():
         response.view = 'generic/menu_page.%s' % request.extension
         return dict(title=T('Create content'), menu_items=menu_items)
 
+@cms_auth.requires_permission('access content')
 @use_custom_view('generic/form')
 def node_update():
     """Node update form"""
@@ -192,13 +188,13 @@ def node_update():
         node_id = int(request.args[0])
         node_revision = request.vars.get('revision')
         node_language = request.vars.get('language')
+        node = cmsdb.node.read(node_id, language=node_language, revision=node_revision)
     except:
         raise HTTP(404, 'Wrong arguments')
-    else:
-        pass
     response.view = 'generic/form.' + request.extension
     return dict(
-        title = T('Update node #%(id)d') % dict(id=node_id),
+        title = T('Update node #%(id)d (%(type)s)') % node,
+        subtitle = T('Language: %(language)s - Revision %(revision)s') % dict(language=node_language, revision=node_revision),
         tabs = _node_menu(node_id),
         form = cmsdb.node.form_update(
             node_id=node_id,
@@ -206,6 +202,7 @@ def node_update():
             language=node_language),
     )
 
+@cms_auth.requires_permission('access content')
 def node_read():
     """Full-page node display"""
     try:
@@ -218,34 +215,29 @@ def node_read():
             node=node,
             tabs=_node_menu(node.id))
 
+@cms_auth.requires_permission('access content')
 @use_custom_view('generic/form')
 def node_delete():
-    """Node deletion confirm form.
-    
-    .. WARNING::
-        Crud().delete() actually deletes the record without confirmation!
-    """
-    try:
-        node = _node_load(request.args[0])
-    except:
-        raise HTTP(404)
-    else:
-        return dict(
-            title=T('Node #%d (%s): delete', (node.id, node.title)),
-            tabs=_node_menu(node.id),
-            form = "Please use the udpate form to delete entries"
-        )
+    node_id=int(request.args[0])
+    dict(
+        title = T('Delete node'),
+        tabs = _node_menu(node_id),
+        form = None
+    )
 
+@cms_auth.requires_permission('access content')
 def node_versions():
     """Information on node versions"""
     ## We need a node, like in node_read();
     ## the thing that changes is the view
     return node_read()
 
+@cms_auth.requires_permission('access content')
 def node_list():
     """List all the content"""
     return dict(nodes=cmsdb.node.search())
 
+@cms_auth.requires_permission('access content')
 def node_search():
     """Content search page"""
     pass

@@ -9,5 +9,6 @@ CMS-Specific Modules
    cms_exceptions
    cms_plugin_def
    cms_populate
+   cms_settings
    cms_tools
    cms_views

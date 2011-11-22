@@ -204,14 +204,6 @@ db.define_table(
     db.node_fields_base.body_format,
     )
 
-
-
-
-
-
-
-
-
 ## Table: block ================================================================
 db.define_table(
     'block',
@@ -227,25 +219,10 @@ db.block.body_format.requires = IS_IN_SET(
     dict([(k,v['label']) for k,v in cms_settings.list_text_formats().items()]))
 
 
-## Table: variable =============================================================
-## Used to store configuration variables, as pickled values
-
-#db.define_table(
-#    'variable',
-#    Field('var_name', 'string', length=256, required=True, unique=True),
-#    Field('var_value_pickled', 'text'), ## pickled value
-#    )
-
-#import pickle
-#class VirtualFields_variable(object):
-#    def var_value(self):
-#        return pickle.loads(self.variable.var_value_pickled)
-#db.variable.virtualfields.append(VirtualFields_variable())
-
 ## CMS-Specific ================================================================
 
-#from cms_tools import *
-#node_manager = NodeManager(db)
+from cms_auth import CMSAuth
+cms_auth = CMSAuth(auth)
 
 from cms_tools import CmsDB, CMS_URL
 cmsdb = CmsDB(db)
