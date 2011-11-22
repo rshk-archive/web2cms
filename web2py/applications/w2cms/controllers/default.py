@@ -194,7 +194,7 @@ def node_update():
     response.view = 'generic/form.' + request.extension
     return dict(
         title = T('Update node #%(id)d (%(type)s)') % node,
-        subtitle = T('Language: %(language)s - Revision %(revision)s') % dict(language=node_language, revision=node_revision),
+        subtitle = T('Language: %(language)s - Revision: %(revision)s') % dict(language=node_language, revision=node_revision),
         tabs = _node_menu(node_id),
         form = cmsdb.node.form_update(
             node_id=node_id,

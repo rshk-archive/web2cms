@@ -397,6 +397,7 @@ class NodeManager(ElementManager):
             ## if specified, revision_id must be a valid revision for this node
             ## if specified, language must exist
             node = self.read(node_id=node_id, revision=revision_id, language=language)
+            #revision_id = node.get_revision(revision_id, language)
             defaults.update(node.values)
         elif action=='translate':
             ## We need a language in which to translate plus a language
@@ -568,6 +569,20 @@ class NodeManager(ElementManager):
                 ##   anymore..
                 ## * If the create_new_revision checkbox is checked,
                 ##   we should create a new revision.
+                
+                if _var_groups['default']['create_new_revision']:
+                    ## Create a new revision
+                    pass
+                
+                else:
+                    ## Just update
+                    
+                    ## Update the selected node
+                    ## Update the node revision record
+                    ## Update the extra fields for the selected node
+                    
+                    pass
+                
                 pass
             
             elif action == 'translate':
@@ -599,8 +614,8 @@ class NodeEntity(ElementEntity):
     of ``node['node_fields_base']['title']``.
     """
     
-    default_revision = None
-    default_language = None
+    _default_revision = None
+    _default_language = None
     
     def __init__(self, *args, **kwargs):
         if kwargs.has_key('default_language'):
@@ -625,6 +640,38 @@ class NodeEntity(ElementEntity):
         return self._db_row.node_revision.select(orderby=
                 ~self.db.node_revision.published |
                 ~self.db.node_revision.id)
+    
+    @property
+    def default_revision(self):
+        if self._default_revision:
+            ## Return the selected default revision id
+            return self._default_revision
+        else:
+            ## Return the default revision id (latest published)
+            return self._db_row.node_revision.select(
+                self.db.node_revision.id,
+                orderby=~self.db.node_revision.published |
+                ~self.db.node_revision.id).first().id
+    
+    @default_revision.setter
+    def default_revision(self, value):
+        ##--------------------------------------------------
+        ## TODO: Validate that select revision must belong
+        ##       to this node!
+        ##--------------------------------------------------
+        db = self.db
+        if db(db.node_revision.node == self.node_id)(db.node_revision.id == value).count():
+            self._default_revision = value
+        else:
+            raise ValueError, "The specified revision is not a valid revision for this node"
+    
+    @property
+    def default_language(self):
+        return self._default_language
+    
+    @default_language.setter
+    def default_language(self, value):
+        self._default_language = value
     
     def keys(self):
         return self.list_tables()
