@@ -22,7 +22,8 @@ legend.collapsible {
     cursor: pointer;
 }
 legend.collapsed {
-    color: #448;
+	/* Link-style */
+    color: #275b90;
     margin-left: 6px;
 }
 

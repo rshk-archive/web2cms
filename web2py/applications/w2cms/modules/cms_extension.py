@@ -1,5 +1,5 @@
 '''
-Definition stuff for the CMS Plugins.
+Definition stuff for the CMS modules.
 '''
 
 __all__ = [

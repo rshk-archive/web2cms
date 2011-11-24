@@ -10,16 +10,16 @@
 <h2>Details</h2>
 
 <ul>
-    <li><strong>Node:</strong> {{=node.type}}</li>
-    <li><strong>ID:</strong> {{=node.id}}</li>
+    <li><strong>Node:</strong> {{=node["type"]}}</li>
+    <li><strong>ID:</strong> {{=node["id"]}}</li>
     <li>Created by
-        {{=A(represent(db.node.created_by, node.created_by, node), _href=CMS_URL('user', node.created_by))}}
-        on {{=node.created_date}}</li>
+        {{=A(represent(db.node.created_by, node["created_by"], node), _href=CMS_URL('user', node["created_by"]))}}
+        on {{=node["created_date"]}}</li>
     <li>Latest update by
-        {{=A(represent(db.node.updated_by, node.updated_by, node), _href=CMS_URL('user', node.updated_by))}}
-        on {{=node.updated_date}}</li>
-    <li><strong>Published:</strong> {{='Yes' if node.published else 'No'}}</li>
-    <li><strong>Weight:</strong> {{=node.weight}}</li>
+        {{=A(represent(db.node.updated_by, node["updated_by"], node), _href=CMS_URL('user', node["updated_by"]))}}
+        on {{=node["updated_date"]}}</li>
+    <li><strong>Published:</strong> {{='Yes' if node["published"] else 'No'}}</li>
+    <li><strong>Weight:</strong> {{=node["weight"]}}</li>
     <li><strong>Revisions:</strong> {{=len(node.revision_numbers)}}</li>
     <li><strong>Revision numbers:</strong> {{=", ".join([str(x) for x in sorted(node.revision_numbers)])}}</li>
     <li><strong>Translations:</strong> {{=", ".join(content_languages.get(l,l) for l in node.translations)}}</li>
@@ -27,7 +27,7 @@
 
 <h2>Revisions</h2>
 
-{{for revision in node.revisions(orderby=db.node_revision.id):}}
+{{for revision in node.revisions.select(orderby=db.node_revision.id):}}
 <h3>Revision {{=revision.id}}</h3>
 
 <fieldset class="collapsible start-collapsed">
@@ -35,10 +35,10 @@
 <ul>
     <li><strong>Revision id:</strong> {{=revision.id}}</li>
     <li>Created by
-        {{=A(represent(db.node.created_by, node.created_by, node), _href=CMS_URL('user', revision.created_by))}}
+        {{=A(represent(db.node.created_by, node["created_by"], node), _href=CMS_URL('user', revision.created_by))}}
         on {{=revision.created_date}}</li>
     <li>Latest update by
-        {{=A(represent(db.node.updated_by, node.updated_by, node), _href=CMS_URL('user', revision.updated_by))}}
+        {{=A(represent(db.node.updated_by, node["updated_by"], node), _href=CMS_URL('user', revision.updated_by))}}
         on {{=revision.updated_date}}</li>
     <li><strong>Published:</strong> {{='Yes' if revision.published else 'No'}}</li>
     <li><strong>Base language:</strong> {{=revision.translation_base}}</li>

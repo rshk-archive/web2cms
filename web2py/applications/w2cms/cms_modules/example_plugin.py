@@ -1,8 +1,6 @@
 '''
 Created on Nov 10, 2011
 @author: samu
-
-Example plugin for the CMS
 '''
 
 cms_plugin_info = dict(
@@ -13,7 +11,7 @@ cms_plugin_info = dict(
     dependencies = [], ## Other cms_plugins this plugin depends on
 )
 
-from cms_plugin_def import *
+from cms_extension import *
 
 class MyExampleController(CustomController): pass
 class MyExampleNode(NodeTypeManager): pass

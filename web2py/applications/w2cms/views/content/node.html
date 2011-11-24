@@ -2,35 +2,35 @@
 {{comments_enabled = True}}
 {{from gluon.sqlhtml import represent}}
 
-<article class="node {{='node-teaser' if teaser else 'node-full'}} node-type-{{=node.type}}">
+<article class="node {{='node-teaser' if teaser else 'node-full'}} node-type-{{=node['type']}}">
     <header>
 		{{#@todo: Read the list of nodes for which to show calendar from configuration}}
-		{{if node.type in ['article']:}}
+		{{if node["type"] in ['article']:}}
 		<div class="node-calendar">
-		    <div class="node-calendar-month">{{=node.created_date.strftime("%B")}}</div>
-		    <div class="node-calendar-day">{{=node.created_date.strftime("%-d")}}</div>
-		    <div class="node-calendar-year">{{=node.created_date.strftime("%Y")}}</div>
+		    <div class="node-calendar-month">{{=node["created_date"].strftime("%B")}}</div>
+		    <div class="node-calendar-day">{{=node["created_date"].strftime("%-d")}}</div>
+		    <div class="node-calendar-year">{{=node["created_date"].strftime("%Y")}}</div>
 		</div>
 		{{pass}}
 	
 		{{if teaser:}}
-		<h2 class="node-title">{{=A(node.values['node_fields_base']['title'], _href=CMS_URL('node', node.id))}}</h2>
+		<h2 class="node-title">{{=A(node.values['node_fields_base']['title'], _href=CMS_URL('node', node["id"]))}}</h2>
 		{{else:}}
 		<h1 class="node-title">{{=node.values['node_fields_base']['title']}}</h1>
 		{{pass}}
 		
-		<time pubdate datetime="{{=node.created_date.strftime('%FT%T')}}"></time>
+		<time pubdate datetime="{{=node["created_date"].strftime('%FT%T')}}"></time>
 		
 		<div class="submitted">
 		{{=XML(T('Submitted by %(author)s on %(date)s', dict(
-		    author = A(represent(db.node.created_by, node.created_by, node), _href=CMS_URL('user', node.created_by)),
-		    date = represent(db.node.created_date, node.created_date, node),
+		    author = A(represent(db.node.created_by, node["created_by"], node), _href=CMS_URL('user', node["created_by"])),
+		    date = represent(db.node.created_date, node["created_date"], node),
 		)))}}
 		</div>
 		
-		{{if node.created_date != node.updated_date:}}
+		{{if node["created_date"] != node["updated_date"]:}}
 		<div class="updated">
-        ({{=T('Last update on %(date)s', dict(date=represent(db.node.updated_date, node.updated_date, node)))}})
+        ({{=T('Last update on %(date)s', dict(date=represent(db.node.updated_date, node["updated_date"], node)))}})
         </div>
         {{pass}}
 		
@@ -53,7 +53,7 @@
 	    {{for langcode in node.translations:}}
 	    {{langname = cms_settings.content_languages[langcode]}}
 	        <li>{{=A(IMG(_src=URL('static', 'images/icons/flags/%s.png' % (langcode if langcode else 'neutral')), _alt=langname, _title=langname),
-	            _href=CMS_URL('node', node.id, vars=dict(language=langcode)))}}</li>
+	            _href=CMS_URL('node', node["id"], vars=dict(language=langcode)))}}</li>
 	    {{pass}}
 	    </ul>
 	    </nav>
@@ -62,8 +62,8 @@
 	    <nav class="node-actions">
 	       <ul class="inline-links">
 	           <li><strong>Actions:</strong></li>
-	           <li>{{=A(T('Edit'), _href=URL('default','node_update',args=[node.id]))}}</li>
-	           <li>{{=A(T('Add comment'), _href=URL('default','comment_create',args=['node', node.id]))}}</li>
+	           <li>{{=A(T('Edit'), _href=URL('default','node_update',args=[node["id"]]))}}</li>
+	           <li>{{=A(T('Add comment'), _href=URL('default','comment_create',args=['node', node["id"]]))}}</li>
 	       </ul>
 	    </nav>
     </footer>
@@ -73,7 +73,7 @@
 
 	{{#if (not teaser) and comments_enabled:}}
 	{{#from helpers import get_comments}}
-	{{#comments=get_comments(db, 'node', str(node.id))}}
+	{{#comments=get_comments(db, 'node', str(node["id"]))}}
 	{{#include 'content/comment-list.html'}}
 	{{#pass}}
 

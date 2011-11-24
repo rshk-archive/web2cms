@@ -184,12 +184,8 @@ class ElementEntity(object, DictMixin):
     def row(self):
         return self._db_row
     
-#    def __getattr__(self, name):
-#        if self._db_row.has_key(name):
-#            return self._db_row[name]
-#        raise AttributeError("No such attribute: %r" % name)
-    
     def __getitem__(self, key):
+        ## Try to return items from the associated db row
         if self._db_row.has_key(key):
             return self._db_row[key]
         raise KeyError(str(key))
@@ -222,44 +218,45 @@ class NodeManager(ElementManager):
             to ``values._language``, if set, or to the current language.
         :return: the ID of the newly created node
         """
+        raise NotImplementedError
         
-        db = self.db
-        
-        try:
-        
-            row_node = {
-                'type' : values.get('type', ''),
-                'weight' : values.get('weight', 0),
-                'published' : values.get('published', True),
-            }
-            
-            node_id = db.node.insert(**row_node)
-            
-            row_node_version = {
-                'node' : node_id,
-                'revision_id' : 1, # first revision for this node
-                'language' : values.get('language', 'neutral'),
-                'published' : values.get('published', True),
-                'is_translation_base' : True,
-            }
-            
-            version_id = db.node_version.insert(**row_node_version)
-            
-            row_node_fields_base = {
-                'node_version' : version_id,
-                'title' : values.get('title', 'Untitled node %d' % node_id),
-                'body' : values.get('body', ''),
-                'body_format' : values.get('body_format', 'html-full'),
-            }
-            
-            db.node_fields_base.insert(**row_node_fields_base)
-        
-        except:
-            db.rollback()
-        else:
-            db.commit()
-        
-        return node_id
+#        db = self.db
+#        
+#        try:
+#        
+#            row_node = {
+#                'type' : values.get('type', ''),
+#                'weight' : values.get('weight', 0),
+#                'published' : values.get('published', True),
+#            }
+#            
+#            node_id = db.node.insert(**row_node)
+#            
+#            row_node_version = {
+#                'node' : node_id,
+#                'revision_id' : 1, # first revision for this node
+#                'language' : values.get('language', 'neutral'),
+#                'published' : values.get('published', True),
+#                'is_translation_base' : True,
+#            }
+#            
+#            version_id = db.node_version.insert(**row_node_version)
+#            
+#            row_node_fields_base = {
+#                'node_version' : version_id,
+#                'title' : values.get('title', 'Untitled node %d' % node_id),
+#                'body' : values.get('body', ''),
+#                'body_format' : values.get('body_format', 'html-full'),
+#            }
+#            
+#            db.node_fields_base.insert(**row_node_fields_base)
+#        
+#        except:
+#            db.rollback()
+#        else:
+#            db.commit()
+#        
+#        return node_id
     
     def read(self, node_id, revision=None, language=None):
         """Load a given node object, by id.
@@ -267,7 +264,11 @@ class NodeManager(ElementManager):
         :return: A ``NodeEntity`` object containing values for the whole node.
         """
         
-        return NodeEntity(self.db.node[node_id], self._cmsdb, default_language=language, default_revision=revision)
+        return NodeEntity(
+            db_row=self.db.node[node_id],
+            cmsdb=self._cmsdb,
+            default_language=language,
+            default_revision=revision)
     
     def update(self, values, node_id=None):
         """Update the selected node.
@@ -348,7 +349,7 @@ class NodeManager(ElementManager):
         """
         db = self.db
         return [
-            NodeEntity(row, self._cmsdb)
+            NodeEntity(db_row=row, cmsdb=self._cmsdb)
             for row in db(query).select(db.node.ALL, orderby=orderby)
             ]
     
@@ -430,13 +431,11 @@ class NodeManager(ElementManager):
         for table in _component_tables:
             
             ## Prepare default values for fields
-            print "Setting defaults", defaults
             if defaults.has_key(table):
                 for field in db[table].fields:
                     try:
                         db[table][field].default = defaults[table][field]
                     except KeyError, e:
-                        print e
                         pass
             
             ## Create SQLFORM from the table
@@ -617,19 +616,18 @@ class NodeEntity(ElementEntity):
     _default_revision = None
     _default_language = None
     
-    def __init__(self, *args, **kwargs):
-        if kwargs.has_key('default_language'):
-            self.default_language = kwargs['default_language']
-            del kwargs['default_language']
+    def __init__(self, default_language=None, default_revision=None, **kwargs):
+        ElementEntity.__init__(self, **kwargs)
+        
+        if default_language is not None:
+            self.default_language = default_language
         else:
             self.default_language = 'en'
         
-        if kwargs.has_key('default_revision'):
-            ##TODO: Validate revision id
-            self.default_revision = kwargs['default_revision']
-            del kwargs['default_revision']
+        if default_revision is not None:
+            self.default_revision = default_revision
         
-        ElementEntity.__init__(self, *args, **kwargs)
+        #ElementEntity.__init__(self, *args, **kwargs)
     
     @property
     def node_id(self):
@@ -709,27 +707,15 @@ class NodeEntity(ElementEntity):
         """Return a list of tables this node came from"""
         return sorted(['node', 'node_revision'] + NodeVersion.search_tables)
     
-#    @property
-#    def latest_version(self):
-#        """@DEPRECATED"""
-#        return self._get_latest_version()
-#    
-#    def _get_latest_version(self):
-#        """@DEPRECATED"""
-#        return self._get_latest_revision()
-#    
-#    @property
-#    def first_version(self):
-#        """@DEPRECATED"""
-#        return self._get_first_version()
-    
     @property
     def latest_revision(self):
+        """:returns: The id of the latest revision for this node"""
         return self._get_latest_revision()
 
     @property
     def values(self):
-        return self.get_values()
+        #return self.get_values()
+        return self.get_revision()
     
     def get_values(self):
         """Return values for the selected revision"""
@@ -748,22 +734,17 @@ class NodeEntity(ElementEntity):
     
     @property
     def revision_numbers(self):
-        db = self.db
-        _rev_numbers = []
-        for row in db(db.node_revision.node==self.node_id).select(
-            db.node_revision.id, distinct=True):
-            _rev_numbers.append(row.id)
-        return _rev_numbers
+        """:returns: A list of revision ids associated with this node"""
+        return sorted([
+            row.id
+            for row in self.revisions\
+                .select(self.db.node_revision.id, distinct=True)
+            ])
     
-    def revisions(self, *args, **kwargs):
-        """Returns a Rows object containing all the revisions
-        records for this node, from ``node_revision`` table.
-        
-        Passed-in arguments and keywords are passed directly
-        to ``select()``.
-        """
-        db = self.db
-        return db(db.node_revision.node==self.node_id).select(*args, **kwargs)
+    @property
+    def revisions(self):
+        """:returns: a ``Set`` of records from node_revision"""
+        return self.db(self.db.node_revision.node == self.node_id)
     
     def _get_latest_revision(self):
         """Returns the latest version for this node, looking for:
@@ -784,6 +765,8 @@ class NodeEntity(ElementEntity):
         db = self.db
         if not language:
             language = self.default_language
+        if not revision_id:
+            revision_id = self.default_revision
         if revision_id is None:
             ## Return latest revision
             results = self._db_row.node_revision.select(
@@ -791,23 +774,19 @@ class NodeEntity(ElementEntity):
                 ).first()
         else:
             ## Return specified revision
-            results = self._db_row.node_revision.select(
-                db.node_revision.id == revision_id).first()
+            results = self.db\
+                (db.node_revision.node == self.node_id)\
+                (db.node_revision.id == revision_id)\
+                .select().first()
         return NodeVersion(self._cmsdb, results, language=language)
     
-    def _get_first_version(self):
-        db = self.db
-        return self._db_row.node_version.select(
-            orderby=db.node_version.revision_id |
-            ~db.node_version.is_translation_base |
-            db.node_version.id 
-            ).first()
-    
-    def __getattr__(self, name):
-        try:
-            return self[name]
-        except:
-            raise KeyError, str(name)
+#    def _get_first_version(self):
+#        db = self.db
+#        return self._db_row.node_version.select(
+#            orderby=db.node_version.revision_id |
+#            ~db.node_version.is_translation_base |
+#            db.node_version.id 
+#            ).first()
 
 class NodeVersion(object, DictMixin):
     search_tables = ['node_fields_base']
@@ -825,30 +804,6 @@ class NodeVersion(object, DictMixin):
     def db(self):
         return self._cmsdb._db
     
-#    def __getattr__(self,name):
-#        db=self.db
-#        
-#        if hasattr(self._row, name):
-#            return getattr(self._row, name)
-#        
-#        for t in self.search_tables:
-#            _values = getattr(self._row, t).select().first()
-#            
-#            ## Try to get translated value
-#            if _values.has_key('t9n_%s' % t) and self._language:
-#                _table_t = db['t9n_%s' % t]
-#                _values_t = db(_table_t.id.belongs(_values['t9n_%s' % t]._select(_table_t.id)))(_table_t.language==self._language).select().first()
-#                if hasattr(_values_t, name):
-#                    val = getattr(_values_t, name)
-#                    if val is not None: return val
-#            
-#            ## Try to return the language neutral value
-#            if hasattr(_values, name):
-#                return getattr(_values, name)
-#        
-#        ## Nothing found. fail
-#        raise AttributeError('Attribute %r not found' % name)
-    
     def get_values(self, language=None):
         if language is None:
             language=self._language
@@ -859,7 +814,8 @@ class NodeVersion(object, DictMixin):
         values['node_revision'] = self._row.as_dict()
         
         for t in self.search_tables:
-            _values = getattr(self._row, t).select().first()
+            #_values = getattr(self._row, t).select().first()
+            _values = self._row[t].select().first()
             values[t] = _values.as_dict()
                 
             ## Translate fields
@@ -878,3 +834,24 @@ class NodeVersion(object, DictMixin):
     @property
     def values(self):
         return self.get_values(self._language)
+    
+    def __getitem__(self, name):
+        if name == 'node':
+            ## TODO: Test this
+            return self.db(self.db.node.id == self._row.node).select().first().as_dict()
+        elif name == 'node_revision':
+            return self._row.as_dict()
+        else:
+            _all_values = self.get_values()
+            if _all_values.has_key(name):
+                return _all_values[name]
+            else:
+                for k,v in _all_values.items():
+                    try:
+                        return _all_values[k][name]
+                    except KeyError:
+                        pass
+        raise KeyError, name
+    
+    def keys(self):
+        return ['node', 'node_revision'] + self.search_tables

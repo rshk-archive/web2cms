@@ -213,7 +213,7 @@ def node_read():
     else:
         return dict(
             node=node,
-            tabs=_node_menu(node.id))
+            tabs=_node_menu(node['id']))
 
 @cms_auth.requires_permission('access content')
 @use_custom_view('generic/form')

@@ -125,9 +125,11 @@ def dbadmin():
     ## Everything is done in the view
     return dict()
 
+CMS_MODULES_DIR = 'cms_modules'
+
 @cms_auth.requires_permission(auth, "administer", "plugins")
 def plugins():
-    plugins_dir = os.path.abspath(os.path.join(request.folder, 'cms_plugins'))
+    plugins_dir = os.path.abspath(os.path.join(request.folder, CMS_MODULES_DIR))
     _all_files = os.listdir(plugins_dir)
     _found = []
     
@@ -150,7 +152,7 @@ def plugins():
     
     for plugin_name in _found:
         try:
-            _mod = __import__('cms_plugins', globals=globals(), locals=locals(), fromlist=[plugin_name])
+            _mod = __import__(CMS_MODULES_DIR, globals=globals(), locals=locals(), fromlist=[plugin_name])
             plugin_module = getattr(_mod, plugin_name)
             plugin_info = plugin_module.cms_plugin_info
             plugin_contents = []
@@ -158,13 +160,16 @@ def plugins():
             for elm_name in dir(plugin_module):
                 if elm_name.startswith('_'): continue
                 elm = getattr(plugin_module, elm_name)
-                if type(elm).__name__ == 'classobj':
-                    if issubclass(elm, CustomController) and not elm is CustomController:
-                        plugin_contents.append(('CustomController', elm))
-                    elif issubclass(elm, NodeTypeManager) and not elm is NodeTypeManager:
-                        plugin_contents.append(('NodeTypeManager', elm))
-                    elif issubclass(elm, DynamicBlock) and not elm is DynamicBlock:
-                        plugin_contents.append(('DynamicBlock', elm))
+                
+                ## Check that element have cms_object_info
+                if hasattr(elm, 'cms_object_info'):
+                    if type(elm).__name__ == 'classobj':
+                        if issubclass(elm, CustomController) and not elm is CustomController:
+                            plugin_contents.append(('CustomController', elm))
+                        elif issubclass(elm, NodeTypeManager) and not elm is NodeTypeManager:
+                            plugin_contents.append(('NodeTypeManager', elm))
+                        elif issubclass(elm, DynamicBlock) and not elm is DynamicBlock:
+                            plugin_contents.append(('DynamicBlock', elm))
             
             _loaded_plugins[plugin_name] = dict(
                 module=plugin_module,
