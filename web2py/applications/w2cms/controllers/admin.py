@@ -5,28 +5,12 @@ from helpers import use_custom_view
 from cms_auth import requires_cms_permission
 
 ## The main administration menu, shown in the administrative page
-admin_menu = [
-    (T('Database'), False, URL('admin', 'dbadmin'), [],
-        {'icon':URL('static','images/icons/server-database.png'),
-         'description':T('Administer database')}),
-    (T('Plugins'), False, URL('admin', 'plugins'), [],
-        {'icon':URL('static','images/icons/plugin.png'),
-         'description':T('Administer plugins')}),
-    (T('Content'), False, URL('admin','content'), [],
-        {'icon': URL('static', 'images/icons/admin-content.png'),
-         'description': 'Administer the CMS content.'}),
-    (T('Users'), False, URL('admin','users'), [],
-        {'icon': URL('static', 'images/icons/system-users.png'),
-         'description': 'Administer the CMS users.'}),
-    (T('Files'), False, URL('admin','files'), [],
-        {'icon': URL('static', 'images/icons/folder.png'),
-         'description': 'Use the web file manager to administer uploaded files.'}),
-]
+
 
 @cms_auth.requires_permission(auth, "access admin panel")
 @use_custom_view('generic/menu_page')
 def index():
-    links = admin_menu[:]
+    links = menu_admin[:]
     return dict(
         title=T('Administration panel'),
         menu_items=links,
@@ -128,7 +112,7 @@ def dbadmin():
 CMS_MODULES_DIR = 'cms_modules'
 
 @cms_auth.requires_permission(auth, "administer", "plugins")
-def plugins():
+def modules():
     plugins_dir = os.path.abspath(os.path.join(request.folder, CMS_MODULES_DIR))
     _all_files = os.listdir(plugins_dir)
     _found = []
@@ -186,3 +170,6 @@ def plugins():
         errors=_errors,
         loaded_plugins=_loaded_plugins,
         )
+
+def blocks():
+    return dict()

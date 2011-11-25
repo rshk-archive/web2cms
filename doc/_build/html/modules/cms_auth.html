@@ -58,9 +58,49 @@
             
   <div class="section" id="module-cms_auth">
 <span id="cms-auth"></span><h1>cms_auth<a class="headerlink" href="#module-cms_auth" title="Permalink to this headline">¶</a></h1>
-<p>Custom authentication stuff for CMS.</p>
-<p>Created on Nov 10, 2011
-&#64;author: samu</p>
+<p>Custom authentication functions to be used with web2cms.</p>
+<p><strong>Added features:</strong></p>
+<ul class="simple">
+<li>Cascading, entity-based, permission checking.
+An user is automatically checked for permission on the selected entity
+or some higher-level more-including permission.</li>
+<li>Support for &#8220;anonymous user&#8221; virtual group + permissions [TODO]</li>
+</ul>
+<dl class="class">
+<dt id="cms_auth.CMSAuth">
+<em class="property">class </em><tt class="descclassname">cms_auth.</tt><tt class="descname">CMSAuth</tt><big>(</big><em>auth</em><big>)</big><a class="headerlink" href="#cms_auth.CMSAuth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Auth wrapper that exposes more convenient methods
+to be used in web2cms</p>
+<dl class="method">
+<dt id="cms_auth.CMSAuth.has_permission">
+<tt class="descname">has_permission</tt><big>(</big><em>name='any'</em>, <em>table_name=''</em>, <em>record_id=0</em>, <em>user_id=None</em>, <em>group_id=None</em><big>)</big><a class="headerlink" href="#cms_auth.CMSAuth.has_permission" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom permission checking, using recursive permissions.</p>
+<p>If the user is superuser, return True directly.
+Else, test that user has one of these permissions:</p>
+<p>name, table_name, record_id
+&#8216;*&#8217;,  table_name, record_id
+name, table_name, &#8216;*&#8217;
+&#8216;*&#8217;,  table_name, &#8216;*&#8217;
+name, &#8216;*&#8217;,        &#8216;*&#8217;
+&#8216;*&#8217;,  &#8216;*&#8217;,        &#8216;*&#8217;</p>
+<p>If there is no logged-in user, it should check permissions
+for the virtual group &#8220;0&#8221; (anonymous users): that is, permissions
+assigned to group 0.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">We need to find a way to store such permissions skipping
+the IS_IN_DB() validation on auth_permissions!</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="cms_auth.CMSAuth.requires_permission">
+<tt class="descname">requires_permission</tt><big>(</big><em>name='any'</em>, <em>table_name=''</em>, <em>record_id=0</em><big>)</big><a class="headerlink" href="#cms_auth.CMSAuth.requires_permission" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorator for CMS permissions resolution method</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="function">
 <dt id="cms_auth.has_permission">
 <tt class="descclassname">cms_auth.</tt><tt class="descname">has_permission</tt><big>(</big><em>auth</em>, <em>name='any'</em>, <em>table_name=''</em>, <em>record_id=0</em>, <em>user_id=None</em>, <em>group_id=None</em><big>)</big><a class="headerlink" href="#cms_auth.has_permission" title="Permalink to this definition">¶</a></dt>
@@ -69,8 +109,8 @@
 Else, test that user has one of these permissions:</p>
 <p>name, table_name, record_id
 &#8216;*&#8217;,  table_name, record_id
-name, &#8216;*&#8217;,        record_id
-&#8216;*&#8217;,  &#8216;*&#8217;,        record_id
+name, &#8216;*&#8217;,        record_id &#8212;-&gt; ??? MAKES NO SENSE
+&#8216;*&#8217;,  &#8216;*&#8217;,        record_id &#8212;-&gt; ??? MAKES NO SENSE
 name, table_name, &#8216;*&#8217;
 &#8216;*&#8217;,  table_name, &#8216;*&#8217;
 name, &#8216;*&#8217;,        &#8216;*&#8217;

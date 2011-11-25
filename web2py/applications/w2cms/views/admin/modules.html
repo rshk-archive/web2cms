@@ -1,0 +1,81 @@
+{{left_sidebar_enabled=right_sidebar_enabled=False}}
+{{body_classes='fluid-width'}}
+{{extend 'layout.html'}}
+
+{{#TODO: Use a better way to generate breadcrumbs! }}
+<div class="breadcrumb">
+{{=A(T('Admin'), _href=URL('admin','index'))}}
+» {{=T('Plugins')}}
+</div>
+
+<h1>Plugins administration</h1>
+
+{{if errors:}}
+<div class="messages-box">
+<ul class="messages">
+{{for (plugin_name, exception) in errors:}}
+<li class="message message-error">{{=T('Importing %s:', plugin_name)}} {{=exception}}</li>
+{{pass}}
+</ul>
+</div>
+{{pass}}
+
+
+<table class="plugins-list zebra" style="width: 100%;">
+<thead><tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Version</th>
+        <th>Description</th>
+        <th>Req. Core</th>
+        <th>Dependencies</th>
+        <th>Components</th>
+        <th>Enabled</th>
+        <th>Actions</th>
+</tr></thead>
+<tbody>
+{{for plugin_id, plugin in loaded_plugins.items():}}
+<tr>
+    <td>{{=plugin_id}}</td>
+    <td><strong>{{=plugin['info']['name']}}</strong></td>
+    <td>{{=plugin['info']['version']}}</td>
+    <td><em>{{=plugin['info']['description']}}</em><br/></td>
+    <td>{{=plugin['info']['core_version']}}</td>
+    <td>{{=plugin['info']['dependencies']}}</td>
+    <td>
+	    <ul>
+	    {{for elm_type, elm in plugin['contents']:}}
+	       <li>{{=elm_type}}: {{=elm.__name__}}</li>
+	    {{pass}}
+	    </ul>
+    </td>
+    <td>???</td>
+    <td>---</td>
+</tr>
+{{pass}}
+</tbody>
+</table>
+
+
+{{if False:}}
+{{for plugin_id, plugin in loaded_plugins.items():}}
+<div class="plugin-info" style="border: solid 1px #bbb;margin-bottom:5px;padding:10px;">
+	<h3>{{=plugin['info']['name']}}</h3>
+	<em>{{=plugin['info']['description']}}</em><br/>
+	Plugin id: {{=plugin_id}}<br/>
+	Version: {{=plugin['info']['version']}}<br/>
+	Minimum core version: {{=plugin['info']['core_version']}}<br/>
+	Dependencies: {{=plugin['info']['dependencies']}}<br/><br/>
+	
+	Components:<br/>
+	<ul>
+	{{for elm_type, elm in plugin['contents']:}}
+	   <li>{{=elm_type}}: {{=elm.__name__}}</li>
+	{{pass}}
+	</ul>
+</div>
+{{pass}}
+{{pass}}
+
+<h2>Debug/vars</h2>
+{{=BEAUTIFY(response._vars)}}

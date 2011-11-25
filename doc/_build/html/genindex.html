@@ -55,7 +55,6 @@
  <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
  | <a href="#E"><strong>E</strong></a>
- | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
  | <a href="#H"><strong>H</strong></a>
  | <a href="#L"><strong>L</strong></a>
@@ -79,10 +78,6 @@
   </dt>
 
       
-  <dt><a href="modules/cms_plugin_def.html#module-cms_plugin_def">cms_plugin_def (module)</a>
-  </dt>
-
-      
   <dt><a href="modules/cms_populate.html#module-cms_populate">cms_populate (module)</a>
   </dt>
 
@@ -101,6 +96,10 @@
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
+  <dt><a href="modules/cms_auth.html#cms_auth.CMSAuth">CMSAuth (class in cms_auth)</a>
+  </dt>
+
+      
   <dt><a href="modules/cms_tools.html#cms_tools.CmsDB">CmsDB (class in cms_tools)</a>
   </dt>
 
@@ -118,10 +117,6 @@
 
       
   <dt><a href="modules/cms_settings.html#cms_settings.CustomConfigParser">CustomConfigParser (class in cms_settings)</a>
-  </dt>
-
-      
-  <dt><a href="modules/cms_plugin_def.html#cms_plugin_def.CustomController">CustomController (class in cms_plugin_def)</a>
   </dt>
 
   </dl></td>
@@ -152,10 +147,6 @@
   <dt><a href="modules/cms_tools.html#cms_tools.descend_tree">descend_tree() (in module cms_tools)</a>
   </dt>
 
-      
-  <dt><a href="modules/cms_plugin_def.html#cms_plugin_def.DynamicBlock">DynamicBlock (class in cms_plugin_def)</a>
-  </dt>
-
   </dl></td>
 </tr></table>
 
@@ -169,19 +160,13 @@
   </dl></td>
 </tr></table>
 
-<h2 id="F">F</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%" valign="top"><dl>
-      
-  <dt><a href="modules/cms_tools.html#cms_tools.NodeEntity.first_version">first_version (cms_tools.NodeEntity attribute)</a>
-  </dt>
-
-  </dl></td>
-</tr></table>
-
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="modules/cms_tools.html#cms_tools.REGION.get_content">get_content() (cms_tools.REGION method)</a>
+  </dt>
+
       
   <dt><a href="modules/cms_tools.html#cms_tools.NodeEntity.get_revision">get_revision() (cms_tools.NodeEntity method)</a>
   </dt>
@@ -191,15 +176,19 @@
   </dt>
 
       
-  <dt><a href="modules/cms_settings.html#cms_settings.CMSSettingsManager.get_var">get_var() (cms_settings.CMSSettingsManager method)</a>
+  <dt><a href="modules/cms_tools.html#cms_tools.NodeEntity.get_values">get_values() (cms_tools.NodeEntity method)</a>
   </dt>
 
       
-  <dt><a href="modules/cms_settings.html#cms_settings.CustomConfigParser.getbooleand">getbooleand() (cms_settings.CustomConfigParser method)</a>
+  <dt><a href="modules/cms_settings.html#cms_settings.CMSSettingsManager.get_var">get_var() (cms_settings.CMSSettingsManager method)</a>
   </dt>
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="modules/cms_settings.html#cms_settings.CustomConfigParser.getbooleand">getbooleand() (cms_settings.CustomConfigParser method)</a>
+  </dt>
+
       
   <dt><a href="modules/cms_settings.html#cms_settings.CustomConfigParser.getd">getd() (cms_settings.CustomConfigParser method)</a>
   </dt>
@@ -219,9 +208,15 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="modules/cms_auth.html#cms_auth.has_permission">has_permission() (in module cms_auth)</a>
+  <dt><a href="modules/cms_auth.html#cms_auth.CMSAuth.has_permission">has_permission() (cms_auth.CMSAuth method)</a>
   </dt>
 
+      <dd><dl>
+        
+  <dt><a href="modules/cms_auth.html#cms_auth.has_permission">(in module cms_auth)</a>
+  </dt>
+
+      </dl></dd>
   </dl></td>
 </tr></table>
 
@@ -229,7 +224,11 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="modules/cms_tools.html#cms_tools.NodeEntity.latest_version">latest_version (cms_tools.NodeEntity attribute)</a>
+  <dt><a href="modules/cms_tools.html#cms_tools.NodeEntity.latest_revision">latest_revision (cms_tools.NodeEntity attribute)</a>
+  </dt>
+
+      
+  <dt><a href="modules/cms_tools.html#cms_tools.NodeEntity.list_tables">list_tables() (cms_tools.NodeEntity method)</a>
   </dt>
 
   </dl></td>
@@ -248,14 +247,10 @@
   <dt><a href="modules/cms_tools.html#cms_tools.NodeEntity">NodeEntity (class in cms_tools)</a>
   </dt>
 
-      
-  <dt><a href="modules/cms_tools.html#cms_tools.NodeManager">NodeManager (class in cms_tools)</a>
-  </dt>
-
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="modules/cms_plugin_def.html#cms_plugin_def.NodeTypeManager">NodeTypeManager (class in cms_plugin_def)</a>
+  <dt><a href="modules/cms_tools.html#cms_tools.NodeManager">NodeManager (class in cms_tools)</a>
   </dt>
 
   </dl></td>
@@ -288,10 +283,26 @@
   <dt><a href="modules/cms_tools.html#cms_tools.NodeManager.read_version">read_version() (cms_tools.NodeManager method)</a>
   </dt>
 
+      
+  <dt><a href="modules/cms_tools.html#cms_tools.REGION">REGION (class in cms_tools)</a>
+  </dt>
+
+      
+  <dt><a href="modules/cms_auth.html#cms_auth.requires_cms_permission">requires_cms_permission() (in module cms_auth)</a>
+  </dt>
+
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="modules/cms_auth.html#cms_auth.requires_cms_permission">requires_cms_permission() (in module cms_auth)</a>
+  <dt><a href="modules/cms_auth.html#cms_auth.CMSAuth.requires_permission">requires_permission() (cms_auth.CMSAuth method)</a>
+  </dt>
+
+      
+  <dt><a href="modules/cms_tools.html#cms_tools.NodeEntity.revision_numbers">revision_numbers (cms_tools.NodeEntity attribute)</a>
+  </dt>
+
+      
+  <dt><a href="modules/cms_tools.html#cms_tools.NodeEntity.revisions">revisions (cms_tools.NodeEntity attribute)</a>
   </dt>
 
   </dl></td>
@@ -339,12 +350,6 @@
 
 <h2 id="V">V</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%" valign="top"><dl>
-      
-  <dt><a href="modules/cms_tools.html#cms_tools.NodeEntity.values">values (cms_tools.NodeEntity attribute)</a>
-  </dt>
-
-  </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="modules/cms_tools.html#cms_tools.vars_to_tree">vars_to_tree() (in module cms_tools)</a>

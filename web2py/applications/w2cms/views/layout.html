@@ -41,6 +41,7 @@
     {{
     from cms_settings import cfg_parser
     from helpers import get_region_content, get_region
+    from cms_tools import REGION
     import helpers
     helpers.db = db
     main_cfg = cfg_parser('cms-settings', force_reload=True)
@@ -101,13 +102,17 @@
     <div class="flash">{{=response.flash or ''}}</div> <!-- notification div -->
 
     <div id="container">                        
-      
-    <div id="wrapper"> 
+    <div id="wrapper">
+    
+    {{=REGION('page_pre')}}
+     
     <div id="page-upper">       
     {{try:}}{{=auth.navbar(action=URL('default','user'))}}{{except:pass}}
     </div>
     
     <div id="header"> <!-- header and login nav -->
+      {{=REGION('header_pre')}}
+    
       {{block header}} <!-- this is default header -->
       
       <!-- Site logo -->
@@ -146,6 +151,8 @@
       
       <div style="clear: both;"></div><!-- Clear the divs -->
       {{end}}
+      
+      {{=REGION('header_post')}}
     </div><!-- header  -->
     
     
@@ -172,11 +179,11 @@
     <div id="page"> <!-- Here my central body -->     
 
       {{if left_sidebar_enabled:}}
-        {{left_sidebar_content = get_region_content('left_sidebar')}}
-        {{if left_sidebar_content:}}
+        {{left_sidebar_content = REGION('left_sidebar',load=True)}}
+        {{if left_sidebar_content.content:}}
           <div id="left_sidebar" {{=XML(left_sidebar_style)}} >
             <div style="padding: 4px;">
-          {{block left_sidebar}}{{=left_sidebar_content}}{{end}}       
+            {{block left_sidebar}}{{=left_sidebar_content}}{{end}}       
             </div>
           </div><!-- left_sidebar -->
         {{pass}}
@@ -184,19 +191,19 @@
 
       <!-- content -->
       <div id="content" {{=XML(style_content)}} >
-        {{=get_region('content_pre')}}
+        {{=REGION('content_pre')}}
         
         <div id="content-region-content">
         {{include}}
         </div>
         
-        {{=get_region('content_post')}} 
+        {{=REGION('content_post')}}
       </div>
       <!-- content -->
 
       {{if right_sidebar_enabled:}}
-        {{right_sidebar_content = get_region_content('right_sidebar')}}
-        {{if right_sidebar_content:}}
+        {{right_sidebar_content = REGION('right_sidebar',load=True)}}
+        {{if right_sidebar_content.content:}}
           <div id="right_sidebar" {{=XML(right_sidebar_style)}} >
             <div style="padding: 4px;">
               {{block right_sidebar}}{{=right_sidebar_content}}{{end}}
@@ -211,6 +218,8 @@
     
     
     <div id="footer">
+      {{=REGION('footer_pre')}}
+      
       {{block footer}} <!-- this is default footer -->
       
       <!-- "Powered by" image -->
@@ -226,9 +235,14 @@
       
       <div style="clear: both;"></div><!-- Clear the divs -->
       {{end}}
+      
+      {{=REGION('footer_post')}}
 
-    </div><!-- footer -->           
-      </div><!-- wrapper -->
+    </div><!-- footer -->
+    
+    {{=REGION('page_post')}}           
+    
+    </div><!-- wrapper -->
     </div><!-- container -->        
     
     <!--[if lt IE 7 ]>

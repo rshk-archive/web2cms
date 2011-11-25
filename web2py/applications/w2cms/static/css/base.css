@@ -1076,3 +1076,24 @@ ul.inline-links li {
 	margin-right: 5px;
 	display: inline;
 }
+
+.region-placeholder {
+	background: #eee;
+	color:#888;
+	text-align:center;
+	font-size:1.2em;
+	padding:1px;
+	font-weight: bold;
+	font-variant: small-caps;
+	border: dashed 1px #CCC;
+	
+	/* border:dashed 2px #DDD;
+	color:#888;
+	padding:5px;
+	font-size:1.2em;
+	text-align:center; */
+}
+.region-container.highlight:hover {
+    outline: dashed 2px #f00;
+    background: #ffe;
+}

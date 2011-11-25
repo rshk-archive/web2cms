@@ -43,23 +43,9 @@ def get_region_content(region_name, custom_db=None, request_context=None):
             current.response.render('generic/block.html', dict(block=block))
             for block in blocks
         ]))
-#        return DIV(*[
-#            DIV(
-#                H3(block.title, _class='block-title'),
-#                DIV(block.body, _class='block-content'),
-#                _class='block'
-#            )
-#            for block in blocks
-#        ])
 
     return ''
     
-#    return "Content of %s for '%s/%s/%s'" % (
-#        region_name,
-#        request_context.application,
-#        request_context.controller,
-#        request_context.function);
-
 def get_region(region_name, custom_db=None, request_context=None):
     """For HTML requests only, return the region content wrapper in a <div>,
     if any content is present, or an empty string if not.

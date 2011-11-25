@@ -48,15 +48,8 @@ response.menu = [
     
     ## Administration panel
     (T('Admin'), False, URL('admin','index'), []),
-    
-#    ## Development          
-#    (T('Devel'), False, URL('devel','index'), [
-#        (T('Status'), False, URL('devel','status'), []),
-#        (T('Generate'), False, URL('devel','generate'), []),
-#        (T('Appadmin'), False, URL('appadmin','index'), []),
-#    ]),
-    
-    ]
+
+]
 
 menu_development = (T('Devel'), False, URL('devel','index'), [
     (T('Status'), False, URL('devel','status'), [],
@@ -68,6 +61,34 @@ menu_development = (T('Devel'), False, URL('devel','index'), [
     (T('CSS Devel'), False, URL('devel','css_devel'), [],
         {'icon':URL('static','images/icons/devel.png')}),
 ])
+
+menu_admin = [
+    (T('Database'), False, URL('admin', 'dbadmin'), [],
+        {'icon':URL('static','images/icons/server-database.png'),
+         'description':T('Administer database')}),
+    (T('Extension modules'), False, URL('admin', 'modules'), [],
+        {'icon':URL('static','images/icons/plugin.png'),
+         'description':T('Administer CMS extension modules.')}),
+    (T('Content'), False, URL('admin','content'), [],
+        {'icon': URL('static', 'images/icons/admin-content.png'),
+         'description': 'Administer the CMS content.'}),
+    (T('Users'), False, URL('admin','users'), [],
+        {'icon': URL('static', 'images/icons/system-users.png'),
+         'description': 'Administer the CMS users.'}),
+    (T('File manager'), False, URL('admin','files'), [],
+        {'icon': URL('static', 'images/icons/folder.png'),
+         'description': 'Use the web file manager to administer uploaded files.'}),
+    (T('Blocks Placement'), False, URL('admin','blocks'), [],
+        {'icon': URL('static', 'images/icons/preferences-other.png'),
+         'description': 'Administer placement of blocks in the page regions.'}),
+]
+
+## Dictionary to temporarily store menu definitions.
+## This should be then replaced by something else.
+menus = {
+    'development': menu_development,
+    'admin': menu_admin,
+}
 
 response.menu.append(menu_development)
 

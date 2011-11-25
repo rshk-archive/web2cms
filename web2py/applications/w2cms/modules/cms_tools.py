@@ -855,3 +855,65 @@ class NodeVersion(object, DictMixin):
     
     def keys(self):
         return ['node', 'node_revision'] + self.search_tables
+
+
+##==============================================================================
+## Regions / blocks management
+##==============================================================================
+
+class REGION:
+    """TODO: Use LOAD() to load region content!
+    """
+    
+    db = None
+    name = None
+    content = None
+    highlight = True
+    
+    def __init__(self, name, load=False):
+        self.name = name
+        if load:
+            self.content = self.get_content()
+        else:
+            self.content = None
+    
+    def xml(self):
+        if self.content is None:
+            self.content = self.get_content()
+        
+        if not self.highlight:
+            ## TODO: Use LOAD() here, to load region as component!
+            return str(DIV(self.content,
+                _id="region-%s" % self.name,
+                _class="region-container",
+                ))
+        else:
+            return str(DIV(
+                DIV(self.name.replace('_',' ').title(), _class="region-placeholder"),
+                self.content,
+                _id="region-%s" % self.name,
+                _class="region-container highlight",
+                ))
+    
+    def __str__(self):
+        return self.xml()
+
+    def get_content(self):
+        """Get the content for a given region / page.
+        
+        :param region_name: An identifier of the region, such as 'left_sidebar' or
+            'my_example_region'
+        :param request_context: The ``request`` object. Defaults to current.request
+        """
+        
+        db = self.db
+        
+        blocks = db(db.block.region==self.name).select(db.block.ALL, orderby=db.block.weight)
+    
+        if blocks:
+            return XML("\n".join([
+                current.response.render('generic/block.html', dict(block=block))
+                for block in blocks
+            ]))
+    
+        return ''

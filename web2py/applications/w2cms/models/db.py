@@ -227,3 +227,5 @@ cms_auth = CMSAuth(auth)
 from cms_tools import CmsDB, CMS_URL
 cmsdb = CmsDB(db)
 
+from cms_tools import REGION
+REGION.db = db
