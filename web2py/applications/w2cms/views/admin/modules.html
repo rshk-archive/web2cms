@@ -4,78 +4,77 @@
 
 {{#TODO: Use a better way to generate breadcrumbs! }}
 <div class="breadcrumb">
-{{=A(T('Admin'), _href=URL('admin','index'))}}
-» {{=T('Plugins')}}
+{{=A(T('Admin'), _href=URL('admin','index'))}} » {{=T('Extension modules')}}
 </div>
 
-<h1>Plugins administration</h1>
+<h2>Extension modules</h2>
 
-{{if errors:}}
-<div class="messages-box">
-<ul class="messages">
-{{for (plugin_name, exception) in errors:}}
-<li class="message message-error">{{=T('Importing %s:', plugin_name)}} {{=exception}}</li>
-{{pass}}
-</ul>
-</div>
-{{pass}}
-
-
-<table class="plugins-list zebra" style="width: 100%;">
-<thead><tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Version</th>
-        <th>Description</th>
-        <th>Req. Core</th>
-        <th>Dependencies</th>
-        <th>Components</th>
-        <th>Enabled</th>
-        <th>Actions</th>
+<table class="zebra grid" style="width:100%;">
+<thead><tr style="border-left: solid 4px #666;">
+    <th>Name / version</th>
+    <th>Dependencies</th>
+    <th>Metadata</th>
+    <th>Components</th>
+    <th>Actions</th>
 </tr></thead>
 <tbody>
-{{for plugin_id, plugin in loaded_plugins.items():}}
-<tr>
-    <td>{{=plugin_id}}</td>
-    <td><strong>{{=plugin['info']['name']}}</strong></td>
-    <td>{{=plugin['info']['version']}}</td>
-    <td><em>{{=plugin['info']['description']}}</em><br/></td>
-    <td>{{=plugin['info']['core_version']}}</td>
-    <td>{{=plugin['info']['dependencies']}}</td>
+
+{{enabled_icon = IMG(_src=URL('static', 'images/icons/tick.png'), _title=T('Enabled'), _alt=T('Enabled'))}}
+{{disabled_icon = IMG(_src=URL('static', 'images/icons/cross.png'), _title=T('Disabled'), _alt=T('Disabled'))}}
+
+{{enabled = SPAN(T('enabled'), _style="color:#0A0;")}}
+{{disabled = SPAN(T('disabled'), _style="color:#A00;")}}
+
+{{for module_id,module in modules.items():}}
+{{module_enabled = module_id in enabled_modules}}
+<tr class="{{='grayed-out ' if not module_enabled else ''}}" style="border-left: solid 4px {{='#0A0' if module_enabled else '#A00'}};">
+    
     <td>
+        <span style="font-size:1.2em;"><strong>{{=module['info'].get('name', module_id)}}</strong></span>
+        <em>{{=module['info'].get('version', '')}}</em>
+        ({{=enabled if module_enabled else disabled}})
+        <br/>
+        {{=module['info'].get('description', '')}}<br/>
+        <hr/>
+        <strong>Module ID:</strong> {{=module_id}}
+    </td>
+    
+    <td>
+        {{deps = module.get('dependencies')}}
+        {{if deps:}}
+        {{=UL(*[LI(d) for d in deps])}}
+        {{pass}}
+    </td>
+    
+    <td>
+    {{for k,v in module['info'].get('meta', {}).items():}}
+    <strong>{{=k.replace('_', ' ').title()}}:</strong> {{=v}}<br/>
+    {{pass}}
+    </td>
+    
+    <td>
+        {{_components = module.get('components')}}
+        {{if _components:}}
 	    <ul>
-	    {{for elm_type, elm in plugin['contents']:}}
-	       <li>{{=elm_type}}: {{=elm.__name__}}</li>
+	    {{for component_type, components in _components.items():}}
+	        {{for component_name,component in components.items():}}
+	        <li><strong>{{=component_name}}</strong> ({{=component_type}})</li>
+	        {{pass}}
 	    {{pass}}
 	    </ul>
+	    {{pass}}
     </td>
-    <td>???</td>
-    <td>---</td>
+    
+    <td>
+        {{=A(enabled_icon, T('enable'), _href=URL('admin', 'module_enable', args=[module_id], vars=dict(enabled=1)))}}
+        {{=A(disabled_icon, T('disable'), _href=URL('admin', 'module_enable', args=[module_id], vars=dict(enabled=0)))}}
+    </td>
 </tr>
 {{pass}}
 </tbody>
 </table>
 
-
-{{if False:}}
-{{for plugin_id, plugin in loaded_plugins.items():}}
-<div class="plugin-info" style="border: solid 1px #bbb;margin-bottom:5px;padding:10px;">
-	<h3>{{=plugin['info']['name']}}</h3>
-	<em>{{=plugin['info']['description']}}</em><br/>
-	Plugin id: {{=plugin_id}}<br/>
-	Version: {{=plugin['info']['version']}}<br/>
-	Minimum core version: {{=plugin['info']['core_version']}}<br/>
-	Dependencies: {{=plugin['info']['dependencies']}}<br/><br/>
-	
-	Components:<br/>
-	<ul>
-	{{for elm_type, elm in plugin['contents']:}}
-	   <li>{{=elm_type}}: {{=elm.__name__}}</li>
-	{{pass}}
-	</ul>
-</div>
-{{pass}}
-{{pass}}
-
+{{if globals().get('debug_vars', False):}}
 <h2>Debug/vars</h2>
 {{=BEAUTIFY(response._vars)}}
+{{pass}}

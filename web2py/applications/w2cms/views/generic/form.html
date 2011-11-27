@@ -8,6 +8,7 @@
 {{=form if 'form' in globals() else T('Undefined form')}}
 
 
+{{if globals().get('debug_form', False):}}
 <!-- Debugging stuff. To be removed in production -->
 <hr/>
 <h2>Submitted variables</h2>
@@ -16,3 +17,4 @@
 {{=BEAUTIFY(form.vars)}}
 <h2>Errors in form</h2>
 {{=BEAUTIFY(form.errors)}}
+{{pass}}

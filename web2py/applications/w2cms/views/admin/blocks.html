@@ -1,3 +1,9 @@
+{{
+from cms_tools import REGION
+REGION.highlight = True
+}}
+
+
 {{#body_classes='fluid-width'}}
 {{extend 'layout.html'}}
 
@@ -7,19 +13,4 @@
 </div>
 
 <h1>Blocks placement</h1>
-
-<!-- 
-{{block right_sidebar}}
-<div class="region-placeholder">Right sidebar</div>
-{{end}}
-{{block left_sidebar}}
-<div class="region-placeholder">Right sidebar</div>
-{{end}}
-{{block region_content_pre}}
-<div class="region-placeholder">Content / pre</div>
-{{end}}
-{{block region_content_post}}
-<div class="region-placeholder">Content / post</div>
-{{end}}
- -->
 

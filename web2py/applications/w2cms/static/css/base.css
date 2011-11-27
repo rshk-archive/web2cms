@@ -978,31 +978,48 @@ table.zebra > tbody > tr:nth-child(even) {
 
 /** Table cell highlighting
 *******************************************************************************/
+table > tbody > tr.highlight > td,
 table > tbody > tr > td.highlight,
+table > tbody > tr.highlight-yellow > td,
 table > tbody > tr > td.highlight-yellow,
+table.zebra > tbody > tr.highlight:nth-child(odd) > td,
 table.zebra > tbody > tr:nth-child(odd) > td.highlight,
+table.zebra > tbody > tr.highlight-yellow:nth-child(odd) > td,
 table.zebra > tbody > tr:nth-child(odd) > td.highlight-yellow {
 	background: #ffe;
 }
+table.zebra > tbody > tr.highlight:nth-child(even) > td,
 table.zebra > tbody > tr:nth-child(even) > td.highlight,
+table.zebra > tbody > tr.highlight-yellow:nth-child(even) > td,
 table.zebra > tbody > tr:nth-child(even) > td.highlight-yellow {
 	background: #ffd;
 }
+table > tbody > tr.highlight-yellow > td,
 table > tbody > tr > td.highlight-yellow,
+table.zebra > tbody > tr.highlight-red:nth-child(odd) > td,
 table.zebra > tbody > tr:nth-child(odd) > td.highlight-red {
     background: #fee;
 }
+table.zebra > tbody > tr.highlight-red:nth-child(even) > td,
 table.zebra > tbody > tr:nth-child(even) > td.highlight-red {
     background: #fdd;
 }
+table > tbody > tr.highlight-yellow > td,
 table > tbody > tr > td.highlight-yellow,
+table.zebra > tbody > tr.highlight-green:nth-child(odd) > td,
 table.zebra > tbody > tr:nth-child(odd) > td.highlight-green {
     background: #efe;
 }
-table.zebra > tbody > tr:nth-child(even) > td.highlight-green {
+table.zebra > tbody > tr:nth-child(even) > td.highlight-green,
+table.zebra > tbody > tr.highlight-green:nth-child(even) > td {
     background: #dfd;
 }
 
+/** Grayed-out **/
+table > tbody > tr.grayed-out > td,
+table > tbody > tr > td.grayed-out {
+	opacity: .75;
+}
 
 /** Other table styles
 *******************************************************************************/
@@ -1086,6 +1103,7 @@ ul.inline-links li {
 	font-weight: bold;
 	font-variant: small-caps;
 	border: dashed 1px #CCC;
+	margin:5px;
 	
 	/* border:dashed 2px #DDD;
 	color:#888;
@@ -1096,4 +1114,19 @@ ul.inline-links li {
 .region-container.highlight:hover {
     outline: dashed 2px #f00;
     background: #ffe;
+}
+
+/** Confirmation form
+*******************************************************************************/
+.confirm-form {
+	border: solid 1px #888;
+	padding: 15px;
+	text-align: center;
+	border-radius: 10px;
+	background: #f8f8f8;
+}
+.confirm-form .message {
+	padding: 5px;
+	margin-bottom: 10px;
+	font-size: 1.2em;
 }

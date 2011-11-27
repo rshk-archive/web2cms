@@ -24,6 +24,7 @@ from gluon.storage import Storage
 import cms_settings
 from UserDict import DictMixin
 
+
 ##==============================================================================
 ## Utility functions
 ## TODO: Move to helpers
@@ -80,6 +81,7 @@ def vars_to_tree(vars):
         place_into(vars_new, ksplit, v)
     return vars_new
 
+
 ##==============================================================================
 ## CMS Database object
 ##==============================================================================
@@ -89,6 +91,7 @@ class CmsDB(object):
     """
     
     _db = None
+    _auth = None
     _managers = None
     
     _current_language = None
@@ -220,44 +223,6 @@ class NodeManager(ElementManager):
         """
         raise NotImplementedError
         
-#        db = self.db
-#        
-#        try:
-#        
-#            row_node = {
-#                'type' : values.get('type', ''),
-#                'weight' : values.get('weight', 0),
-#                'published' : values.get('published', True),
-#            }
-#            
-#            node_id = db.node.insert(**row_node)
-#            
-#            row_node_version = {
-#                'node' : node_id,
-#                'revision_id' : 1, # first revision for this node
-#                'language' : values.get('language', 'neutral'),
-#                'published' : values.get('published', True),
-#                'is_translation_base' : True,
-#            }
-#            
-#            version_id = db.node_version.insert(**row_node_version)
-#            
-#            row_node_fields_base = {
-#                'node_version' : version_id,
-#                'title' : values.get('title', 'Untitled node %d' % node_id),
-#                'body' : values.get('body', ''),
-#                'body_format' : values.get('body_format', 'html-full'),
-#            }
-#            
-#            db.node_fields_base.insert(**row_node_fields_base)
-#        
-#        except:
-#            db.rollback()
-#        else:
-#            db.commit()
-#        
-#        return node_id
-    
     def read(self, node_id, revision=None, language=None):
         """Load a given node object, by id.
         
@@ -588,9 +553,7 @@ class NodeManager(ElementManager):
                 pass
             
         return form
-    
-    
-    
+
 
 class NodeEntity(ElementEntity):
     """\
@@ -780,13 +743,6 @@ class NodeEntity(ElementEntity):
                 .select().first()
         return NodeVersion(self._cmsdb, results, language=language)
     
-#    def _get_first_version(self):
-#        db = self.db
-#        return self._db_row.node_version.select(
-#            orderby=db.node_version.revision_id |
-#            ~db.node_version.is_translation_base |
-#            db.node_version.id 
-#            ).first()
 
 class NodeVersion(object, DictMixin):
     search_tables = ['node_fields_base']
@@ -861,6 +817,18 @@ class NodeVersion(object, DictMixin):
 ## Regions / blocks management
 ##==============================================================================
 
+class BlocksManager(ElementManager):
+    """Blocks management class
+    """
+    
+    def define_tables(self):
+        db = self.db
+        pass
+    
+    def list_blocks(self):
+        db = self.db
+        all_blocks = db().select(db.block.ALL)
+
 class REGION:
     """TODO: Use LOAD() to load region content!
     """
@@ -868,7 +836,7 @@ class REGION:
     db = None
     name = None
     content = None
-    highlight = True
+    highlight = False
     
     def __init__(self, name, load=False):
         self.name = name

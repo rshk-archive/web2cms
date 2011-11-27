@@ -109,67 +109,63 @@ def dbadmin():
     ## Everything is done in the view
     return dict()
 
-CMS_MODULES_DIR = 'cms_modules'
-
 @cms_auth.requires_permission(auth, "administer", "plugins")
 def modules():
-    plugins_dir = os.path.abspath(os.path.join(request.folder, CMS_MODULES_DIR))
-    _all_files = os.listdir(plugins_dir)
-    _found = []
-    
-    for f in _all_files:
-        _fullname = os.path.join(plugins_dir, f)
-        if f.endswith('.py'):
-            _found.append(f[:-3])
-        elif os.path.isdir(_fullname) and os.path.isfile(os.path.join(_fullname, '__init__.py')):
-            _found.append(f)
-    
-    _errors = []
-    _loaded_plugins = {}
-    
-    _app_folder = os.path.abspath(request.folder)
-    
-    if not _app_folder in sys.path:
-        sys.path.insert(0, _app_folder)
-    
-    from cms_plugin_def import *
-    
-    for plugin_name in _found:
-        try:
-            _mod = __import__(CMS_MODULES_DIR, globals=globals(), locals=locals(), fromlist=[plugin_name])
-            plugin_module = getattr(_mod, plugin_name)
-            plugin_info = plugin_module.cms_plugin_info
-            plugin_contents = []
-            
-            for elm_name in dir(plugin_module):
-                if elm_name.startswith('_'): continue
-                elm = getattr(plugin_module, elm_name)
-                
-                ## Check that element have cms_object_info
-                if hasattr(elm, 'cms_object_info'):
-                    if type(elm).__name__ == 'classobj':
-                        if issubclass(elm, CustomController) and not elm is CustomController:
-                            plugin_contents.append(('CustomController', elm))
-                        elif issubclass(elm, NodeTypeManager) and not elm is NodeTypeManager:
-                            plugin_contents.append(('NodeTypeManager', elm))
-                        elif issubclass(elm, DynamicBlock) and not elm is DynamicBlock:
-                            plugin_contents.append(('DynamicBlock', elm))
-            
-            _loaded_plugins[plugin_name] = dict(
-                module=plugin_module,
-                info=plugin_info,
-                contents=plugin_contents,
-                )
-            
-            #dir(getattr(plugin_module, 'example_plugin'))
-        except Exception, e:
-            _errors.append((plugin_name, e))
-    
     return dict(
-        found_plugins=_found,
-        errors=_errors,
-        loaded_plugins=_loaded_plugins,
+        modules=cms_extm.discover_modules(),
+        enabled_modules=cms_extm.list_enabled_modules(),
         )
 
+@cms_auth.requires_permission(auth, "administer", "plugins")
+@use_custom_view('generic/form')
+def module_enable():
+    module_name = request.args[0]
+    module_label = None
+    module = cms_extm.load_module(module_name)
+    module_label = module['info']['name']
+    enabled = int(request.vars.get('enabled',1))
+    _form_destination = URL('admin','modules')
+#    form = FORM(
+#        DIV(T('Are you sure you want to %(action)s module %(module)s?') %
+#            dict(action=T('enable') if enabled else T('disable'), module=module_label),
+#            _class='message'),
+#        DIV(
+#            INPUT(_type='submit', _value=T('%(action)s module') %
+#                  dict(action=T('Enable') if enabled else T('Disable'))),
+#            ' ', A(T('Cancel'), _href=_form_destination),
+#            _class='buttons'
+#        ),
+#        _class='confirm-form',
+#        )
+    form = _confirm_form(
+        message=T('Are you sure you want to %(action)s module %(module)s?') %
+            dict(action=T('enable') if enabled else T('disable'), module=module_label),
+        submit_text=T('Enable') if enabled else T('Disable'),
+        cancel_url=_form_destination,
+        )
+    if form.process().accepted:
+        if enabled:
+            cms_extm.enable(module_name)
+        else:
+            cms_extm.disable(module_name)
+        session.flash = T('Module %(module)s %(action)s') % dict(action=T('enabled') if enabled else T('disabled'), module=module_name)
+        redirect(_form_destination)
+    return dict(form=form)
+
+def _confirm_form(message=None, submit_text=None, cancel_text=None, cancel_url=None):
+    if message is None:
+        message = T('Are you sure?'),
+    if submit_text is None:
+        submit_text = T('Confirm')
+    if cancel_text is None:
+        cancel_text = T('Cancel')
+    return FORM(
+        DIV(message, _class='message'),
+        DIV(INPUT(_type='submit', _value=submit_text),
+            ' ', A(cancel_text, _href=cancel_text),
+            _class='buttons'),
+        _class='confirm-form')
+
+@cms_auth.requires_permission(auth, "administer", "blocks")
 def blocks():
     return dict()

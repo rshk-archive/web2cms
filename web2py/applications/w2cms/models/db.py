@@ -113,9 +113,9 @@ def user_name_represent(value, row=None):
         return 'unknown'
 
 
-## Standard signature fields ===================================================
-## This signature table is slightly different from the one defined
-## by Auth inside auth.signature, so we redefine it here.
+# Standard signature fields ===================================================
+# This signature table is slightly different from the one defined
+# by Auth inside auth.signature, so we redefine it here.
 signature = db.Table(db, 'cms_signature',
     Field('created_date', 'datetime', default=request.now),
     Field('created_by', db.auth_user, default=auth.user_id),
@@ -225,7 +225,11 @@ from cms_auth import CMSAuth
 cms_auth = CMSAuth(auth)
 
 from cms_tools import CmsDB, CMS_URL
-cmsdb = CmsDB(db)
+cmsdb = CmsDB(db=db)
 
 from cms_tools import REGION
+REGION.highlight = False
 REGION.db = db
+
+from cms_extension import ExtensionsManager
+cms_extm = ExtensionsManager(db)
