@@ -394,7 +394,8 @@ body.fluid-width #wrapper {width:95%;}
     margin: 0 auto;
     padding: 0;
 }
-#page { padding: 20px 10px 30px 10px; }
+/* #page { padding: 20px 10px 30px 10px; } */
+#page { padding: 5px 0; }
 #wrapper {margin: 0 auto;}
 #wrapper {background-color: #fff; padding: 0}
 #statusbar { margin: 0 }
@@ -1094,6 +1095,8 @@ ul.inline-links li {
 	display: inline;
 }
 
+/** Regions
+*/
 .region-placeholder {
 	background: #eee;
 	color:#888;
@@ -1103,7 +1106,6 @@ ul.inline-links li {
 	font-weight: bold;
 	font-variant: small-caps;
 	border: dashed 1px #CCC;
-	margin:5px;
 	
 	/* border:dashed 2px #DDD;
 	color:#888;
@@ -1112,9 +1114,21 @@ ul.inline-links li {
 	text-align:center; */
 }
 .region-container.highlight:hover {
-    outline: dashed 2px #f00;
-    background: #ffe;
+	/* #275b90 */
+    outline: solid 1px #BDD3E9;
+    background: #F3F9FF;
+    /* background: #ffe; */
 }
+.region-container.highlight .block:hover {
+	outline: solid 1px #E9E6BD;
+	background: #FFFEF3;
+}
+.region-container.empty {display:none;}
+
+#content { padding: 0 5px; }
+/* #left_sidebar {padding-left: 10px;}
+#right_sidebar {padding-right: 10px;} */
+.region-container {padding:5px;}
 
 /** Confirmation form
 *******************************************************************************/

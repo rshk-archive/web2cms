@@ -63,19 +63,40 @@
     {{include 'web2py_ajax.html'}}
 
     {{
-    #using sidebars need to know what sidebar you want to use
-    #prior of using it, because of static width size of content, you can use
-    #left_sidebar, right_sidebar, both or none (False left and right)    
+    ## using sidebars need to know what sidebar you want to use
+    ## prior of using it, because of static width size of content, you can use
+    ## left_sidebar, right_sidebar, both or none (False left and right)    
     left_sidebar_enabled = globals().get('left_sidebar_enabled',True)
     right_sidebar_enabled = globals().get('right_sidebar_enabled',True)
-    if left_sidebar_enabled and right_sidebar_enabled: width_content='63%'
-    elif left_sidebar_enabled != right_sidebar_enabled: width_content='720px'
-    else: width_content='100%'
-    if left_sidebar_enabled: left_sidebar_style = 'style="display: block;"'
-    else: left_sidebar_style = 'style="display: none;"'
-    if right_sidebar_enabled: right_sidebar_style = 'style="display: block;"'
-    else: right_sidebar_style = 'style="display: none;"'
+    
+    left_sidebar_width = 160
+    right_sidebar_width = 160
+    content_width = 960
+    
+    if left_sidebar_enabled:
+        content_width = content_width - left_sidebar_width - 20
+        pass
+    
+    if right_sidebar_enabled:
+        content_width = content_width - right_sidebar_width - 20
+        pass
+    
+    width_content = '%dpx' % content_width
+    
+    if left_sidebar_enabled:
+        left_sidebar_style = 'style="display: block;width: %dpx;"' % left_sidebar_width
+    else:
+        left_sidebar_style = 'style="display: none;"'
+    pass
+    
+    if right_sidebar_enabled:
+        right_sidebar_style = 'style="display: block;width: %dpx;"' % right_sidebar_width
+    else:
+        right_sidebar_style = 'style="display: none;"'
+    pass
+    
     style_content = 'style="width: %s"' % width_content
+    #style_content = 'style="width: 50%"'
     }}
     
     <!-- uncomment here to load jquery-ui -->
@@ -175,6 +196,7 @@
       {{end}}               
     </div><!-- statusbar -->
     
+    {{=REGION('main_pre')}}
     
     <div id="page"> <!-- Here my central body -->     
 
@@ -182,9 +204,7 @@
         {{left_sidebar_content = REGION('left_sidebar',load=True)}}
         {{if left_sidebar_content.content:}}
           <div id="left_sidebar" {{=XML(left_sidebar_style)}} >
-            <div style="padding: 4px;">
             {{block left_sidebar}}{{=left_sidebar_content}}{{end}}       
-            </div>
           </div><!-- left_sidebar -->
         {{pass}}
       {{pass}}
@@ -205,17 +225,16 @@
         {{right_sidebar_content = REGION('right_sidebar',load=True)}}
         {{if right_sidebar_content.content:}}
           <div id="right_sidebar" {{=XML(right_sidebar_style)}} >
-            <div style="padding: 4px;">
               {{block right_sidebar}}{{=right_sidebar_content}}{{end}}
-            </div>
           </div><!-- right_sidebar -->
         {{pass}}
       {{pass}}
 
       <div style="clear: both;"></div><!-- Clear the divs -->
       
-    </div><!-- page -->                         
+    </div><!-- page -->
     
+    {{=REGION('main_post')}}
     
     <div id="footer">
       {{=REGION('footer_pre')}}

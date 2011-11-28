@@ -829,7 +829,7 @@ class BlocksManager(ElementManager):
         db = self.db
         all_blocks = db().select(db.block.ALL)
 
-class REGION:
+class REGION(DIV):
     """TODO: Use LOAD() to load region content!
     """
     
@@ -849,19 +849,19 @@ class REGION:
         if self.content is None:
             self.content = self.get_content()
         
-        if not self.highlight:
-            ## TODO: Use LOAD() here, to load region as component!
-            return str(DIV(self.content,
-                _id="region-%s" % self.name,
-                _class="region-container",
-                ))
+        _id="region-%s" % self.name
+        _classes = ['region-container']
+        if self.highlight:
+            _classes.append('highlight')
+        if not self.content and not self.highlight:
+            _classes.append('empty')
+        
+        if self.highlight:
+            _content = [DIV(self.name.replace('_',' ').title(), _class="region-placeholder"), DIV(self.content)]
         else:
-            return str(DIV(
-                DIV(self.name.replace('_',' ').title(), _class="region-placeholder"),
-                self.content,
-                _id="region-%s" % self.name,
-                _class="region-container highlight",
-                ))
+            _content = DIV(self.content)
+        
+        return DIV(*_content, _id=_id, _class=" ".join(_classes)).xml()
     
     def __str__(self):
         return self.xml()
