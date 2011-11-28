@@ -1,2 +1,2 @@
 User-agent: *
-Disallow: /welcome/default/user
+Disallow: /w2cms/default/user
