@@ -3,12 +3,13 @@ Definition stuff for the CMS modules.
 '''
 
 __all__ = [
+    'cms_component',
+    'ExtensionsManager',
     'CustomController',
     'NodeTypeManager',
     'DynamicBlock',
-    'ExtensionsManager',
-    'cms_component',
-    ]
+]
+
 
 from gluon import current
 import os
@@ -71,6 +72,7 @@ class ExtensionsManager:
         :type name: string
         """
         import imp
+        from helpers import recursive_update
         
         ## Find the module in the search path
         ## Returns (file, pathname, description)
@@ -90,7 +92,11 @@ class ExtensionsManager:
                 package = 'Misc',
                 ),
             )
-        module_info.update(module.cms_module_info)
+        
+        #module_info.update(module.cms_module_info)
+        recursive_update(module_info, module.cms_module_info)
+        
+        ## Retrieve components
         components = {}
         for m_object in dir(module):
             obj = getattr(module, m_object)
@@ -99,6 +105,8 @@ class ExtensionsManager:
                 if not components.has_key(c_info['type']):
                     components[c_info['type']] = {}
                 components[c_info['type']][m_object] = obj
+        
+        ## Return information about the module
         return dict(
             name=name,
             module=module,
@@ -169,7 +177,7 @@ class ExtensionsManager:
         self.enable(name, False)
     
     def get_components(self, c_type):
-        """Get all components of a given type from enabled modules.
+        """Get all components of a given type from the enabled modules.
         
         :param c_type: The type of interesting component
         :return: A list of tuples: ``('module/component', ComponentObject)``
