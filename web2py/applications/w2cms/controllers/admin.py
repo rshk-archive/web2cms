@@ -125,19 +125,8 @@ def module_enable():
     module_label = module['info']['name']
     enabled = int(request.vars.get('enabled',1))
     _form_destination = URL('admin','modules')
-#    form = FORM(
-#        DIV(T('Are you sure you want to %(action)s module %(module)s?') %
-#            dict(action=T('enable') if enabled else T('disable'), module=module_label),
-#            _class='message'),
-#        DIV(
-#            INPUT(_type='submit', _value=T('%(action)s module') %
-#                  dict(action=T('Enable') if enabled else T('Disable'))),
-#            ' ', A(T('Cancel'), _href=_form_destination),
-#            _class='buttons'
-#        ),
-#        _class='confirm-form',
-#        )
-    form = _confirm_form(
+    from helpers import confirm_form
+    form = confirm_form(
         message=T('Are you sure you want to %(action)s module %(module)s?') %
             dict(action=T('enable') if enabled else T('disable'), module=module_label),
         submit_text=T('Enable') if enabled else T('Disable'),
@@ -152,19 +141,6 @@ def module_enable():
         redirect(_form_destination)
     return dict(form=form)
 
-def _confirm_form(message=None, submit_text=None, cancel_text=None, cancel_url=None):
-    if message is None:
-        message = T('Are you sure?'),
-    if submit_text is None:
-        submit_text = T('Confirm')
-    if cancel_text is None:
-        cancel_text = T('Cancel')
-    return FORM(
-        DIV(message, _class='message'),
-        DIV(INPUT(_type='submit', _value=submit_text),
-            ' ', A(cancel_text, _href=cancel_text),
-            _class='buttons'),
-        _class='confirm-form')
 
 @cms_auth.requires_permission(auth, "administer", "blocks")
 def blocks():
@@ -172,13 +148,16 @@ def blocks():
     
     all_blocks_data = []
     for block_mgr_id, block_mgr in block_cmp:
-        for block_id,block_description in block_mgr().list_blocks():
+        for block_id,block_description in block_mgr(cms).list_blocks():
             _module, _class = block_mgr_id.split('/',1)
             all_blocks_data.append({
                 'module':_module,
                 'class':_class,
                 'id':block_id,
+                'uuid':'block--%s--%s--%s' % (_module,_class,block_id),
                 'description':block_description,
                 })
+    
+    #edit_form = SQLFORM()
     
     return dict(block_cmp=block_cmp,all_blocks=all_blocks_data)

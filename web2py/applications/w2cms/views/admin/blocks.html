@@ -13,6 +13,9 @@ REGION.highlight = True
 
 <h1>Blocks placement</h1>
 
+{{regions=cms.theme_mgr.list_regions()}}
+<div>Regions: {{=", ".join(regions)}}</div>
+
 <table class="zebra grid" style="width:100%;">
 <thead><tr>
     <th>{{=T('Module')}}</th>
@@ -29,10 +32,10 @@ REGION.highlight = True
     <td>{{=block['module']}}</td>
     <td>{{=block['class']}}</td>
     <td>{{=block['id']}}</td>
-    <td>{{=block['description']}}</td>
-    <td>{{=INPUT(_name='block--%(module)s/%(class)s/%(id)s--region' % block, _style='width:50px;')}}</td>
-    <td>???</td>
-    <td>configure</td>
+    <td class='highlight'>{{=SPAN(block['description'], _style='font-weight:bold;')}}</td>
+    <td>{{=INPUT(_name='block--%(module)s/%(class)s/%(id)s--region' % block, _style='width:120px;')}}</td>
+    <td>{{=INPUT(_name='block--%(module)s/%(class)s/%(id)s--region' % block, _style='width:60px;')}}</td>
+    <td>{{=A(T('configure'), _href=URL('admin','block_configure',args=[block['module'],block['class'],block['id']]))}}</td>
 </tr>
 {{pass}}
 </tbody>

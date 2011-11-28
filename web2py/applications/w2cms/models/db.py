@@ -221,15 +221,28 @@ db.block.body_format.requires = IS_IN_SET(
 
 ## CMS-Specific ================================================================
 
-from cms_auth import CMSAuth
-cms_auth = CMSAuth(auth)
+from cms_core import CmsCore
+cms = CmsCore(
+    db=db,
+    auth=auth,
+    request=request,
+    response=response,
+    session=session,
+    )
 
-from cms_tools import CmsDB, CMS_URL
-cmsdb = CmsDB(db=db)
+cms_auth = cms.cms_auth
+cmsdb = cms.cms_db
+cms_extm = cms.ext_mgr
+
+#from cms_auth import CMSAuth
+#cms_auth = CMSAuth(auth)
+#
+#from cms_tools import CmsDB, CMS_URL
+#cmsdb = CmsDB(db=db)
 
 from cms_tools import REGION
 REGION.highlight = False
 REGION.db = db
 
-from cms_extension import ExtensionsManager
-cms_extm = ExtensionsManager(db)
+#from cms_extension import ExtensionsManager
+#cms_extm = ExtensionsManager(db)

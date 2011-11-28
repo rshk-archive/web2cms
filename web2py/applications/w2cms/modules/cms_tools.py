@@ -14,12 +14,9 @@ so for the moment just one language is used.
 
 '''
 
-## Beware that by using __all__, classes not included here gets undocumented
-#__all__ = ['CmsDB', 'CMS_URL']
-
-
 import gluon.dal
 from gluon import *
+from gluon.tools import redirect
 from gluon.storage import Storage
 import cms_settings
 from UserDict import DictMixin
@@ -35,52 +32,6 @@ def CMS_URL(entity_type, entity_id=None, action='read', args=None, vars=None):
         args = [entity_id] + (args or [])
     return URL('default', '%s_%s' % (entity_type, action), args=args, vars=vars)
 
-def descend_tree(tree, childrenattr='components', ilev=0):
-    """Generator that yields all the children by exploring a tree.
-    
-    :param tree: The tree of objects to be explored.
-        Usually a gluon.storage.Storage
-    :param childrenattr: The attribute of the branches containing
-        children elements.
-    :param ilev: Used internally to track the indentation level
-        of the current branch.
-    
-    :return: ``ilev, element`` for each found element.
-    """
-    if not isinstance(tree, list):
-        tree = [tree]
-    for branch in tree:
-        yield (ilev, branch)
-        if hasattr(branch, childrenattr):
-            for elm in getattr(branch, childrenattr):
-                for x in descend_tree(elm, childrenattr, ilev+1):
-                    yield x
-
-def split_query_varname(varname):
-    """Split query variable name"""
-    _split = varname.split('[',1)
-    if len(_split) < 2:
-        return [_split[0]]
-    else:
-        return [_split[0]] + _split[1][:-1].split('][')
-
-def place_into(container, keys, value):
-    """Recursively place stuff into ad dict"""
-    if len(keys) == 1:
-        container[keys[0]] = value
-    else:
-        if not container.has_key(keys[0]):
-            container[keys[0]] = {}
-        place_into(container[keys[0]], keys[1:], value)
-
-def vars_to_tree(vars):
-    """Reorganize vars from query string into a tree"""
-    vars_new = {}
-    for k,v in vars.items():
-        ksplit = split_query_varname(k)
-        place_into(vars_new, ksplit, v)
-    return vars_new
-
 
 ##==============================================================================
 ## CMS Database object
@@ -90,26 +41,30 @@ class CmsDB(object):
     """Wrapper for DB, to be used to access CMS entities.
     """
     
-    _db = None
-    _auth = None
-    _managers = None
+    cms = None
+    _managers = None ## Entity managers
     
+    ##TODO: Should we manage language down here?
     _current_language = None
     _default_language = None
     _working_user = None
     
-    def __init__(self, db, language=None, user=None):
+    def __init__(self, cms, language=None, user=None):
+        self.cms = cms
+        
         ##@todo: load default language from configuration
         self._default_language = 'en-en'
-        
-        self._db = db
         self._current_language = language or self._default_language
         self._working_user = user
         self._managers = {}
         self._managers['node'] = NodeManager(self)
     
     def __getattr__(self, name):
-        if self._managers.has_key(name):
+        if name == 'db':
+            return self.cms.db
+        elif name == 'auth':
+            return self.cms.auth
+        elif self._managers.has_key(name):
             return self._managers[name]
         raise AttributeError('%r object has no attribute %r' % (type(self).__name__, name))
     
@@ -140,15 +95,23 @@ class CmsDB(object):
 ##==============================================================================
 
 class ElementManager(object):
+    """Base class for element managers
+    """
     ## To store CMSDB
+    _cms = None
     _cmsdb = None
     
     def __init__(self, cmsdb):
         self._cmsdb = cmsdb
+        self._cms = cmsdb.cms
+    
+    @property
+    def cms(self):
+        return self._cms
     
     @property
     def db(self):
-        return self._cmsdb._db
+        return self._cms.db
     
     @property
     def cmsdb(self):
@@ -170,18 +133,27 @@ class ElementManager(object):
     def current_user(self, value):
         self._cmsdb.set_working_user(value)
 
+
 class ElementEntity(object, DictMixin):
+    """Base class for element entity representation
+    """
     
     _db_row = None
     _cmsdb = None
+    _cms = None
     
     def __init__(self, db_row=None, cmsdb=None):
         self._db_row = db_row
         self._cmsdb = cmsdb
+        self._cms = cmsdb.cms
     
     @property
     def db(self):
         return self._cmsdb._db
+    
+    @property
+    def cms(self):
+        return self._cms
     
     @property
     def row(self):
@@ -520,7 +492,6 @@ class NodeManager(ElementManager):
                     current.session.flash = "New node was created - id %d" % node_id
                     db.commit()
                     ## Go to node page
-                    from gluon.tools import redirect
                     redirect(CMS_URL('node', node_id))
             
             elif action == 'update':
@@ -802,7 +773,7 @@ class NodeVersion(object, DictMixin):
             if _all_values.has_key(name):
                 return _all_values[name]
             else:
-                for k,v in _all_values.items():
+                for k in _all_values.keys():
                     try:
                         return _all_values[k][name]
                     except KeyError:
@@ -822,12 +793,18 @@ class BlocksManager(ElementManager):
     """
     
     def define_tables(self):
-        db = self.db
         pass
     
     def list_blocks(self):
+        """List all the blocks from DB"""
         db = self.db
         all_blocks = db().select(db.block.ALL)
+        return all_blocks
+    
+    def discover_blocks(self):
+        """List all blocks from all the 'block' components
+        and update cache in database."""
+        pass
 
 class REGION(DIV):
     """TODO: Use LOAD() to load region content!

@@ -227,7 +227,13 @@ def cms_component(c_type=None, label=None):
 ##          some base classes defining common methods, etc.
 ##==============================================================================
 
-class CustomController:
+class CmsExtensionBase:
+    """Base for CMS extension components"""
+    cms=None
+    def __init__(self, cms):
+        self.cms=cms
+
+class CustomController(CmsExtensionBase):
     """Base class for "custom controllers".
     
     .. NOTE::
@@ -240,7 +246,7 @@ class CustomController:
     controller_name = None
     pass
 
-class NodeTypeManager:
+class NodeTypeManager(CmsExtensionBase):
     """Base class for node type managers.
     
     .. WARNING:: This component behavior is not yet defined!
@@ -249,7 +255,7 @@ class NodeTypeManager:
     node_type_name = None
     pass
 
-class DynamicBlock:
+class DynamicBlock(CmsExtensionBase):
     """Class to define a "dynamic block" extension module component.
     """
     

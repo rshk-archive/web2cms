@@ -68,3 +68,18 @@ def _render_view_node(view_name, view_args, view_vars, db):
         node=db.node[int(view_args[0])],
         teaser=False,
         )
+
+class CmsThemeManager:
+    """This is the CMS theme manager
+    """
+    cms=None # To store the CMS core object
+    current_theme = None # Not used yet
+    
+    def __init__(self, cms):
+        pass
+    
+    def list_regions(self):
+        """List regions configured in the current theme."""
+        return ['page_pre', 'page_post', 'header_pre', 'header_post',
+                'main_pre', 'main_post', 'footer_pre', 'footer_post',
+                'right_sidebar', 'left_sidebar']
