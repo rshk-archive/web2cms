@@ -3,7 +3,7 @@ Module defining some example blocks, to be used to test modules
 functionality.
 '''
 
-from cms_extension import cms_component
+from cms_extension import cms_component, DynamicBlock
 
 cms_module_info = dict(
     name='Example Blocks',
@@ -18,3 +18,16 @@ cms_module_info = dict(
         ),
 )
 
+@cms_component('block')
+class ExampleBlocks(DynamicBlock):
+    def list_blocks(self):
+        return [
+            ('block-0', 'Example block #0'),
+            ('block-1', 'Example block #1'),
+            ('block-2', 'Example block #2'),
+        ]
+    
+    def get_block(self, block_id):
+        return dict(
+            title='Block %s' % block_id,
+            body='Content of block %s' % block_id)

@@ -69,34 +69,63 @@
     left_sidebar_enabled = globals().get('left_sidebar_enabled',True)
     right_sidebar_enabled = globals().get('right_sidebar_enabled',True)
     
-    left_sidebar_width = 160
-    right_sidebar_width = 160
-    content_width = 960
+    ## Layout type can be 'fixed' or 'fluid'
+    layout_type = globals().get('layout_type','fixed')
     
-    if left_sidebar_enabled:
-        content_width = content_width - left_sidebar_width - 20
+    layout_fixed_width = 960#px
+    left_sidebar_fixed_width = 180#px
+    right_sidebar_fixed_width = 180#px
+    
+    layout_fluid_width = 99#%
+    left_sidebar_fluid_width = 20#%
+    right_sidebar_fluid_width = 20#%
+    
+    left_sidebar_style = 'style="display: none;"'
+    right_sidebar_style = 'style="display: none;"'
+    
+    body_classes = globals().get('body_classes', [])
+    #if not isinstance(body_classes, (list,set)):
+    #    body_classes = [body_classes]
+    
+    ## Fixed layout
+    if layout_type == 'fixed':
+        content_width = layout_fixed_width
+        if left_sidebar_enabled:
+            content_width -= left_sidebar_fixed_width + 20
+            left_sidebar_style = 'style="display:table-cell;width: %dpx;"' % left_sidebar_fixed_width
+            pass
+        if right_sidebar_enabled:
+	        content_width -= right_sidebar_fixed_width + 20
+	        right_sidebar_style = 'style="display:table-cell;width: %dpx;"' % right_sidebar_fixed_width
+	        pass
+	    width_content = '%dpx' % content_width
+	    body_classes.append('fixed-width')
         pass
     
-    if right_sidebar_enabled:
-        content_width = content_width - right_sidebar_width - 20
+    ## Fluid layout
+    elif layout_type == 'fluid':
+        content_width = layout_fluid_width
+        if left_sidebar_enabled:
+            content_width -= left_sidebar_fluid_width
+            left_sidebar_style = 'style="display:table-cell;width: %d%%;"' % left_sidebar_fluid_width
+            pass
+        if right_sidebar_enabled:
+            content_width -= right_sidebar_fluid_width
+            right_sidebar_style = 'style="display:table-cell;width: %d%%;"' % right_sidebar_fluid_width
+            pass
+        width_content = '%d%%' % content_width
+        body_classes.append('fluid-width')
         pass
     
-    width_content = '%dpx' % content_width
-    
-    if left_sidebar_enabled:
-        left_sidebar_style = 'style="display: block;width: %dpx;"' % left_sidebar_width
+    ## Wrong layout type!
     else:
-        left_sidebar_style = 'style="display: none;"'
-    pass
+        raise ValueError, 'unknown layout type %r' % layout_type
+        pass
     
-    if right_sidebar_enabled:
-        right_sidebar_style = 'style="display: block;width: %dpx;"' % right_sidebar_width
-    else:
-        right_sidebar_style = 'style="display: none;"'
-    pass
+    style_content='style="display:table-cell;width:%s;"' % width_content
     
-    style_content = 'style="width: %s"' % width_content
-    #style_content = 'style="width: 50%"'
+    ## Convert body classes into string
+    body_classes = " ".join(body_classes)
     }}
     
     <!-- uncomment here to load jquery-ui -->
@@ -112,7 +141,6 @@
     
   </head>
   
-  {{body_classes=globals().get('body_classes','')}}
   <!-- paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/ -->  
   <!--[if lt IE 7 ]> <body class="ie6 {{=body_classes}}"> <![endif]-->
   <!--[if IE 7 ]>    <body class="ie7 {{=body_classes}}"> <![endif]-->

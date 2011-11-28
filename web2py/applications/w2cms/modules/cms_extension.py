@@ -187,7 +187,7 @@ class ExtensionsManager:
             module = self.load_module(module_name)
             if module['components'].has_key(c_type):
                 for cv,ck in module['components'][c_type].items():
-                    _result.append('%s/%s' % (module_name, cv), ck)
+                    _result.append(('%s/%s' % (module_name, cv), ck))
         return _result
 
 def cms_component(c_type=None, label=None):

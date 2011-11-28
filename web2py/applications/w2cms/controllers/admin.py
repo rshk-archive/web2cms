@@ -168,4 +168,17 @@ def _confirm_form(message=None, submit_text=None, cancel_text=None, cancel_url=N
 
 @cms_auth.requires_permission(auth, "administer", "blocks")
 def blocks():
-    return dict()
+    block_cmp = cms_extm.get_components('block')
+    
+    all_blocks_data = []
+    for block_mgr_id, block_mgr in block_cmp:
+        for block_id,block_description in block_mgr().list_blocks():
+            _module, _class = block_mgr_id.split('/',1)
+            all_blocks_data.append({
+                'module':_module,
+                'class':_class,
+                'id':block_id,
+                'description':block_description,
+                })
+    
+    return dict(block_cmp=block_cmp,all_blocks=all_blocks_data)

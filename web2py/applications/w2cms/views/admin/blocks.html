@@ -3,8 +3,7 @@ from cms_tools import REGION
 REGION.highlight = True
 }}
 
-
-{{#body_classes='fluid-width'}}
+{{layout_type='fluid'}}
 {{extend 'layout.html'}}
 
 {{#TODO: Use a better way to generate breadcrumbs! }}
@@ -14,3 +13,27 @@ REGION.highlight = True
 
 <h1>Blocks placement</h1>
 
+<table class="zebra grid" style="width:100%;">
+<thead><tr>
+    <th>{{=T('Module')}}</th>
+    <th>{{=T('Class')}}</th>
+    <th>{{=T('Id')}}</th>
+    <th>{{=T('Description')}}</th>
+    <th>{{=T('Region')}}</th>
+    <th>{{=T('Weight')}}</th>
+    <th>{{=T('Actions')}}</th>
+</tr></thead>
+<tbody>
+{{for block in all_blocks:}}
+<tr>
+    <td>{{=block['module']}}</td>
+    <td>{{=block['class']}}</td>
+    <td>{{=block['id']}}</td>
+    <td>{{=block['description']}}</td>
+    <td>{{=INPUT(_name='block--%(module)s/%(class)s/%(id)s--region' % block, _style='width:50px;')}}</td>
+    <td>???</td>
+    <td>configure</td>
+</tr>
+{{pass}}
+</tbody>
+</table>
