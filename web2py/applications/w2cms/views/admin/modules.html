@@ -10,10 +10,9 @@
 <h2>Extension modules</h2>
 
 <table class="zebra grid" style="width:100%;">
-<thead><tr style="border-left: solid 4px #666;">
+<thead><tr>
     <th>Name / version</th>
     <th>Dependencies</th>
-    <th>Metadata</th>
     <th>Components</th>
     <th>Actions</th>
 </tr></thead>
@@ -25,34 +24,36 @@
 {{enabled = SPAN(T('enabled'), _style="color:#0A0;")}}
 {{disabled = SPAN(T('disabled'), _style="color:#A00;")}}
 
-{{for module_id,module in modules.items():}}
+{{for module_id, module in modules.items():}}
 {{module_enabled = module_id in enabled_modules}}
-<tr class="{{='grayed-out ' if not module_enabled else ''}}" style="border-left: solid 4px {{='#0A0' if module_enabled else '#A00'}};">
+<tr>
     
-    <td>
-        <span style="font-size:1.2em;"><strong>{{=module['info'].get('name', module_id)}}</strong></span>
+    <td style="width: 40%;">
+        <!-- Name / version / status -->
+        <span style="font-size:1.2em;font-weight:bold;">{{=module['info'].get('name', module_id)}}</span>
         <em>{{=module['info'].get('version', '')}}</em>
-        ({{=enabled if module_enabled else disabled}})
-        <br/>
+        ({{=enabled if module_enabled else disabled}})<br/>
+        
+        <!-- Description -->
         {{=module['info'].get('description', '')}}<br/>
-        <hr/>
-        <strong>Module ID:</strong> {{=module_id}}
+        
+        <!-- Metadata -->
+        <div style="font-size:.8em;">
+        <strong>Module ID:</strong> {{=module_id}} -
+        {{for i,(k,v) in enumerate(module['info'].get('meta', {}).items()):}}
+	    {{=' - ' if i != 0 else ''}}<strong>{{=k.replace('_', ' ').title()}}:</strong> {{=v}}
+	    {{pass}}
+	    </div>
     </td>
     
-    <td>
+    <td style="width: 20%;">
         {{deps = module.get('dependencies')}}
         {{if deps:}}
         {{=UL(*[LI(d) for d in deps])}}
         {{pass}}
     </td>
     
-    <td>
-    {{for k,v in module['info'].get('meta', {}).items():}}
-    <strong>{{=k.replace('_', ' ').title()}}:</strong> {{=v}}<br/>
-    {{pass}}
-    </td>
-    
-    <td>
+    <td style="width: 20%;">
         {{_components = module.get('components')}}
         {{if _components:}}
 	    <ul>
@@ -65,14 +66,40 @@
 	    {{pass}}
     </td>
     
-    <td>
-        {{=A(enabled_icon, T('enable'), _href=URL('admin', 'module_enable', args=[module_id], vars=dict(enabled=1)))}}
-        {{=A(disabled_icon, T('disable'), _href=URL('admin', 'module_enable', args=[module_id], vars=dict(enabled=0)))}}
+    <td style="width: 20%;">
+        {{=A(enabled_icon, ' ', T('Enable'), _href=URL('admin', 'module_enable', args=[module_id], vars=dict(enabled=1)), _class="button")}}
+        {{=A(disabled_icon, ' ', T('Disable'), _href=URL('admin', 'module_enable', args=[module_id], vars=dict(enabled=0)), _class="button")}}
     </td>
 </tr>
 {{pass}}
 </tbody>
 </table>
+
+
+<h2>Compact view</h2>
+<table class="grid zebra" style="width:100%;">
+<thead><tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Version</th>
+    <th>Status</th>
+    <th>Actions</th>
+</tr></thead>
+<tbody>
+{{for module_id, module in modules.items():}}
+{{module_enabled = module_id in enabled_modules}}
+<tr>
+    <td>{{=module_id}}</td>
+    <td><span style="font-size:1.2em;font-weight:bold;">{{=module['info'].get('name', module_id)}}</span></td>
+    <td>{{=module['info'].get('version', '')}}</td>
+    <td>{{=enabled if module_enabled else disabled}}</td>
+    <td style="width: 20%;">
+        {{=A(enabled_icon, ' ', T('Enable'), _href=URL('admin', 'module_enable', args=[module_id], vars=dict(enabled=1)), _class="button")}}
+        {{=A(disabled_icon, ' ', T('Disable'), _href=URL('admin', 'module_enable', args=[module_id], vars=dict(enabled=0)), _class="button")}}
+    </td>
+</tr>
+{{pass}}
+</tbody></table>
 
 {{if globals().get('debug_vars', False):}}
 <h2>Debug/vars</h2>

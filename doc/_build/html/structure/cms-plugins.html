@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>CMS Plugins &mdash; web2py_cms 0.1-alpha documentation</title>
+    <title>Extension modules &mdash; web2py_cms 0.1-alpha documentation</title>
     
     <link rel="stylesheet" href="../_static/default.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -54,25 +54,49 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="cms-plugins">
-<h1>CMS Plugins<a class="headerlink" href="#cms-plugins" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="extension-modules">
+<h1>Extension modules<a class="headerlink" href="#extension-modules" title="Permalink to this headline">¶</a></h1>
 <div class="admonition-todo admonition " id="index-0">
 <p class="first admonition-title">Todo</p>
-<p class="last">Find a non-clashing name for the cms plugins/components/pieces/..</p>
+<p class="last">&#8220;Extension modules&#8221; is a non-conflicting name, but we could improve
+by replacing it with something better (a single word would be perfect).
+But (module, component, plugin) are already taken and I don&#8217;t
+like calling them &#8220;add-on&#8221;.</p>
 </div>
-<p>Each <strong>CMS plugin</strong> is a Python module (or package), placed in the
-<tt class="docutils literal"><span class="pre">cms_plugins</span></tt>, inside the w2cms application folder.</p>
-<div class="section" id="the-cms-plugin-info">
-<h2>The <tt class="docutils literal"><span class="pre">cms_plugin_info</span></tt><a class="headerlink" href="#the-cms-plugin-info" title="Permalink to this headline">¶</a></h2>
-<p>In order to be successfully recognised as a plugin, and subsequentially
-loaded, it is required to contain a dict named <tt class="docutils literal"><span class="pre">cms_plugin_info</span></tt>,
-structured like this:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">cms_plugin_info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s">&#39;Example Plugin&#39;</span><span class="p">,</span> <span class="c">## Plugin descriptive label</span>
+<p>Each <strong>Extension module</strong> is a Python module (or package), placed
+in a given search path.</p>
+<p>By default, the search path includes <tt class="docutils literal"><span class="pre">cms_modules_core</span></tt>
+and <tt class="docutils literal"><span class="pre">cms_modules_extra</span></tt> directories in the application folder, where
+the first one is meant for modules shipped along with the CMS, and
+the second for the extra downloaded modules.</p>
+<div class="section" id="the-cms-module-info-dict">
+<h2>The <tt class="docutils literal"><span class="pre">cms_module_info</span></tt> dict<a class="headerlink" href="#the-cms-module-info-dict" title="Permalink to this headline">¶</a></h2>
+<p>In order to be successfully recognized as a valid extension module,
+the module must contain a dict named <tt class="docutils literal"><span class="pre">cms_module_info</span></tt>, containing
+something like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">cms_module_info</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+    <span class="c">## Plugin descriptive label. Defaults to module name</span>
+    <span class="n">name</span><span class="o">=</span><span class="s">&#39;Example Plugin&#39;</span><span class="p">,</span>
+
+    <span class="c">## Short description for this module</span>
     <span class="n">description</span><span class="o">=</span><span class="s">&#39;Just an example plugin&#39;</span><span class="p">,</span>
-    <span class="n">version</span><span class="o">=</span><span class="s">&#39;0.1-alpha&#39;</span><span class="p">,</span> <span class="c">## Version of the cms_plugin</span>
-    <span class="n">core_version</span><span class="o">=</span><span class="s">&#39;0.1&#39;</span><span class="p">,</span> <span class="c">## Minimum required core version</span>
-    <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[],</span> <span class="c">## Other cms_plugins this plugin depends on</span>
+
+    <span class="c">## Version of the extension module</span>
+    <span class="n">version</span><span class="o">=</span><span class="s">&#39;0.1-alpha&#39;</span><span class="p">,</span>
+
+    <span class="c">## Minimum required core version</span>
+    <span class="n">core_version</span><span class="o">=</span><span class="s">&#39;0.1&#39;</span><span class="p">,</span>
+
+    <span class="c">## List of other extension modules this module depends on</span>
+    <span class="c">## In future, will be expanded to something more complex</span>
+    <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[],</span>
+
+    <span class="c">## Module metadata</span>
+    <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+        <span class="n">author</span><span class="o">=</span><span class="s">&#39;Samuele Santi &lt;samuele@santi.co.it&gt;&#39;</span><span class="p">,</span>
+        <span class="n">license</span><span class="o">=</span><span class="s">&#39;GPL&#39;</span><span class="p">,</span>
+        <span class="n">website</span><span class="o">=</span><span class="s">&#39;http://w2cms.com&#39;</span><span class="p">,</span>
+    <span class="p">),</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -112,14 +136,293 @@ as dependency on specific version(s), conflict, ...</p>
 used in place of another, or to provide some kind of service on
 which other plugins relay (such as user management or mail service)</p>
 </div>
+<dl class="docutils">
+<dt>meta</dt>
+<dd><p class="first">Some metadata related to the module. Although this may contain
+anything, currently supported keys are:</p>
+<dl class="last docutils">
+<dt>author</dt>
+<dd>Module author&#8217;s name (and possibly email). Comma-separate
+multiple author names.</dd>
+<dt>license</dt>
+<dd>Identifier of the license under which the module is released.
+This is not well defined atm.</dd>
+<dt>website</dt>
+<dd>Homepage of the module</dd>
+<dt>package</dt>
+<dd>Name of the &#8220;package&#8221; this module belongs to.
+Packages are used to categorize modules in the administrative
+interface.</dd>
+</dl>
+</dd>
+</dl>
 </div>
-<div class="section" id="other-cms-plugin-members">
-<h2>Other cms_plugin members<a class="headerlink" href="#other-cms-plugin-members" title="Permalink to this headline">¶</a></h2>
-<p>Plugins can contain several objects, to be used to change or enhance
-behavior of the CMS or other plugins.
-When a plugin is loaded, its content is scanned for sub-classes of some
-well-known objects.</p>
-<p>Found matching objects can then be instantiated and used.</p>
+<div class="section" id="defining-extension-components">
+<h2>Defining extension components<a class="headerlink" href="#defining-extension-components" title="Permalink to this headline">¶</a></h2>
+<p>Extension modules can contain several components that can then be loaded
+and used by the core or other modules.</p>
+<p>To find such components, a special <tt class="docutils literal"><span class="pre">&#64;component</span></tt> decorator is used.</p>
+</div>
+<div class="section" id="code-documentation">
+<h2>Code documentation<a class="headerlink" href="#code-documentation" title="Permalink to this headline">¶</a></h2>
+<p>Following is developers documentation of the underlying objects and API.</p>
+<div class="section" id="extension-manager">
+<h3>Extension manager<a class="headerlink" href="#extension-manager" title="Permalink to this headline">¶</a></h3>
+<p>The extension manager is instantiated as <tt class="docutils literal"><span class="pre">cms_extm</span></tt> in the <tt class="docutils literal"><span class="pre">db</span></tt> model,
+and accessible from all controllers that needs to operate on with
+extension modules.</p>
+<div class="admonition-todo admonition " id="index-1">
+<p class="first admonition-title">Todo</p>
+<p class="last">We need a smooth way to make it accessible to modules too..</p>
+</div>
+<dl class="class">
+<dt id="cms_extension.ExtensionsManager">
+<em class="property">class </em><tt class="descclassname">cms_extension.</tt><tt class="descname">ExtensionsManager</tt><big>(</big><em>db</em><big>)</big><a class="headerlink" href="#cms_extension.ExtensionsManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extensions manager for the CMS</p>
+<dl class="method">
+<dt id="cms_extension.ExtensionsManager.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>db</em><big>)</big><a class="headerlink" href="#cms_extension.ExtensionsManager.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>ExtensionsManager class constructor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>db</strong> &#8211; A valid <tt class="docutils literal"><span class="pre">DAL()</span></tt> connection object.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cms_extension.ExtensionsManager.define_tables">
+<tt class="descname">define_tables</tt><big>(</big><big>)</big><a class="headerlink" href="#cms_extension.ExtensionsManager.define_tables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Define needed tables for the extension manager.
+This is automatically called by constructor if a valid <tt class="docutils literal"><span class="pre">db</span></tt>
+is passed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cms_extension.ExtensionsManager.list_available_modules">
+<tt class="descname">list_available_modules</tt><big>(</big><big>)</big><a class="headerlink" href="#cms_extension.ExtensionsManager.list_available_modules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use <tt class="docutils literal"><span class="pre">pkgutil</span></tt> to list names of all the available
+extension modules, from _extensions_search_path.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Names of modules found in path</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list of strings</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cms_extension.ExtensionsManager.list_enabled_modules">
+<tt class="descname">list_enabled_modules</tt><big>(</big><big>)</big><a class="headerlink" href="#cms_extension.ExtensionsManager.list_enabled_modules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lists the enabled modules from database.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Names of the enabled modules</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list of strings</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cms_extension.ExtensionsManager.load_module">
+<tt class="descname">load_module</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#cms_extension.ExtensionsManager.load_module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load and return the specified module from path.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<em>string</em>) &#8211; The module name</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cms_extension.ExtensionsManager.discover_modules">
+<tt class="descname">discover_modules</tt><big>(</big><big>)</big><a class="headerlink" href="#cms_extension.ExtensionsManager.discover_modules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Discover extension modules in the extensions search path.</p>
+<p><strong>How this works</strong></p>
+<p>Extension modules should be placed inside a given search path.
+By default, that path includes the following directories in
+the CMS application directory:</p>
+<blockquote>
+<div><ul class="simple">
+<li><tt class="docutils literal"><span class="pre">cms_modules_core</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">cms_modules_extra</span></tt></li>
+</ul>
+</div></blockquote>
+<p>Where <tt class="docutils literal"><span class="pre">cms_modules_core</span></tt> contains the &#8220;core&#8221; modules shipped
+along with the application itself, and <tt class="docutils literal"><span class="pre">cms_modules_extra</span></tt>
+is there to contain third-party modules.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><tt class="docutils literal"><span class="pre">cms_modules_extra</span></tt> should take the precedence,
+in order to allow overriding of core modules [?]</p>
+</div>
+<p>Then, <tt class="docutils literal"><span class="pre">pkgutil.walk_packages()</span></tt> is used to explore contents
+of the directories in path.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cms_extension.ExtensionsManager.enable">
+<tt class="descname">enable</tt><big>(</big><em>name</em>, <em>enabled=True</em><big>)</big><a class="headerlink" href="#cms_extension.ExtensionsManager.enable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enable the specified extension module.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<em>string</em>) &#8211; The module name</li>
+<li><strong>enabled</strong> (<em>boolean</em>) &#8211; Whether to mark the module as enabled or disabled</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cms_extension.ExtensionsManager.disable">
+<tt class="descname">disable</tt><big>(</big><em>name</em><big>)</big><a class="headerlink" href="#cms_extension.ExtensionsManager.disable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Disable the specified extension module, by calling
+<tt class="docutils literal"><span class="pre">self.enable(name,</span> <span class="pre">False)</span></tt>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cms_extension.ExtensionsManager.get_components">
+<tt class="descname">get_components</tt><big>(</big><em>c_type</em><big>)</big><a class="headerlink" href="#cms_extension.ExtensionsManager.get_components" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all components of a given type from enabled modules.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>c_type</strong> &#8211; The type of interesting component</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A list of tuples: <tt class="docutils literal"><span class="pre">('module/component',</span> <span class="pre">ComponentObject)</span></tt></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="cms-component-decorator">
+<h3><tt class="docutils literal"><span class="pre">&#64;cms_component()</span></tt> decorator<a class="headerlink" href="#cms-component-decorator" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="cms_extension.cms_component">
+<tt class="descclassname">cms_extension.</tt><tt class="descname">cms_component</tt><big>(</big><em>c_type=None</em>, <em>label=None</em><big>)</big><a class="headerlink" href="#cms_extension.cms_component" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorator to be used to mark an extension module component.</p>
+<p>To mark the component, an additional <tt class="docutils literal"><span class="pre">cms_ext_info</span></tt> attribute
+will be added to it.
+It is a dict, with the following keys:</p>
+<dl class="docutils">
+<dt>type</dt>
+<dd>The value passed as <tt class="docutils literal"><span class="pre">c_type</span></tt></dd>
+<dt>label</dt>
+<dd>The value passed as <tt class="docutils literal"><span class="pre">label</span></tt></dd>
+<dt>name</dt>
+<dd>The component <tt class="docutils literal"><span class="pre">__name__</span></tt></dd>
+<dt>module</dt>
+<dd>The component <tt class="docutils literal"><span class="pre">__module__</span></tt></dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>c_type</strong> &#8211; The component type</li>
+<li><strong>label</strong> &#8211; An optional label to be attached to this component.
+Defaults to <tt class="docutils literal"><span class="pre">module.name</span></tt>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="dynamic-block-component">
+<h3>Dynamic block component<a class="headerlink" href="#dynamic-block-component" title="Permalink to this headline">¶</a></h3>
+<p>This type of extension module component is used to generate dynamic
+blocks that can be placed inside the theme regions.</p>
+<dl class="class">
+<dt id="cms_extension.DynamicBlock">
+<em class="property">class </em><tt class="descclassname">cms_extension.</tt><tt class="descname">DynamicBlock</tt><a class="headerlink" href="#cms_extension.DynamicBlock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to define a &#8220;dynamic block&#8221; extension module component.</p>
+<dl class="method">
+<dt id="cms_extension.DynamicBlock.list_blocks">
+<tt class="descname">list_blocks</tt><big>(</big><big>)</big><a class="headerlink" href="#cms_extension.DynamicBlock.list_blocks" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method should return a list of defined blocks.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list of <tt class="docutils literal"><span class="pre">(id,</span> <span class="pre">description)</span></tt> tuples</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="cms_extension.DynamicBlock.get_block">
+<tt class="descname">get_block</tt><big>(</big><em>block_id</em><big>)</big><a class="headerlink" href="#cms_extension.DynamicBlock.get_block" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method should return the content of the specified block.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><tt class="docutils literal"><span class="pre">dict(title='...',</span> <span class="pre">body='...')</span></tt></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="node-type-manager-component">
+<h3>Node type manager component<a class="headerlink" href="#node-type-manager-component" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="cms_extension.NodeTypeManager">
+<em class="property">class </em><tt class="descclassname">cms_extension.</tt><tt class="descname">NodeTypeManager</tt><a class="headerlink" href="#cms_extension.NodeTypeManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for node type managers.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This component behavior is not yet defined!</p>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="custom-controller-component">
+<h3>Custom controller component<a class="headerlink" href="#custom-controller-component" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="cms_extension.CustomController">
+<em class="property">class </em><tt class="descclassname">cms_extension.</tt><tt class="descname">CustomController</tt><a class="headerlink" href="#cms_extension.CustomController" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base class for &#8220;custom controllers&#8221;.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Custom controllers are used like standard web2py controllers,
+but they should respond on: <tt class="docutils literal"><span class="pre">plugin_ctl/&lt;plugin_name&gt;/&lt;controller_name&gt;</span></tt></p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This component behavior is not yet defined!</p>
+</div>
+</dd></dl>
+
+</div>
 </div>
 </div>
 
@@ -131,9 +434,17 @@ well-known objects.</p>
         <div class="sphinxsidebarwrapper">
   <h3><a href="../index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">CMS Plugins</a><ul>
-<li><a class="reference internal" href="#the-cms-plugin-info">The <tt class="docutils literal"><span class="pre">cms_plugin_info</span></tt></a></li>
-<li><a class="reference internal" href="#other-cms-plugin-members">Other cms_plugin members</a></li>
+<li><a class="reference internal" href="#">Extension modules</a><ul>
+<li><a class="reference internal" href="#the-cms-module-info-dict">The <tt class="docutils literal"><span class="pre">cms_module_info</span></tt> dict</a></li>
+<li><a class="reference internal" href="#defining-extension-components">Defining extension components</a></li>
+<li><a class="reference internal" href="#code-documentation">Code documentation</a><ul>
+<li><a class="reference internal" href="#extension-manager">Extension manager</a></li>
+<li><a class="reference internal" href="#cms-component-decorator"><tt class="docutils literal"><span class="pre">&#64;cms_component()</span></tt> decorator</a></li>
+<li><a class="reference internal" href="#dynamic-block-component">Dynamic block component</a></li>
+<li><a class="reference internal" href="#node-type-manager-component">Node type manager component</a></li>
+<li><a class="reference internal" href="#custom-controller-component">Custom controller component</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
