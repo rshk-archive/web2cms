@@ -3,10 +3,13 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to web2cms's documentation!
-======================================
+*******************************************
+Welcome to web2cms |version| documentation!
+*******************************************
 
 **web2cms** is the project for a web2py_-based Content Management System.
+
+Project homepage: http://w2cms.com
 
 Documentation topics
 ====================
@@ -30,11 +33,15 @@ Documentation topics
 
 **Actual structure**
 
+| :doc:`structure/elements`
+| Definition of the base elements.
+
 | :doc:`modules/index`
-| Documentation of cms-specific modules and tools
+| Documentation of CMS-specific modules and tools.
 
 | :doc:`structure/cms-plugins`
-| Structure of a CMS plugin
+| Structure of a CMS plugin.
+
 
 .. raw:: html
 
@@ -46,16 +53,28 @@ Documentation topics
 **Discussion/planning**
 
 | :doc:`brainstorming/index`
-| Brainstorming / discussions on the new features
+| Brainstorming / discussions on the new features.
 
 | :doc:`use-cases/index`
-| Discussion of possible use cases for a CMS
+| Discussion of possible use cases for a CMS.
 
+| :doc:`brainstorming/problems-with-web2py`
+| List of relevant problems with the web2py core.
 
 
 .. raw:: html
 
     </td></tr></table></div>
+
+
+Project links
+=============
+
+* `Project homepage <http://w2cms.com>`_
+* `Online documentation <http://w2cms.com/doc/_build/html/>`_
+* `GitHub project page <https://github.com/rshk/web2cms>`_
+* ``#web2cms`` on `twitter <https://twitter.com/search/%23web2cms>`_
+  / `identica <https://identi.ca/tag/web2cms>`_
 
 
 Indices and tables
@@ -74,6 +93,7 @@ Indices and tables
 * :ref:`search`
 
 
-.. @@@@@ LINKS @@@@@
+.. @@@@@ LINKS DOWN HERE @@@@@
 
 .. _web2py: http://web2py.com
+

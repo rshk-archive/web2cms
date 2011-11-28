@@ -38,10 +38,10 @@ Table of Contents
 .. toctree::
    :maxdepth: 2
 
-   component-structure
    content-types
-   elements
    translations
+   problems-with-web2py
+   /structure/elements
 
 
 

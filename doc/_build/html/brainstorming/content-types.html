@@ -28,7 +28,7 @@
     <link rel="top" title="web2py_cms 0.1-alpha documentation" href="../index.html" />
     <link rel="up" title="Brainstorming" href="index.html" />
     <link rel="next" title="CMS Elements" href="elements.html" />
-    <link rel="prev" title="Components structure" href="component-structure.html" /> 
+    <link rel="prev" title="Brainstorming" href="index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -44,7 +44,7 @@
           <a href="elements.html" title="CMS Elements"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="component-structure.html" title="Components structure"
+          <a href="index.html" title="Brainstorming"
              accesskey="P">previous</a> |</li>
         <li><a href="../index.html">web2py_cms 0.1-alpha documentation</a> &raquo;</li>
           <li><a href="index.html" accesskey="U">Brainstorming</a> &raquo;</li> 
@@ -60,34 +60,42 @@
 <h1>Default content types<a class="headerlink" href="#default-content-types" title="Permalink to this headline">¶</a></h1>
 <p>This is a list of content types that should be defined / handled
 in order to test / support a wide range of needed features.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">We should create modules defining <a href="#id1"><span class="problematic" id="id2">``</span></a>NodeTypeController``s, in order
+to allow definition of these content types!
+We don&#8217;t want content-types to be defined in core.
+Plus, we may need a way to handle user-defined content types -&gt; how to?</p>
+</div>
 <div class="section" id="page">
 <h2>Page<a class="headerlink" href="#page" title="Permalink to this headline">¶</a></h2>
-<p>Standard pages, to be placed in menus etc.</p>
-<p><strong>Fields:</strong></p>
-<ul class="simple">
-<li>Title</li>
-<li>Body</li>
-</ul>
+<p>Standard pages. Should have a <tt class="docutils literal"><span class="pre">title</span></tt> and <tt class="docutils literal"><span class="pre">body</span></tt>.
+May be inserted in menus (by using standard menu items association).</p>
 </div>
 <div class="section" id="article">
 <h2>Article<a class="headerlink" href="#article" title="Permalink to this headline">¶</a></h2>
-<p>For blog posts, etc.</p>
-<p><strong>Fields:</strong></p>
-<ul class="simple">
-<li>Title</li>
-<li>Body</li>
-<li>Picture (it&#8217;s nice to have a small picture for each blog post)</li>
-</ul>
+<p>Articles are used for &#8220;feed-like&#8221; content, such as blog posts, news, etc.
+The only additional field might be <tt class="docutils literal"><span class="pre">picture</span></tt> to allow adding an image
+to the post.</p>
+<p>The main difference then will be in views / rendering of the content / etc.</p>
 </div>
 <div class="section" id="photo">
 <h2>Photo<a class="headerlink" href="#photo" title="Permalink to this headline">¶</a></h2>
-<p>Represents a single photo. Photos can then be grouped in galleries.</p>
-<p><strong>Fields:</strong></p>
-<ul class="simple">
-<li>Photo</li>
-<li>Title</li>
-<li>Description</li>
-</ul>
+<p>Represents a single photo.
+Fields may be: <tt class="docutils literal"><span class="pre">photo</span></tt>, <tt class="docutils literal"><span class="pre">title</span></tt>, <tt class="docutils literal"><span class="pre">description</span></tt>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">To group photos into galleries, use <strong>taxonomy</strong>.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">To associate a location, use the <strong>attributes</strong></p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">We&#8217;ll need some <strong>image management</strong> to scale photos, apply effects,
+etc. -&gt; write that</p>
+</div>
 </div>
 </div>
 
@@ -108,8 +116,8 @@ in order to test / support a wide range of needed features.</p>
 </ul>
 
   <h4>Previous topic</h4>
-  <p class="topless"><a href="component-structure.html"
-                        title="previous chapter">Components structure</a></p>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Brainstorming</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="elements.html"
                         title="next chapter">CMS Elements</a></p>
@@ -148,7 +156,7 @@ in order to test / support a wide range of needed features.</p>
           <a href="elements.html" title="CMS Elements"
              >next</a> |</li>
         <li class="right" >
-          <a href="component-structure.html" title="Components structure"
+          <a href="index.html" title="Brainstorming"
              >previous</a> |</li>
         <li><a href="../index.html">web2py_cms 0.1-alpha documentation</a> &raquo;</li>
           <li><a href="index.html" >Brainstorming</a> &raquo;</li> 

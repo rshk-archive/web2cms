@@ -26,7 +26,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="top" title="web2py_cms 0.1-alpha documentation" href="../index.html" />
-    <link rel="next" title="Components structure" href="component-structure.html" />
+    <link rel="next" title="Default content types" href="content-types.html" />
     <link rel="prev" title="Welcome to web2cms’s documentation!" href="../index.html" /> 
   </head>
   <body>
@@ -40,7 +40,7 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="component-structure.html" title="Components structure"
+          <a href="content-types.html" title="Default content types"
              accesskey="N">next</a> |</li>
         <li class="right" >
           <a href="../index.html" title="Welcome to web2cms’s documentation!"
@@ -93,35 +93,35 @@ but it would be useful to have.</p>
 <h2>Table of Contents<a class="headerlink" href="#table-of-contents" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="component-structure.html">Components structure</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="component-structure.html#what-components-should-be-able-to-do">What components should be able to do</a></li>
-<li class="toctree-l2"><a class="reference internal" href="component-structure.html#how-to-read-components">How to read components</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="content-types.html">Default content types</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="content-types.html#page">Page</a></li>
 <li class="toctree-l2"><a class="reference internal" href="content-types.html#article">Article</a></li>
 <li class="toctree-l2"><a class="reference internal" href="content-types.html#photo">Photo</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="elements.html">CMS Elements</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="elements.html#generic-re-used-fields">Generic, re-used fields</a></li>
-<li class="toctree-l2"><a class="reference internal" href="elements.html#user">User</a></li>
-<li class="toctree-l2"><a class="reference internal" href="elements.html#group">Group</a></li>
-<li class="toctree-l2"><a class="reference internal" href="elements.html#node">Node</a></li>
-<li class="toctree-l2"><a class="reference internal" href="elements.html#taxonomy-tags">Taxonomy/tags</a></li>
-<li class="toctree-l2"><a class="reference internal" href="elements.html#comment">Comment</a></li>
-<li class="toctree-l2"><a class="reference internal" href="elements.html#flag">Flag</a></li>
-<li class="toctree-l2"><a class="reference internal" href="elements.html#relationship">Relationship</a></li>
-<li class="toctree-l2"><a class="reference internal" href="elements.html#menu">Menu</a></li>
-<li class="toctree-l2"><a class="reference internal" href="elements.html#menu-link">Menu link</a></li>
-<li class="toctree-l2"><a class="reference internal" href="elements.html#content-display">Content display</a></li>
-<li class="toctree-l2"><a class="reference internal" href="elements.html#configuration">Configuration</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="translations.html">Translation support</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="translations.html#desired-language-discovery">Desired language discovery</a></li>
 <li class="toctree-l2"><a class="reference internal" href="translations.html#generic-table-translation">Generic table translation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="problems-with-web2py.html">Problems with web2py core</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="problems-with-web2py.html#multi-field-unique-keys">Multi-field UNIQUE keys</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../structure/elements.html">CMS Elements</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../structure/elements.html#multi-purpose-fields">Multi-purpose fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../structure/elements.html#element-translation">Element translation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../structure/elements.html#users-and-groups">Users and groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../structure/elements.html#the-node-element">The <tt class="docutils literal"><span class="pre">node</span></tt> element</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../structure/elements.html#the-comment-element">The <tt class="docutils literal"><span class="pre">comment</span></tt> element</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../structure/elements.html#taxonomy-and-terms">Taxonomy and terms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../structure/elements.html#additional-attributes">Additional attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../structure/elements.html#flagging">Flagging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../structure/elements.html#relationship">Relationship</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../structure/elements.html#tree-structure">Tree structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../structure/elements.html#menu-and-links">Menu and links</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../structure/elements.html#the-display-element">The <tt class="docutils literal"><span class="pre">display</span></tt> element</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../structure/elements.html#configuration-and-settings">Configuration and settings</a></li>
 </ul>
 </li>
 </ul>
@@ -520,8 +520,8 @@ the CMS.</p>
   <p class="topless"><a href="../index.html"
                         title="previous chapter">Welcome to web2cms&#8217;s documentation!</a></p>
   <h4>Next topic</h4>
-  <p class="topless"><a href="component-structure.html"
-                        title="next chapter">Components structure</a></p>
+  <p class="topless"><a href="content-types.html"
+                        title="next chapter">Default content types</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="../_sources/brainstorming/index.txt"
@@ -554,7 +554,7 @@ the CMS.</p>
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="component-structure.html" title="Components structure"
+          <a href="content-types.html" title="Default content types"
              >next</a> |</li>
         <li class="right" >
           <a href="../index.html" title="Welcome to web2cms’s documentation!"

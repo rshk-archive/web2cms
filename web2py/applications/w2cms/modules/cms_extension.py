@@ -182,6 +182,43 @@ class ExtensionsManager:
                     _result.append('%s/%s' % (module_name, cv), ck)
         return _result
 
+def cms_component(c_type=None, label=None):
+    """Decorator to be used to mark an extension module component.
+    
+    To mark the component, an additional ``cms_ext_info`` attribute
+    will be added to it.
+    It is a dict, with the following keys:
+    
+    type
+        The value passed as ``c_type``
+    label
+        The value passed as ``label``
+    name
+        The component ``__name__``
+    module
+        The component ``__module__``
+    
+    :param c_type: The component type
+    :param label: An optional label to be attached to this component.
+        Defaults to ``module.name``.
+    """
+    def decorator(c):
+        c.cms_ext_info = dict(
+            type = c_type,
+            name = c.__name__,
+            module = c.__module__,
+            label = label or ("%s.%s" % (c.__module__, c.__name__))
+        )
+        return c
+    return decorator
+
+##==============================================================================
+## Base classes to be used for some components.
+##
+## Warning: their use is not mandatory, it is just useful to have
+##          some base classes defining common methods, etc.
+##==============================================================================
+
 class CustomController:
     """Base class for "custom controllers".
     
@@ -222,35 +259,6 @@ class DynamicBlock:
         """
         raise NotImplementedError
 
-def cms_component(c_type=None, label=None):
-    """Decorator to be used to mark an extension module component.
-    
-    To mark the component, an additional ``cms_ext_info`` attribute
-    will be added to it.
-    It is a dict, with the following keys:
-    
-    type
-        The value passed as ``c_type``
-    label
-        The value passed as ``label``
-    name
-        The component ``__name__``
-    module
-        The component ``__module__``
-    
-    :param c_type: The component type
-    :param label: An optional label to be attached to this component.
-        Defaults to ``module.name``.
-    """
-    def decorator(c):
-        c.cms_ext_info = dict(
-            type = c_type,
-            name = c.__name__,
-            module = c.__module__,
-            label = label or ("%s.%s" % (c.__module__, c.__name__))
-        )
-        return c
-    return decorator
 
 def get_component_info(c):
     try:

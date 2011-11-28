@@ -5,36 +5,41 @@ Default content types
 This is a list of content types that should be defined / handled
 in order to test / support a wide range of needed features.
 
+.. NOTE::
+    We should create modules defining ``NodeTypeController``s, in order
+    to allow definition of these content types!
+    We don't want content-types to be defined in core.
+    Plus, we may need a way to handle user-defined content types -> how to?
+
 Page
 ====
 
-Standard pages, to be placed in menus etc.
-
-**Fields:**
-
-* Title
-* Body
+Standard pages. Should have a ``title`` and ``body``.
+May be inserted in menus (by using standard menu items association).
 
 
 Article
 =======
 
-For blog posts, etc.
+Articles are used for "feed-like" content, such as blog posts, news, etc.
+The only additional field might be ``picture`` to allow adding an image
+to the post.
 
-**Fields:**
-
-* Title
-* Body
-* Picture (it's nice to have a small picture for each blog post)
+The main difference then will be in views / rendering of the content / etc.
 
 
 Photo
 =====
 
-Represents a single photo. Photos can then be grouped in galleries.
+Represents a single photo.
+Fields may be: ``photo``, ``title``, ``description``.
 
-**Fields:**
+.. NOTE::
+    To group photos into galleries, use **taxonomy**.
 
-* Photo
-* Title
-* Description
+.. NOTE::
+    To associate a location, use the **attributes**
+
+.. NOTE::
+    We'll need some **image management** to scale photos, apply effects,
+    etc. -> write that

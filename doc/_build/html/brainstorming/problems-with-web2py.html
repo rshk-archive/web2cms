@@ -1,0 +1,124 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Problems with web2py core &mdash; web2py_cms 0.1-alpha documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1-alpha',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="web2py_cms 0.1-alpha documentation" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">web2py_cms 0.1-alpha documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="problems-with-web2py-core">
+<h1>Problems with web2py core<a class="headerlink" href="#problems-with-web2py-core" title="Permalink to this headline">¶</a></h1>
+<p>This is a list of all the issues found with the web2py core and other
+framework-related stuff.</p>
+<div class="section" id="multi-field-unique-keys">
+<span id="issues-multi-field-unique-keys"></span><h2>Multi-field UNIQUE keys<a class="headerlink" href="#multi-field-unique-keys" title="Permalink to this headline">¶</a></h2>
+<p>In many cases we need to ensure uniqueness on multi-field values,
+such as entity references, or <tt class="docutils literal"><span class="pre">record,language</span></tt> for translations, ..</p>
+<p>By default, web2py&#8217;s <tt class="docutils literal"><span class="pre">DAL</span></tt> doesn&#8217;t provide the ability to create
+such multi-field UNIQUE keys so, while we try to ensure key uniqueness
+on the application side, we should find another way to enforce this
+on the database side too.</p>
+<p>These are two ways to accomplish this:</p>
+<ul class="simple">
+<li>Use <tt class="docutils literal"><span class="pre">executesql()</span></tt> upon table creation to define unique keys,
+with different queries depending on the in use database type.</li>
+<li>Create a computed field containing values from the fields in the
+unique key group, and place an <tt class="docutils literal"><span class="pre">unique=True</span></tt> on that field definition.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Problems with web2py core</a><ul>
+<li><a class="reference internal" href="#multi-field-unique-keys">Multi-field UNIQUE keys</a></li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/brainstorming/problems-with-web2py.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../index.html">web2py_cms 0.1-alpha documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, Samuele Santi &lt;redshadow@hackzine.org&gt;.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.
+    </div>
+  </body>
+</html>
